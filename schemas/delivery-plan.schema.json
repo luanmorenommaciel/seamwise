@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/delivery-plan-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "seam_map_sha256", "swimlanes", "legs", "steel_thread", "steel_thread_path", "steel_thread_sha256", "objections", "contentions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["DELIVERY_PLAN=READY", "DELIVERY_PLAN=NEEDS_REVIEW", "DELIVERY_PLAN=OPEN_OBJECTIONS", "DELIVERY_PLAN=NEEDS_OWNER_INPUT", "DELIVERY_PLAN=NEEDS_ARCHITECTURE_DECISION", "DELIVERY_PLAN=ERROR"]},
+    "seam_map_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "review_authority_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "swimlanes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "seam_id", "owner", "path", "sha256"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^LANE-"},
+          "seam_id": {"type": "string", "pattern": "^SEAM-"},
+          "owner": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "pattern": "^seamwise/swimlanes/LANE-[A-Z0-9-]+\\.md$"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "legs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "seam_id", "swimlane_id", "path", "sha256"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^LEG-"},
+          "seam_id": {"type": "string", "pattern": "^SEAM-"},
+          "swimlane_id": {"type": "string", "pattern": "^LANE-"},
+          "path": {"type": "string", "pattern": "^seamwise/legs/LEG-[A-Z0-9-]+\\.md$"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "steel_thread": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "steel_thread_path": {"const": "seamwise/steel-thread.md"},
+    "steel_thread_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "objections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "summary"],
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"enum": ["FIXED", "ACCEPTED", "OPEN"]},
+          "summary": {"type": "string", "minLength": 1},
+          "owner": {"type": "string", "minLength": 1},
+          "rationale": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "contentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["between", "resolution", "order"],
+        "properties": {
+          "between": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^T-"}},
+          "resolution": {"type": "string", "minLength": 1},
+          "order": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^T-"}}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Compile Task Graph"
+  short_description: "Compile dependency-safe atomic work"
+  default_prompt: "Use $to-task-graph to compile this reviewed plan into a lineage-complete task graph."

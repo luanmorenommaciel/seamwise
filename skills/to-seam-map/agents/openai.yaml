@@ -1,0 +1,4 @@
+interface:
+  display_name: "Map System Seams"
+  short_description: "Find evidence-backed system boundaries"
+  default_prompt: "Use $to-seam-map to identify and challenge the real seams for this delivery intent."

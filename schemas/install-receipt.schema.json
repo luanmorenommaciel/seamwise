@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/install-receipt-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "seamwise_version", "host", "scope", "base", "installed_at", "entries"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "seamwise_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "host": {"enum": ["codex", "claude"]},
+    "scope": {"enum": ["project", "user"]},
+    "base": {"type": "string", "minLength": 1},
+    "installed_at": {"type": "string", "format": "date-time"},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["skill", "target", "sha256", "files"],
+        "properties": {
+          "skill": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "files": {"type": "integer", "minimum": 1}
+        }
+      }
+    }
+  }
+}

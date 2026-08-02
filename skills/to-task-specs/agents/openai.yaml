@@ -1,0 +1,4 @@
+interface:
+  display_name: "Materialize Task Specs"
+  short_description: "Create proof-bearing Task-Spec contracts"
+  default_prompt: "Use $to-task-specs to materialize this ready task graph as validated, unsealed Task-Specs."

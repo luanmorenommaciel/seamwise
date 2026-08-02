@@ -90,7 +90,7 @@
   <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
     <text x="72" y="74" fill="#80a0b9" font-size="18" font-weight="700" letter-spacing="4">SEAMWISE DECOMPOSITION</text>
     <text x="72" y="116" fill="#f4f8fb" font-size="28" font-weight="720">Intent → structure → progression → proof</text>
-    <text x="1702" y="86" fill="#68879e" font-size="15" text-anchor="end" letter-spacing="2">TARGET ARCHITECTURE</text>
+    <text x="1702" y="86" fill="#68879e" font-size="15" text-anchor="end" letter-spacing="2">COMPILER · v0.1.0 ALPHA</text>
 
     <g fill="#7f9cb2" font-size="15" font-weight="700" letter-spacing="2">
       <text x="194" y="194" text-anchor="middle">DELIVERY INTENT</text>
@@ -126,10 +126,10 @@
       <rect x="448" y="566" width="198" height="84" rx="18" fill="#0d2030" stroke="#f2ad45" stroke-width="2" />
     </g>
     <g fill="#f8fbff" font-size="20" font-weight="700">
-      <text x="477" y="273">Policy / config</text>
-      <text x="477" y="383">Enforcement</text>
-      <text x="477" y="493">Metering</text>
-      <text x="477" y="603">Observability</text>
+      <text x="477" y="273">Policy contract</text>
+      <text x="477" y="383">Policy resolution</text>
+      <text x="477" y="493">Enforcement</text>
+      <text x="477" y="603">Decision visibility</text>
     </g>
     <g fill="#819eb3" font-size="14">
       <text x="477" y="299">evidence-backed joint</text>
@@ -154,10 +154,10 @@
       <rect x="728" y="566" width="211" height="84" rx="18" fill="#302619" stroke="#f2ad45" stroke-width="2" />
     </g>
     <g fill="#f8fbff" font-size="20" font-weight="700">
-      <text x="756" y="273">Policy lane</text>
-      <text x="756" y="383">Enforcement lane</text>
-      <text x="756" y="493">Data lane</text>
-      <text x="756" y="603">Telemetry lane</text>
+      <text x="756" y="273">Contract lane</text>
+      <text x="756" y="383">Resolution lane</text>
+      <text x="756" y="493">Request lane</text>
+      <text x="756" y="603">Visibility lane</text>
     </g>
     <g fill="#90aabe" font-size="14">
       <text x="756" y="299">one coherent stream</text>
@@ -182,14 +182,14 @@
       <rect x="1006" y="554" width="232" height="108" rx="20" fill="#0d2030" stroke="#f2ad45" stroke-width="2" />
     </g>
     <g fill="#f8fbff" font-size="17" font-weight="700">
-      <text x="1032" y="260">Schema</text>
-      <text x="1032" y="294">Policy resolution</text>
-      <text x="1032" y="370">Sync enforcement</text>
-      <text x="1032" y="404">Degraded behavior</text>
-      <text x="1032" y="480">Atomic recording</text>
-      <text x="1032" y="514">Decision telemetry</text>
-      <text x="1032" y="590">Metrics / logs</text>
-      <text x="1032" y="624">Operational proof</text>
+      <text x="1032" y="260">Policy schema</text>
+      <text x="1032" y="294">is valid</text>
+      <text x="1032" y="370">Effective policy</text>
+      <text x="1032" y="404">is resolved</text>
+      <text x="1032" y="480">Request 101</text>
+      <text x="1032" y="514">is denied</text>
+      <text x="1032" y="590">Reason + telemetry</text>
+      <text x="1032" y="624">are visible</text>
     </g>
     <g fill="#829fb5">
       <circle cx="1210" cy="255" r="6" fill="#31d892" />
@@ -218,10 +218,10 @@
       <rect x="1320" y="552" width="382" height="112" rx="22" fill="url(#taskFill)" stroke="#f4c168" stroke-width="2" />
     </g>
     <g fill="#102435" font-size="18" font-weight="760">
-      <text x="1353" y="260">TASK-SPEC · POLICY</text>
-      <text x="1353" y="370">TASK-SPEC · ENFORCEMENT</text>
-      <text x="1353" y="480">TASK-SPEC · METERING</text>
-      <text x="1353" y="590">TASK-SPEC · OBSERVABILITY</text>
+      <text x="1353" y="260">TASK-SPEC · CONTRACT</text>
+      <text x="1353" y="370">TASK-SPEC · RESOLUTION</text>
+      <text x="1353" y="480">TASK-SPEC · ENFORCEMENT</text>
+      <text x="1353" y="590">TASK-SPEC · VISIBILITY</text>
     </g>
     <g fill="#526b7e" font-size="15">
       <text x="1353" y="290">scope · behavior · evals · dependencies</text>

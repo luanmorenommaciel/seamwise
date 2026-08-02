@@ -1,0 +1,36 @@
+{
+  "name": "seamwise",
+  "version": "0.1.0",
+  "description": "Compile delivery intent through evidence-backed seams into validated, unsealed Task-Spec DAGs.",
+  "author": {
+    "name": "Luan Moreno M. Maciel",
+    "url": "https://github.com/luanmorenommaciel"
+  },
+  "homepage": "https://github.com/luanmorenommaciel/seamwise",
+  "repository": "https://github.com/luanmorenommaciel/seamwise",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "delivery-planning",
+    "task-spec",
+    "agentic-engineering"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Seamwise",
+    "shortDescription": "Turn intent into evidence-backed Task-Spec DAGs.",
+    "longDescription": "Seamwise guides Codex through a fail-closed intent-to-task workflow while the shared CLI owns validation, lineage, and stable gate tokens.",
+    "developerName": "Luan Moreno M. Maciel",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/luanmorenommaciel/seamwise",
+    "defaultPrompt": [
+      "Use $seamwise to turn this delivery intent into trustworthy tasks.",
+      "Use $to-seam-map to identify the real system seams.",
+      "Use $to-delivery-plan to build an ownership-safe delivery plan."
+    ]
+  }
+}

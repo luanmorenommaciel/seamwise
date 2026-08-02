@@ -1,0 +1,101 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "seamwise"
+version = "0.1.0"
+description = "Architecture-aware, model-agnostic intent-to-task compiler"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Luan Moreno M. Maciel" }]
+keywords = ["agentic-engineering", "architecture", "cli", "task-spec"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "click>=8.1,<9",
+  "jsonschema>=4.23,<5",
+  "PyYAML>=6,<7",
+  "rich>=13,<15",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "mypy>=1.15,<2",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "ruff>=0.11,<1",
+  "types-jsonschema>=4.23,<5",
+  "types-PyYAML>=6,<7",
+]
+
+[project.scripts]
+seamwise = "seamwise.cli:main"
+task-spec = "seamwise.task_spec_cli:main"
+
+[project.urls]
+Homepage = "https://github.com/luanmorenommaciel/seamwise"
+Repository = "https://github.com/luanmorenommaciel/seamwise"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/seamwise"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"schemas" = "seamwise/schemas"
+"skills" = "seamwise/assets/skills"
+".codex-plugin" = "seamwise/assets/.codex-plugin"
+".claude-plugin" = "seamwise/assets/.claude-plugin"
+"vendor" = "seamwise/assets/vendor"
+"examples" = "seamwise/assets/examples"
+"docs/seamwise.pdf" = "seamwise/assets/docs/seamwise.pdf"
+"VERSION" = "seamwise/assets/VERSION"
+"TASK_PACK_VERSION" = "seamwise/assets/TASK_PACK_VERSION"
+"LICENSE" = "seamwise/assets/LICENSE"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/.claude-plugin",
+  "/.codex-plugin",
+  "/bin",
+  "/docs",
+  "/examples",
+  "/schemas",
+  "/scripts",
+  "/skills",
+  "/src",
+  "/tests",
+  "/vendor",
+  "/LICENSE",
+  "/README.md",
+  "/TASK_PACK_CHANGELOG.md",
+  "/TASK_PACK_VERSION",
+  "/VERSION",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["seamwise"]

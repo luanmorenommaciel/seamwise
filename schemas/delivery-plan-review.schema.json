@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/delivery-plan-review-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "disposition", "reviewer", "reason", "reviewed_at", "draft_sha256", "plan_sha256", "fixture"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "disposition": {"const": "accepted"},
+    "reviewer": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "draft_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "fixture": {"type": "boolean"}
+  }
+}

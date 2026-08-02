@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/seam-map-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "source_recipe", "intent_id", "intent_sha256", "system_map_sha256", "evidence_sha256", "decisions", "seams"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["SEAM_MAP=READY", "SEAM_MAP=NEEDS_DISCOVERY", "SEAM_MAP=NEEDS_OWNER_INPUT", "SEAM_MAP=NEEDS_ARCHITECTURE_DECISION", "SEAM_MAP=AMBIGUOUS", "SEAM_MAP=ERROR"]},
+    "source_recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "intent_id": {"type": "string"},
+    "intent_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "system_map_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "evidence_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "status", "sha256"],
+        "properties": {
+          "id": {"type": "string"},
+          "path": {"type": "string", "pattern": "^seamwise/decisions/[A-Z][A-Z0-9-]+\\.md$"},
+          "status": {"enum": ["accepted", "proposed"]},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "seams": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "owner", "evidence", "swimlane_id", "sha256"],
+        "properties": {
+          "id": {"type": "string"},
+          "path": {"type": "string"},
+          "owner": {"type": "string"},
+          "evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "swimlane_id": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    }
+  }
+}

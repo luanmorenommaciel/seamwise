@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "seamwise",
+  "displayName": "Seamwise",
+  "version": "0.1.0",
+  "description": "Compile delivery intent through evidence-backed seams into validated, unsealed Task-Spec DAGs.",
+  "author": {
+    "name": "Luan Moreno M. Maciel",
+    "url": "https://github.com/luanmorenommaciel"
+  },
+  "homepage": "https://github.com/luanmorenommaciel/seamwise",
+  "repository": "https://github.com/luanmorenommaciel/seamwise",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "delivery-planning",
+    "task-spec",
+    "agentic-engineering"
+  ],
+  "skills": "./skills/"
+}

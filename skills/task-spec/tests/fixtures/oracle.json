@@ -1,0 +1,101 @@
+{
+  "_doc": "Oracle for tests/test-task-spec-skill.sh --suite fixtures. Each entry maps a fixture filename to the expected validate-task-spec.sh outcome.",
+  "_schema": {
+    "fixture": "filename in tests/fixtures/",
+    "expected_exit": "0 (pass / OK or WARN) or 1 (FAIL)",
+    "expected_match": "substring that MUST appear in the validate output (case-sensitive)",
+    "description": "human-readable purpose"
+  },
+  "fixtures": [
+    {
+      "fixture": "T-20260602-inverted-grep-1.md",
+      "expected_exit": 1,
+      "expected_match": "inverted grep -c pattern",
+      "description": "Variant 1: $(grep -c X file || echo 0)"
+    },
+    {
+      "fixture": "T-20260602-inverted-grep-2.md",
+      "expected_exit": 1,
+      "expected_match": "inverted grep -c pattern",
+      "description": "Variant 2: $(grep -c X file 2>/dev/null || echo 0)"
+    },
+    {
+      "fixture": "T-20260602-inverted-grep-3.md",
+      "expected_exit": 1,
+      "expected_match": "inverted wc fallback",
+      "description": "Variant 3: $(wc -l < file || echo 0)"
+    },
+    {
+      "fixture": "T-20260602-inverted-grep-4.md",
+      "expected_exit": 1,
+      "expected_match": "captures exit status",
+      "description": "Variant 4: grep -c ... ; echo $? captures exit, not match count"
+    },
+    {
+      "fixture": "T-20260602-inverted-grep-5.md",
+      "expected_exit": 0,
+      "expected_match": "OK:",
+      "description": "Variant 5: multi-line non-integer substitution — runtime check (--dry-run-eval) detects this, not the static lint. Static validate passes; oracle declares expected_exit=0 because we are testing the static lint here, and the --dry-run-eval suite is a separate scope."
+    },
+    {
+      "fixture": "T-20260602-inverted-grep-6.md",
+      "expected_exit": 1,
+      "expected_match": "without integer normalisation",
+      "description": "Variant 6: $(cmd) || true followed by numeric compare without ${var:-0} normalisation"
+    },
+    {
+      "fixture": "T-20260602-hand-stamped.md",
+      "expected_exit": 1,
+      "expected_match": "hand-stamping detected",
+      "description": "signed_off:true with signed_off_by=(none) and signed_off_at=(none) — structural sign-off envelope check rejects"
+    },
+    {
+      "fixture": "T-20260602-golden.md",
+      "expected_exit": 0,
+      "expected_match": "OK:",
+      "description": "Canonical clean v2.1 spec — validates cleanly with no errors. Uses `! grep -q PATTERN file` (the recommended replacement for inverted-grep-c)."
+    },
+    {
+      "fixture": "T-20260603-no-envelope-fields.md",
+      "expected_exit": 1,
+      "expected_match": "hand-stamping detected",
+      "description": "v2.1.1 Bug 1 regression: signed_off:true but signed_off_by/signed_off_at lines absent entirely. Pre-fix, the pipefail-broken grep|awk|xargs silently aborted the validator with 0 bytes output. Post-fix, the envelope error must fire."
+    },
+    {
+      "fixture": "T-20260603-legacy-no-signoff.md",
+      "expected_exit": 0,
+      "expected_match": "OK:",
+      "description": "v2.1.1 Bug 1 regression: legacy spec with no signed_off: line at all. Envelope check must NOT fire (signed_off defaults to false when the line is absent)."
+    },
+    {
+      "fixture": "T-20260603-inverted-grep-7-backtick.md",
+      "expected_exit": 1,
+      "expected_match": "without integer normalisation",
+      "description": "WS-B Variant 7: backtick form of Variant 1 — `grep -c X file || echo 0`. The per-command regex only matches $(...) so this is caught by the v2.1.1 umbrella rule."
+    },
+    {
+      "fixture": "T-20260603-inverted-awk.md",
+      "expected_exit": 1,
+      "expected_match": "without integer normalisation",
+      "description": "WS-B: $(awk '/PAT/{n++} END{print n+0}' file || echo 0) — awk isn't grep -c or wc, so only the umbrella rule catches it."
+    },
+    {
+      "fixture": "T-20260603-inverted-python.md",
+      "expected_exit": 1,
+      "expected_match": "without integer normalisation",
+      "description": "WS-B: $(python3 -c '...' 2>/dev/null || echo 0) — python isn't in any per-command fast-path, so only the umbrella rule catches it."
+    },
+    {
+      "fixture": "T-20260603-inverted-jq.md",
+      "expected_exit": 1,
+      "expected_match": "without integer normalisation",
+      "description": "WS-B: $(jq '. | length' < x || echo 0) — jq isn't in any per-command fast-path, so only the umbrella rule catches it."
+    },
+    {
+      "fixture": "T-20260603-fake-envelope.md",
+      "expected_exit": 0,
+      "expected_match": "OK:",
+      "description": "WS-C / v2.1.1 honest-limitation fixture: signed_off:true with plausible hand-edited signed_off_by=luan and signed_off_at=2026-06-03T00:00:00Z. The structural sign-off envelope check is intentionally permissive of this forgery — it catches accidental hand-stamping (empty/non-ISO-8601 values), not adversarial forgery by an author who knows the envelope shape. Real cryptographic protection is deferred to v2.2. This fixture exists to make the limitation visible."
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kurv-edp.local/schemas/task-spec/v2.1.1/agent-contract.schema.json",
+  "title": "Task-Spec Validation Card v2.1.1",
+  "description": "Schema for the YAML validation_card block of a Task-Spec v2.1.1 file. Includes success_criteria, retry_policy, and agent_contract (v2).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["success_criteria", "retry_policy", "agent_contract"],
+  "properties": {
+    "success_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of evals that determine task completion.",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "runnable", "check_type", "terminal"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^eval_[0-9]+$",
+            "description": "Eval identifier. Must match a bash function eval_N() in Success Criteria zone."
+          },
+          "description": {"type": "string", "minLength": 1},
+          "runnable": {
+            "type": "string",
+            "enum": ["bash", "python", "node", "manual"],
+            "description": "Execution backend for the eval body."
+          },
+          "check_type": {
+            "type": "string",
+            "enum": ["deterministic", "probabilistic", "manual-review"]
+          },
+          "terminal": {
+            "type": "boolean",
+            "description": "If true, this eval gates task completion. If false, it is informational."
+          },
+          "expected_duration_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          }
+        }
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "required": [
+        "max_iterations",
+        "circuit_breaker_no_progress",
+        "on_terminal_failure"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "circuit_breaker_no_progress": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Iterations with no progress before tripping the breaker."
+        },
+        "on_terminal_failure": {
+          "type": "string",
+          "enum": ["park_with_context", "fail_loudly", "block_and_notify"]
+        }
+      }
+    },
+    "agent_contract": {
+      "type": "object",
+      "required": [
+        "version",
+        "read",
+        "produce",
+        "required_tools",
+        "timeout_minutes",
+        "sandbox_type",
+        "emit"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "const": 2,
+          "description": "Contract schema version. v2 only."
+        },
+        "read": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Abstract zone categories the agent must read on pickup."
+        },
+        "produce": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["code", "docs", "config", "tests"]
+          },
+          "description": "Artifact categories the executor produces."
+        },
+        "required_tools": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"},
+          "description": "External tools the sandbox must provision."
+        },
+        "timeout_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        },
+        "sandbox_type": {
+          "type": "string",
+          "enum": ["host", "isolated", "ephemeral"]
+        },
+        "output_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "type"],
+            "additionalProperties": true,
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "type": {"type": "string"}
+            }
+          }
+        },
+        "mcp_dependencies": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "emit": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["pass", "fail", "retry_with_reason", "parked_with_context"]
+          },
+          "description": "Terminal outcomes the executor may emit."
+        },
+        "backend_metadata": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Optional executor-specific key/value map (the backend names itself). Replaces the vendor-named codex_metadata/kimi_metadata fields."
+        }
+      }
+    }
+  }
+}

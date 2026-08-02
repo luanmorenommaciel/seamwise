@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/task-graph-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "plan_sha256", "nodes", "edges", "contentions", "critical_path", "critical_path_mermaid_sha256"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["TASK_GRAPH=READY", "TASK_GRAPH=CYCLE", "TASK_GRAPH=COLLISION", "TASK_GRAPH=UNPROVABLE_NODE", "TASK_GRAPH=BLOCKED", "TASK_GRAPH=ERROR"]},
+    "plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "seam_id", "swimlane_id", "leg_id", "effort", "profile", "done_condition", "touches_paths", "creates_paths"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^T-"},
+          "title": {"type": "string"},
+          "seam_id": {"type": "string"},
+          "swimlane_id": {"type": "string"},
+          "leg_id": {"type": "string"},
+          "effort": {"enum": ["XS", "S", "M", "L"]},
+          "profile": {"enum": ["lite", "standard", "full"]},
+          "done_condition": {"type": "string", "minLength": 1},
+          "touches_paths": {"type": "array", "items": {"type": "string"}},
+          "creates_paths": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "kind"],
+        "properties": {
+          "from": {"type": "string"},
+          "to": {"type": "string"},
+          "kind": {"enum": ["depends_on", "contention_order"]}
+        }
+      }
+    },
+    "contentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["between", "resolution", "order"],
+        "properties": {
+          "between": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^T-"}},
+          "resolution": {"type": "string", "minLength": 1},
+          "order": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^T-"}}
+        }
+      }
+    },
+    "critical_path": {"type": "array", "items": {"type": "string"}},
+    "critical_path_mermaid_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

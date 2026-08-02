@@ -1,0 +1,1 @@
+"""Packaged JSON Schema resources."""

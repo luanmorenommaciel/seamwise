@@ -1,0 +1,349 @@
+schema_version: 1
+intent:
+  id: DI-RATE-LIMIT
+  title: Enforce organization-level request limits with visible decisions
+  summary: >-
+    For every organization request, resolve one effective rate-limit policy,
+    deny request 101 when the effective limit is 100, and expose a stable reason
+    plus decision telemetry without changing provider-owned metering.
+  claim: proposed
+  source:
+    uri: docs/seamwise.pdf
+    captured_at: "2026-08-02T00:00:00Z"
+    sha256: cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee
+  success:
+    - A versioned policy schema rejects invalid limits and windows.
+    - Resolution produces exactly one effective policy for an organization.
+    - Request 101 is denied after 100 allowed requests in the same window.
+    - The denial returns a stable reason and emits matching decision telemetry.
+  out_of_scope:
+    - Replacing provider-owned usage metering.
+    - Choosing production storage or deployment infrastructure.
+system_map:
+  claim: proposed
+  components:
+    - Policy contract boundary
+    - Effective policy resolver
+    - Request enforcement boundary
+    - Decision response and telemetry boundary
+  external_dependencies:
+    - Organization identity supplied by the host application
+    - Time-window and counter state supplied by an implementation-selected adapter
+  unknowns: []
+evidence:
+  - id: E-BLUEPRINT
+    claim: external
+    source:
+      uri: docs/seamwise.pdf
+      captured_at: "2026-08-02T00:00:00Z"
+      sha256: cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee
+    confidence: 1.0
+    summary: Canonical Seamwise target blueprint and rate-limiting steel thread.
+decisions:
+  - id: ADR-RATE-LIMIT-ORDER
+    status: accepted
+    owner: example-fixture
+    rationale: >-
+      The fixture follows the blueprint order: schema, effective policy,
+      request 101 enforcement, then visible reason and decision telemetry.
+seams:
+  - id: SEAM-POLICY-CONTRACT
+    name: Policy contract
+    description: Separates accepted policy shape from resolution and enforcement.
+    evidence: [E-BLUEPRINT]
+    responsibility: Define and validate versioned organization rate-limit policy data.
+    consumes: [authored organization policy]
+    produces: [validated policy document]
+    owner: platform-contracts
+    independent_proof: Invalid limits and windows fail schema validation deterministically.
+    decision_ids: [ADR-RATE-LIMIT-ORDER]
+    rejected_alternatives:
+      - alternative: Treat the API handler as the policy boundary
+        reason: Handler ownership would mix contract, resolution, and enforcement concerns.
+    swimlane:
+      id: LANE-POLICY-CONTRACT
+      name: Policy contract lane
+      owner: platform-contracts
+      legs:
+        - id: LEG-POLICY-SCHEMA-VALID
+          observable_state: Rate-limit policy documents are schema-valid
+          proof: Invalid limits and windows are rejected; required fields are machine-readable.
+          requires: []
+          produces: [validated policy document]
+          tasks:
+            - id: T-20260802-policy-schema
+              title: Define the versioned rate-limit policy schema
+              goal: Give every downstream stage one validated policy contract.
+              done_condition: A JSON Schema accepts valid limits and windows and rejects invalid values.
+              effort: S
+              profile: standard
+              execution_backend: any
+              required_tools: [git, bash, python3, pytest]
+              depends_on: []
+              touches_paths: []
+              creates_paths:
+                - src/rate_limit/policy.schema.json
+                - tests/test_policy_schema.py
+              behavior:
+                - id: B-1
+                  given: a policy with a positive limit and window
+                  when: the document is validated
+                  then: schema validation succeeds
+                - id: B-2
+                  given: a policy with a zero limit or window
+                  when: the document is validated
+                  then: schema validation fails
+              evals:
+                - id: eval_1
+                  description: The policy schema exists and parses as JSON
+                  bash: test -f src/rate_limit/policy.schema.json && python3 -m json.tool src/rate_limit/policy.schema.json >/dev/null
+                  verifies: [B-1]
+                - id: eval_2
+                  description: Valid policy examples pass the schema tests
+                  bash: pytest -q tests/test_policy_schema.py -k valid
+                  verifies: [B-1]
+                - id: eval_3
+                  description: Invalid non-positive values are rejected
+                  bash: pytest -q tests/test_policy_schema.py -k invalid
+                  verifies: [B-2]
+              anti_patterns:
+                - action: encode limits only in handler constants
+                  reason: downstream resolution would have no versioned contract
+                  instead: validate one explicit schema before resolution
+                - action: accept zero or negative windows
+                  reason: enforcement semantics would be undefined
+                  instead: reject non-positive values at the contract boundary
+                - action: couple the schema to one storage provider
+                  reason: policy shape and persistence are separate decisions
+                  instead: keep the schema provider-neutral
+              do_not_touch: [docs/seamwise.pdf]
+              rollback: Remove the additive schema and its focused tests.
+              observability: policy schema test pass count
+  - id: SEAM-POLICY-RESOLUTION
+    name: Effective policy resolution
+    description: Separates policy precedence from request-time enforcement.
+    evidence: [E-BLUEPRINT]
+    responsibility: Resolve exactly one effective policy from validated inputs.
+    consumes: [validated policy document, organization identity]
+    produces: [effective policy decision]
+    owner: policy-runtime
+    independent_proof: A deterministic precedence suite returns one effective policy.
+    decision_ids: [ADR-RATE-LIMIT-ORDER]
+    rejected_alternatives:
+      - alternative: Resolve policy independently inside every request adapter
+        reason: Multiple precedence implementations would drift and become unprovable.
+    swimlane:
+      id: LANE-POLICY-RESOLUTION
+      name: Effective policy lane
+      owner: policy-runtime
+      legs:
+        - id: LEG-EFFECTIVE-POLICY-RESOLVED
+          observable_state: Every organization has one effective policy decision
+          proof: Defaults and organization overrides resolve with deterministic precedence.
+          requires: [validated policy document]
+          produces: [effective policy decision]
+          tasks:
+            - id: T-20260802-effective-policy
+              title: Resolve one effective organization policy
+              goal: Make policy precedence explicit before request enforcement.
+              done_condition: The resolver returns one stable policy and provenance for every tested input.
+              effort: S
+              profile: standard
+              execution_backend: any
+              required_tools: [git, bash, python3, pytest]
+              depends_on: [T-20260802-policy-schema]
+              touches_paths: []
+              creates_paths:
+                - src/rate_limit/policy.py
+                - tests/test_policy_resolution.py
+              behavior:
+                - id: B-1
+                  given: a valid organization override
+                  when: effective policy is resolved
+                  then: the override and its provenance are returned
+                - id: B-2
+                  given: no organization override
+                  when: effective policy is resolved
+                  then: the validated default and its provenance are returned
+              evals:
+                - id: eval_1
+                  description: Organization overrides win deterministically
+                  bash: pytest -q tests/test_policy_resolution.py -k override
+                  verifies: [B-1]
+                - id: eval_2
+                  description: Defaults resolve when no override exists
+                  bash: pytest -q tests/test_policy_resolution.py -k default
+                  verifies: [B-2]
+                - id: eval_3
+                  description: Resolution returns policy provenance
+                  bash: pytest -q tests/test_policy_resolution.py -k provenance
+                  verifies: [B-1, B-2]
+              anti_patterns:
+                - action: hide precedence inside conditional request code
+                  reason: effective policy would not be independently testable
+                  instead: expose one deterministic resolver
+                - action: return a policy without provenance
+                  reason: operators could not explain the enforcement decision
+                  instead: return source and version with the policy
+                - action: silently invent a default
+                  reason: missing policy is an ownership decision
+                  instead: require a validated explicit default
+              do_not_touch: [docs/seamwise.pdf]
+              rollback: Remove the additive resolver and focused tests.
+              observability: effective policy resolution test pass count
+  - id: SEAM-REQUEST-ENFORCEMENT
+    name: Request enforcement
+    description: Separates the allow-or-deny decision from response presentation and telemetry.
+    evidence: [E-BLUEPRINT]
+    responsibility: Apply the effective policy to the organization request count.
+    consumes: [effective policy decision, organization identity, current request count]
+    produces: [allow-or-deny decision]
+    owner: request-runtime
+    independent_proof: A boundary test allows requests 1 through 100 and denies request 101.
+    decision_ids: [ADR-RATE-LIMIT-ORDER]
+    rejected_alternatives:
+      - alternative: Infer enforcement from emitted metrics
+        reason: Telemetry observes a decision but cannot authorize or make it.
+    swimlane:
+      id: LANE-REQUEST-ENFORCEMENT
+      name: Request enforcement lane
+      owner: request-runtime
+      legs:
+        - id: LEG-REQUEST-101-DENIED
+          observable_state: Request 101 is denied for a limit of 100
+          proof: Boundary tests allow the first 100 requests and deny the next request once.
+          requires: [effective policy decision]
+          produces: [allow-or-deny decision]
+          tasks:
+            - id: T-20260802-request-101
+              title: Enforce the effective limit at request 101
+              goal: Apply one effective policy at the request boundary without off-by-one drift.
+              done_condition: Requests 1-100 are allowed and request 101 is denied for the same organization window.
+              effort: S
+              profile: standard
+              execution_backend: any
+              required_tools: [git, bash, python3, pytest]
+              depends_on: [T-20260802-effective-policy]
+              touches_paths: []
+              creates_paths:
+                - src/rate_limit/enforcement.py
+                - tests/test_request_101.py
+              behavior:
+                - id: B-1
+                  given: an effective limit of 100 and count 99
+                  when: request 100 is evaluated
+                  then: the request is allowed
+                - id: B-2
+                  given: an effective limit of 100 and count 100
+                  when: request 101 is evaluated
+                  then: the request is denied exactly once
+              evals:
+                - id: eval_1
+                  description: Request 100 remains allowed
+                  bash: pytest -q tests/test_request_101.py -k request_100
+                  verifies: [B-1]
+                - id: eval_2
+                  description: Request 101 is denied
+                  bash: pytest -q tests/test_request_101.py -k request_101
+                  verifies: [B-2]
+                - id: eval_3
+                  description: The boundary has no off-by-one drift
+                  bash: pytest -q tests/test_request_101.py -k boundary
+                  verifies: [B-1, B-2]
+              anti_patterns:
+                - action: check the limit after allowing the request
+                  reason: request 101 would pass through
+                  instead: decide before forwarding work
+                - action: use telemetry as the enforcement source
+                  reason: observation is not authorization
+                  instead: return an explicit decision from enforcement
+                - action: share counters across organizations
+                  reason: one tenant could consume another tenant's budget
+                  instead: key state by organization and window
+              do_not_touch: [docs/seamwise.pdf]
+              rollback: Remove the additive enforcement boundary and focused tests.
+              observability: boundary test pass count
+  - id: SEAM-DECISION-VISIBILITY
+    name: Decision visibility
+    description: Separates enforcement from the externally visible reason and observation record.
+    evidence: [E-BLUEPRINT]
+    responsibility: Present a stable denial reason and emit matching decision telemetry.
+    consumes: [allow-or-deny decision]
+    produces: [visible reason, decision telemetry event]
+    owner: reliability-interface
+    independent_proof: Response and telemetry tests assert the same reason and decision identifier.
+    decision_ids: [ADR-RATE-LIMIT-ORDER]
+    rejected_alternatives:
+      - alternative: Emit a metric without returning a stable reason
+        reason: Callers could not distinguish limit denial from unrelated failures.
+    swimlane:
+      id: LANE-DECISION-VISIBILITY
+      name: Decision visibility lane
+      owner: reliability-interface
+      legs:
+        - id: LEG-DENIAL-REASON-VISIBLE
+          observable_state: Denials expose a stable reason and matching decision telemetry
+          proof: The response reason and telemetry payload share one decision identifier.
+          requires: [allow-or-deny decision]
+          produces: [visible reason, decision telemetry event]
+          tasks:
+            - id: T-20260802-decision-visibility
+              title: Expose the denial reason and decision telemetry
+              goal: Make the request 101 decision explainable without turning telemetry into authority.
+              done_condition: The denial response and telemetry carry the same stable reason and decision identifier.
+              effort: S
+              profile: standard
+              execution_backend: any
+              required_tools: [git, bash, python3, pytest]
+              depends_on: [T-20260802-request-101]
+              touches_paths: []
+              creates_paths:
+                - src/rate_limit/decision.py
+                - tests/test_decision_visibility.py
+              behavior:
+                - id: B-1
+                  given: request 101 is denied
+                  when: the response is created
+                  then: it exposes the stable reason organization_rate_limit_exceeded
+                - id: B-2
+                  given: the same denial decision
+                  when: telemetry is emitted
+                  then: it carries the same reason and decision identifier
+              evals:
+                - id: eval_1
+                  description: The response exposes the stable denial reason
+                  bash: pytest -q tests/test_decision_visibility.py -k response_reason
+                  verifies: [B-1]
+                - id: eval_2
+                  description: Telemetry carries the matching reason
+                  bash: pytest -q tests/test_decision_visibility.py -k telemetry_reason
+                  verifies: [B-2]
+                - id: eval_3
+                  description: Response and telemetry share a decision identifier
+                  bash: pytest -q tests/test_decision_visibility.py -k decision_identifier
+                  verifies: [B-1, B-2]
+              anti_patterns:
+                - action: expose an unstable free-text reason
+                  reason: clients and operators could not depend on it
+                  instead: use a stable machine reason plus human detail
+                - action: let telemetry authorize the denial
+                  reason: observation cannot cross the enforcement boundary
+                  instead: emit only after receiving the decision
+                - action: omit decision lineage
+                  reason: response and telemetry could not be correlated
+                  instead: carry one decision identifier across both outputs
+              do_not_touch: [docs/seamwise.pdf]
+              rollback: Remove the additive response adapter, telemetry event, and focused tests.
+              observability: response-to-telemetry correlation test pass count
+steel_thread:
+  - LEG-POLICY-SCHEMA-VALID
+  - LEG-EFFECTIVE-POLICY-RESOLVED
+  - LEG-REQUEST-101-DENIED
+  - LEG-DENIAL-REASON-VISIBLE
+objections:
+  - id: OBJ-METERING-SEPARATION
+    status: FIXED
+    summary: Metering was removed from the canonical steel thread and kept external.
+    owner: example-fixture
+    rationale: The accepted boundary decision leaves metering outside the four-leg proving path.
+contentions: []

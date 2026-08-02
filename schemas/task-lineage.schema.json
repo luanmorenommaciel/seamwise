@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seamwise.dev/schemas/task-lineage-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "intent", "plan_sha256", "fixture", "tasks"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "intent": {"type": "string"},
+    "plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "fixture": {"type": "boolean"},
+    "tasks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["seam", "swimlane", "leg", "spec", "spec_sha256", "source_sha256"],
+        "properties": {
+          "seam": {"type": "string"},
+          "swimlane": {"type": "string"},
+          "leg": {"type": "string"},
+          "spec": {"type": "string"},
+          "spec_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    }
+  }
+}

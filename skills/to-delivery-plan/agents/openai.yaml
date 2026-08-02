@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Seamwise Delivery"
+  short_description: "Form owning lanes and capability legs"
+  default_prompt: "Use $to-delivery-plan to turn accepted seams into a reviewed delivery plan."

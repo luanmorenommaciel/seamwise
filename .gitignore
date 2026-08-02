@@ -1,0 +1,15 @@
+.venv/
+.DS_Store
+.seamwise/
+.seamwise-install/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+tmp/

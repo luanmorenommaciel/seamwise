@@ -145,26 +145,26 @@
       <path d="M1192 596 V708 M1405 596 V708 M1573 596 V708" />
     </g>
     <g font-size="16" font-weight="730">
-      <text x="1033" y="263" fill="#166c4e">Policy / config</text>
-      <text x="1033" y="389" fill="#176791">Enforcement</text>
-      <text x="1033" y="515" fill="#6048a2">Metering</text>
-      <text x="1033" y="641" fill="#8c6024">Observability</text>
+      <text x="1033" y="263" fill="#166c4e">Policy contract</text>
+      <text x="1033" y="389" fill="#176791">Policy resolution</text>
+      <text x="1033" y="515" fill="#6048a2">Enforcement</text>
+      <text x="1033" y="641" fill="#8c6024">Decision visibility</text>
     </g>
     <g fill="#244156" font-size="15" font-weight="650">
-      <text x="1216" y="263">Policy lane</text>
-      <text x="1216" y="389">Enforcement lane</text>
-      <text x="1216" y="515">Data lane</text>
-      <text x="1216" y="641">Telemetry lane</text>
+      <text x="1216" y="263">Contract lane</text>
+      <text x="1216" y="389">Resolution lane</text>
+      <text x="1216" y="515">Request lane</text>
+      <text x="1216" y="641">Visibility lane</text>
     </g>
     <g fill="#536d7e" font-size="14">
-      <text x="1427" y="250">Schema</text>
-      <text x="1427" y="276">Policy resolution</text>
-      <text x="1427" y="376">Sync enforcement</text>
-      <text x="1427" y="402">Degraded behavior</text>
-      <text x="1427" y="502">Atomic recording</text>
-      <text x="1427" y="528">Decision telemetry</text>
-      <text x="1427" y="628">Metrics / logs</text>
-      <text x="1427" y="654">Operational proof</text>
+      <text x="1427" y="250">Policy schema</text>
+      <text x="1427" y="276">is valid</text>
+      <text x="1427" y="376">Effective policy</text>
+      <text x="1427" y="402">is resolved</text>
+      <text x="1427" y="502">Request 101</text>
+      <text x="1427" y="528">is denied</text>
+      <text x="1427" y="628">Reason + telemetry</text>
+      <text x="1427" y="654">are visible</text>
     </g>
 
     <g>

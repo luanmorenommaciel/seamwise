@@ -1,6 +1,6 @@
 # Seamwise agent contract
 
-Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. This repository is currently in its pre-implementation foundation stage.
+Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. The repository now contains the implemented v0.1.0-alpha compiler candidate; executable code, schemas, tests, and current runtime evidence govern shipped-behavior claims.
 
 ## Read order
 
@@ -8,7 +8,7 @@ Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. This 
 2. `docs/project.md`
 3. `docs/seamwise.pdf`
 4. Relevant accepted decisions and source contracts, once added
-5. Implementation and tests, once they exist
+5. Implementation and tests
 
 ## Source boundary
 
