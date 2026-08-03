@@ -1,19 +1,31 @@
+<div align="center">
+
+[![Seamwise — an architecture-aware intent-to-task compiler that finds natural system joints and preserves them through proof-bearing work.](assets/seamwise-banner.png)](https://github.com/luanmorenommaciel/seamwise)
+
 # Seamwise
 
-## Your agents can split the work. Seamwise makes sure they split the system.
+**Find the joints. Preserve the system. Prove the work.**
 
-Seamwise is an architecture-aware, model-agnostic compiler that turns Delivery
-Intent plus evidence into a reviewed, dependency-safe, proof-bearing Task-Spec
-DAG.
-
-**Find the joints. Form the lanes. Stage the capability. Prove the work.**
+*The architecture-aware compiler between delivery intent and trustworthy implementation tasks.*
 
 [![Candidate: v0.1.0-alpha](https://img.shields.io/badge/candidate-v0.1.0--alpha-31D892)](#verified-candidate-surface)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-73D8FF)](pyproject.toml)
 [![Task-Spec: v3](https://img.shields.io/badge/Task--Spec-v3-C18DFF)](docs/task-spec-v0.1.pdf)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F2AD45)](LICENSE)
 
-![One delivery intent lowered through evidence-backed seams, owning swimlanes, observable capability states, and independently provable Task-Specs.](assets/seamwise-hero.svg)
+[Install](#install) · [Prove it](#prove-it-in-one-workspace) · [Compiler](#the-compiler) · [Codex](#codex) · [Claude Code](#claude-code) · [CLI](#cli-map)
+
+</div>
+
+---
+
+## What is Seamwise?
+
+Your agents can split the work. **Seamwise makes sure they split the system.**
+
+Seamwise is a model-agnostic compiler that turns Delivery Intent plus evidence
+into a reviewed, dependency-safe, proof-bearing Task-Spec DAG without losing
+the architecture that makes each task legitimate.
 
 > One outcome in. A trustworthy, **unsealed** Task-Spec DAG out.
 
@@ -141,6 +153,12 @@ evals according to Task Pack semantics. Fixture reviews can never be sealed.
 
 ## The compiler
 
+![Seamwise lowers delivery intent through evidence-backed system joints, explicit ownership and review, dependency-aware ordering, and independently provable unsealed Task-Specs.](assets/seamwise-hero.svg)
+
+<details>
+<summary><strong>Portable Mermaid view</strong></summary>
+
+
 ```mermaid
 flowchart LR
     I["Delivery Intent<br/>+ evidence"] --> M["1 · Seam map<br/>find + refute joints"]
@@ -160,6 +178,8 @@ flowchart LR
     class R gate;
     class X stop;
 ```
+
+</details>
 
 The governing chain is strict:
 

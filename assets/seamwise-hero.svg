@@ -1,259 +1,137 @@
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="1774"
-  height="887"
-  viewBox="0 0 1774 887"
-  role="img"
-  aria-labelledby="title desc"
->
-  <title id="title">Seamwise intent-to-task architecture</title>
-  <desc id="desc">
-    One delivery intent is lowered through four evidence-backed seams, four owning
-    swimlanes, observable capability legs, and independently provable Task-Specs.
-  </desc>
-
+<svg xmlns="http://www.w3.org/2000/svg" width="1774" height="887" viewBox="0 0 1774 887" role="img" aria-labelledby="title desc">
+  <title id="title">Seamwise lowering chain</title>
+  <desc id="desc">Delivery intent and evidence pass through seam mapping, an ownership plan, explicit review, a dependency graph, and proof-bearing unsealed Task-Specs.</desc>
   <defs>
-    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#07111d" />
-      <stop offset="0.55" stop-color="#0a1726" />
-      <stop offset="1" stop-color="#07101a" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06111d"/>
+      <stop offset="0.55" stop-color="#091827"/>
+      <stop offset="1" stop-color="#07111c"/>
     </linearGradient>
-    <linearGradient id="intentFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#112b3f" />
-      <stop offset="1" stop-color="#0b1d2d" />
+    <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#31d892"/>
+      <stop offset="0.35" stop-color="#73d8ff"/>
+      <stop offset="0.68" stop-color="#a987ff"/>
+      <stop offset="1" stop-color="#f2ad45"/>
     </linearGradient>
-    <linearGradient id="taskFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f8fbff" />
-      <stop offset="1" stop-color="#eaf1f8" />
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#11283a"/>
+      <stop offset="1" stop-color="#0b1b2a"/>
     </linearGradient>
-    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#31d892" />
-      <stop offset="1" stop-color="#74f0b9" />
+    <linearGradient id="finalCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7fbff"/>
+      <stop offset="1" stop-color="#e8f1f8"/>
     </linearGradient>
-    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#4ba4ff" />
-      <stop offset="1" stop-color="#73d8ff" />
-    </linearGradient>
-    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#8c6cff" />
-      <stop offset="1" stop-color="#c18dff" />
-    </linearGradient>
-    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#f2ad45" />
-      <stop offset="1" stop-color="#ffd27b" />
-    </linearGradient>
-    <pattern id="grid" width="78" height="78" patternUnits="userSpaceOnUse">
-      <path d="M 78 0 L 0 0 0 78" fill="none" stroke="#25415a" stroke-width="1" opacity="0.24" />
-      <circle cx="0" cy="0" r="2" fill="#416681" opacity="0.32" />
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#24435a" stroke-width="1" opacity=".22"/>
+      <circle cx="0" cy="0" r="1.8" fill="#416781" opacity=".3"/>
     </pattern>
-    <filter id="glowGreen" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="7" result="blur" />
-      <feFlood flood-color="#31d892" flood-opacity="0.7" />
-      <feComposite in2="blur" operator="in" />
-      <feMerge>
-        <feMergeNode />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="170%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#00040a" flood-opacity=".52"/>
     </filter>
-    <filter id="glowBlue" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="7" result="blur" />
-      <feFlood flood-color="#58b8ff" flood-opacity="0.65" />
-      <feComposite in2="blur" operator="in" />
-      <feMerge>
-        <feMergeNode />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+    <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feFlood flood-color="#73d8ff" flood-opacity=".8"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
-      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000713" flood-opacity="0.45" />
-    </filter>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5ce6ad" />
-    </marker>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#73d8ff" />
-    </marker>
-    <marker id="arrowViolet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b68cff" />
-    </marker>
-    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffd27b" />
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#79d9ff"/>
     </marker>
   </defs>
 
-  <rect width="1774" height="887" fill="url(#background)" />
-  <rect width="1774" height="887" fill="url(#grid)" />
-  <circle cx="309" cy="441" r="258" fill="#13304b" opacity="0.13" />
-  <circle cx="1000" cy="441" r="390" fill="#102c42" opacity="0.12" />
-  <circle cx="1515" cy="441" r="265" fill="#1b2f4b" opacity="0.12" />
+  <rect width="1774" height="887" fill="#071421"/>
+  <rect width="1774" height="887" fill="url(#grid)"/>
+  <circle cx="271" cy="447" r="300" fill="#133450" opacity=".12"/>
+  <circle cx="1508" cy="447" r="310" fill="#243052" opacity=".1"/>
 
-  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <text x="72" y="74" fill="#80a0b9" font-size="18" font-weight="700" letter-spacing="4">SEAMWISE DECOMPOSITION</text>
-    <text x="72" y="116" fill="#f4f8fb" font-size="28" font-weight="720">Intent → structure → progression → proof</text>
-    <text x="1702" y="86" fill="#68879e" font-size="15" text-anchor="end" letter-spacing="2">COMPILER · v0.1.0 ALPHA</text>
+  <g font-family="Arial">
+    <text x="76" y="76" fill="#80a2ba" font-size="18" font-weight="700" letter-spacing="4">THE LOWERING CHAIN</text>
+    <text x="76" y="126" fill="#f4f8fb" font-size="35" font-weight="700">From delivery intent to proof-bearing work.</text>
+    <text x="1698" y="78" fill="#66869d" font-size="15" text-anchor="end" letter-spacing="2">ONE COMPILER · ONE SOURCE OF TRUTH</text>
+    <text x="76" y="164" fill="#91acbf" font-size="18">Boundaries, ownership, causality, and proof survive every transformation.</text>
 
-    <g fill="#7f9cb2" font-size="15" font-weight="700" letter-spacing="2">
-      <text x="194" y="194" text-anchor="middle">DELIVERY INTENT</text>
-      <text x="546" y="194" text-anchor="middle">SEAMS</text>
-      <text x="835" y="194" text-anchor="middle">OWNING LANES</text>
-      <text x="1125" y="194" text-anchor="middle">CAPABILITY LEGS</text>
-      <text x="1512" y="194" text-anchor="middle">TASK-SPECS</text>
-    </g>
+    <path d="M126 455H1644" fill="none" stroke="#173a50" stroke-width="14" stroke-linecap="round"/>
+    <path d="M126 455H1644" fill="none" stroke="url(#rail)" stroke-width="3" stroke-linecap="round" opacity=".92"/>
 
-    <!-- Delivery intent -->
     <g filter="url(#shadow)">
-      <rect x="72" y="314" width="245" height="254" rx="28" fill="url(#intentFill)" stroke="#4f728b" stroke-width="2" />
-      <circle cx="194" cy="358" r="16" fill="#2de092" opacity="0.18" />
-      <circle cx="194" cy="358" r="7" fill="#39e6a0" filter="url(#glowGreen)" />
-      <text x="194" y="407" fill="#ffffff" font-size="25" font-weight="750" text-anchor="middle">Organization-level</text>
-      <text x="194" y="441" fill="#ffffff" font-size="25" font-weight="750" text-anchor="middle">rate limiting</text>
-      <line x1="111" y1="471" x2="277" y2="471" stroke="#36556d" />
-      <text x="194" y="507" fill="#9bb4c6" font-size="16" text-anchor="middle">actor · trigger · scope</text>
-      <text x="194" y="533" fill="#9bb4c6" font-size="16" text-anchor="middle">constraints · evidence</text>
+      <rect x="76" y="312" width="244" height="286" rx="30" fill="#0d2030" stroke="#31d892" stroke-width="2.5"/>
+      <rect x="380" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#50c9d9" stroke-width="2.5"/>
+      <rect x="678" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#8e86ff" stroke-width="2.5"/>
+      <rect x="1088" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#64b9ff" stroke-width="2.5"/>
+      <rect x="1386" y="312" width="312" height="286" rx="30" fill="#f2f7fb" stroke="#f2ad45" stroke-width="2.5"/>
     </g>
 
-    <!-- Intent fan-out -->
-    <path d="M317 441 C380 441 390 278 448 278" fill="none" stroke="#31d892" stroke-width="3" opacity="0.9" marker-end="url(#arrowGreen)" />
-    <path d="M317 441 C386 441 396 388 448 388" fill="none" stroke="#4ba4ff" stroke-width="3" opacity="0.9" marker-end="url(#arrowBlue)" />
-    <path d="M317 441 C386 441 396 498 448 498" fill="none" stroke="#8c6cff" stroke-width="3" opacity="0.9" marker-end="url(#arrowViolet)" />
-    <path d="M317 441 C380 441 390 608 448 608" fill="none" stroke="#f2ad45" stroke-width="3" opacity="0.9" marker-end="url(#arrowAmber)" />
-
-    <!-- Seams -->
-    <g filter="url(#shadow)">
-      <rect x="448" y="236" width="198" height="84" rx="18" fill="#0d2030" stroke="#31d892" stroke-width="2" />
-      <rect x="448" y="346" width="198" height="84" rx="18" fill="#0d2030" stroke="#4ba4ff" stroke-width="2" />
-      <rect x="448" y="456" width="198" height="84" rx="18" fill="#0d2030" stroke="#8c6cff" stroke-width="2" />
-      <rect x="448" y="566" width="198" height="84" rx="18" fill="#0d2030" stroke="#f2ad45" stroke-width="2" />
-    </g>
-    <g fill="#f8fbff" font-size="20" font-weight="700">
-      <text x="477" y="273">Policy contract</text>
-      <text x="477" y="383">Policy resolution</text>
-      <text x="477" y="493">Enforcement</text>
-      <text x="477" y="603">Decision visibility</text>
-    </g>
-    <g fill="#819eb3" font-size="14">
-      <text x="477" y="299">evidence-backed joint</text>
-      <text x="477" y="409">evidence-backed joint</text>
-      <text x="477" y="519">evidence-backed joint</text>
-      <text x="477" y="629">evidence-backed joint</text>
+    <g>
+      <circle cx="198" cy="362" r="18" fill="#31d892" opacity=".18"/>
+      <circle cx="198" cy="362" r="7" fill="#3be5a0"/>
+      <text x="116" y="414" fill="#80a2ba" font-size="14" font-weight="700" letter-spacing="2">INPUT</text>
+      <text x="116" y="454" fill="#ffffff" font-size="26" font-weight="700">Delivery intent</text>
+      <text x="116" y="486" fill="#ffffff" font-size="26" font-weight="700">+ evidence</text>
+      <line x1="116" y1="516" x2="280" y2="516" stroke="#34566d"/>
+      <text x="116" y="548" fill="#91acbf" font-size="15">outcome · constraints</text>
+      <text x="116" y="573" fill="#91acbf" font-size="15">source · freshness · hash</text>
     </g>
 
-    <!-- One seam, exactly one lane -->
-    <g fill="none" stroke-width="3">
-      <path d="M646 278 H728" stroke="#31d892" marker-end="url(#arrowGreen)" />
-      <path d="M646 388 H728" stroke="#4ba4ff" marker-end="url(#arrowBlue)" />
-      <path d="M646 498 H728" stroke="#8c6cff" marker-end="url(#arrowViolet)" />
-      <path d="M646 608 H728" stroke="#f2ad45" marker-end="url(#arrowAmber)" />
+    <g>
+      <text x="420" y="390" fill="#78cbd7" font-size="13" font-weight="700" letter-spacing="2">01 · FIND</text>
+      <text x="420" y="438" fill="#ffffff" font-size="26" font-weight="700">Seam map</text>
+      <text x="420" y="477" fill="#9bb4c6" font-size="16">Defensible system</text>
+      <text x="420" y="502" fill="#9bb4c6" font-size="16">joints, not folders.</text>
+      <rect x="420" y="528" width="122" height="4" rx="2" fill="#50c9d9"/>
     </g>
 
-    <!-- Swimlanes -->
-    <g filter="url(#shadow)">
-      <rect x="728" y="236" width="211" height="84" rx="18" fill="#102b2b" stroke="#31d892" stroke-width="2" />
-      <rect x="728" y="346" width="211" height="84" rx="18" fill="#10253a" stroke="#4ba4ff" stroke-width="2" />
-      <rect x="728" y="456" width="211" height="84" rx="18" fill="#231e3c" stroke="#8c6cff" stroke-width="2" />
-      <rect x="728" y="566" width="211" height="84" rx="18" fill="#302619" stroke="#f2ad45" stroke-width="2" />
-    </g>
-    <g fill="#f8fbff" font-size="20" font-weight="700">
-      <text x="756" y="273">Contract lane</text>
-      <text x="756" y="383">Resolution lane</text>
-      <text x="756" y="493">Request lane</text>
-      <text x="756" y="603">Visibility lane</text>
-    </g>
-    <g fill="#90aabe" font-size="14">
-      <text x="756" y="299">one coherent stream</text>
-      <text x="756" y="409">one coherent stream</text>
-      <text x="756" y="519">one coherent stream</text>
-      <text x="756" y="629">one coherent stream</text>
+    <g>
+      <text x="718" y="390" fill="#a79fff" font-size="13" font-weight="700" letter-spacing="2">02 · FORM</text>
+      <text x="718" y="438" fill="#ffffff" font-size="26" font-weight="700">Delivery plan</text>
+      <text x="718" y="477" fill="#9bb4c6" font-size="16">One owner. Observable</text>
+      <text x="718" y="502" fill="#9bb4c6" font-size="16">capability states.</text>
+      <rect x="718" y="528" width="122" height="4" rx="2" fill="#a987ff"/>
     </g>
 
-    <!-- Lane to legs -->
-    <g fill="none" stroke-width="3">
-      <path d="M939 278 H1006" stroke="#31d892" marker-end="url(#arrowGreen)" />
-      <path d="M939 388 H1006" stroke="#4ba4ff" marker-end="url(#arrowBlue)" />
-      <path d="M939 498 H1006" stroke="#8c6cff" marker-end="url(#arrowViolet)" />
-      <path d="M939 608 H1006" stroke="#f2ad45" marker-end="url(#arrowAmber)" />
+    <g transform="translate(999 455)">
+      <path d="M0 -65L54 0L0 65L-54 0Z" fill="#2e2518" stroke="#f2ad45" stroke-width="2.5" filter="url(#shadow)"/>
+      <circle cx="0" cy="0" r="8" fill="#ffd27b" filter="url(#glow)"/>
+      <text x="0" y="92" fill="#f1c876" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">EXPLICIT REVIEW</text>
+      <text x="0" y="115" fill="#829fb3" font-size="13" text-anchor="middle">never inferred</text>
     </g>
 
-    <!-- Capability legs -->
-    <g filter="url(#shadow)">
-      <rect x="1006" y="224" width="232" height="108" rx="20" fill="#0d2030" stroke="#31d892" stroke-width="2" />
-      <rect x="1006" y="334" width="232" height="108" rx="20" fill="#0d2030" stroke="#4ba4ff" stroke-width="2" />
-      <rect x="1006" y="444" width="232" height="108" rx="20" fill="#0d2030" stroke="#8c6cff" stroke-width="2" />
-      <rect x="1006" y="554" width="232" height="108" rx="20" fill="#0d2030" stroke="#f2ad45" stroke-width="2" />
-    </g>
-    <g fill="#f8fbff" font-size="17" font-weight="700">
-      <text x="1032" y="260">Policy schema</text>
-      <text x="1032" y="294">is valid</text>
-      <text x="1032" y="370">Effective policy</text>
-      <text x="1032" y="404">is resolved</text>
-      <text x="1032" y="480">Request 101</text>
-      <text x="1032" y="514">is denied</text>
-      <text x="1032" y="590">Reason + telemetry</text>
-      <text x="1032" y="624">are visible</text>
-    </g>
-    <g fill="#829fb5">
-      <circle cx="1210" cy="255" r="6" fill="#31d892" />
-      <circle cx="1210" cy="289" r="6" fill="#31d892" opacity="0.55" />
-      <circle cx="1210" cy="365" r="6" fill="#4ba4ff" />
-      <circle cx="1210" cy="399" r="6" fill="#4ba4ff" opacity="0.55" />
-      <circle cx="1210" cy="475" r="6" fill="#8c6cff" />
-      <circle cx="1210" cy="509" r="6" fill="#8c6cff" opacity="0.55" />
-      <circle cx="1210" cy="585" r="6" fill="#f2ad45" />
-      <circle cx="1210" cy="619" r="6" fill="#f2ad45" opacity="0.55" />
+    <g>
+      <text x="1128" y="390" fill="#7bc8ff" font-size="13" font-weight="700" letter-spacing="2">03 · ORDER</text>
+      <text x="1128" y="438" fill="#ffffff" font-size="26" font-weight="700">Task graph</text>
+      <text x="1128" y="477" fill="#9bb4c6" font-size="16">Dependencies, contention,</text>
+      <text x="1128" y="502" fill="#9bb4c6" font-size="16">and safe concurrency.</text>
+      <rect x="1128" y="528" width="122" height="4" rx="2" fill="#64b9ff"/>
     </g>
 
-    <!-- Legs to Task-Specs -->
-    <g fill="none" stroke-width="3">
-      <path d="M1238 278 H1320" stroke="#31d892" marker-end="url(#arrowGreen)" />
-      <path d="M1238 388 H1320" stroke="#4ba4ff" marker-end="url(#arrowBlue)" />
-      <path d="M1238 498 H1320" stroke="#8c6cff" marker-end="url(#arrowViolet)" />
-      <path d="M1238 608 H1320" stroke="#f2ad45" marker-end="url(#arrowAmber)" />
+    <g>
+      <text x="1428" y="366" fill="#8c6024" font-size="13" font-weight="700" letter-spacing="2">04 · PROVE</text>
+      <text x="1428" y="415" fill="#102435" font-size="28" font-weight="700">Task-Specs</text>
+      <text x="1428" y="454" fill="#526d7f" font-size="16">Scope · behavior · evals</text>
+      <text x="1428" y="481" fill="#526d7f" font-size="16">dependencies · rollback</text>
+      <line x1="1428" y1="510" x2="1656" y2="510" stroke="#c8d7e1"/>
+      <text x="1428" y="544" fill="#2e8e68" font-size="14" font-weight="700">VALIDATED</text>
+      <text x="1656" y="544" fill="#9a5f17" font-size="14" font-weight="700" text-anchor="end">UNSEALED</text>
     </g>
 
-    <!-- Task-Spec cards -->
-    <g filter="url(#shadow)">
-      <rect x="1320" y="222" width="382" height="112" rx="22" fill="url(#taskFill)" stroke="#79dfb4" stroke-width="2" />
-      <rect x="1320" y="332" width="382" height="112" rx="22" fill="url(#taskFill)" stroke="#6ec8ff" stroke-width="2" />
-      <rect x="1320" y="442" width="382" height="112" rx="22" fill="url(#taskFill)" stroke="#b18cff" stroke-width="2" />
-      <rect x="1320" y="552" width="382" height="112" rx="22" fill="url(#taskFill)" stroke="#f4c168" stroke-width="2" />
-    </g>
-    <g fill="#102435" font-size="18" font-weight="760">
-      <text x="1353" y="260">TASK-SPEC · CONTRACT</text>
-      <text x="1353" y="370">TASK-SPEC · RESOLUTION</text>
-      <text x="1353" y="480">TASK-SPEC · ENFORCEMENT</text>
-      <text x="1353" y="590">TASK-SPEC · VISIBILITY</text>
-    </g>
-    <g fill="#526b7e" font-size="15">
-      <text x="1353" y="290">scope · behavior · evals · dependencies</text>
-      <text x="1353" y="309">authority · rollback · observability</text>
-      <text x="1353" y="400">scope · behavior · evals · dependencies</text>
-      <text x="1353" y="419">authority · rollback · observability</text>
-      <text x="1353" y="510">scope · behavior · evals · dependencies</text>
-      <text x="1353" y="529">authority · rollback · observability</text>
-      <text x="1353" y="620">scope · behavior · evals · dependencies</text>
-      <text x="1353" y="639">authority · rollback · observability</text>
+    <g fill="none" stroke="#79d9ff" stroke-width="2.4" marker-end="url(#arrow)">
+      <path d="M320 455H366"/>
+      <path d="M618 455H664"/>
+      <path d="M916 455H931"/>
+      <path d="M1067 455H1074"/>
+      <path d="M1326 455H1372"/>
     </g>
 
-    <!-- Steel thread -->
-    <path
-      d="M1118 278 C1268 278 1268 388 1118 388 C968 388 968 498 1118 498 C1268 498 1268 608 1118 608"
-      fill="none"
-      stroke="#ffffff"
-      stroke-width="2"
-      stroke-dasharray="7 9"
-      opacity="0.28"
-    />
-    <text x="1118" y="699" fill="#8da9bd" font-size="14" text-anchor="middle" letter-spacing="1.5">STEEL THREAD · EARLY END-TO-END PROOF</text>
-
-    <g transform="translate(72 778)">
-      <rect width="1630" height="64" rx="18" fill="#0d1f2e" stroke="#29465b" />
-      <circle cx="32" cy="32" r="8" fill="#31d892" filter="url(#glowGreen)" />
-      <text x="56" y="39" fill="#dce9f1" font-size="18" font-weight="650">
-        Find the joints. Form the lanes. Stage the capability. Prove the work.
-      </text>
-      <text x="1594" y="39" fill="#86a5ba" font-size="16" text-anchor="end">
-        one compiler · any conformant executor
-      </text>
+    <g transform="translate(76 680)">
+      <rect width="1622" height="132" rx="24" fill="#0b1d2b" stroke="#294a60"/>
+      <text x="34" y="38" fill="#7295ad" font-size="13" font-weight="700" letter-spacing="2">TRUST RAIL · EACH GATE RECHECKS THE CHAIN</text>
+      <g font-size="16" font-weight="700">
+        <rect x="34" y="61" width="250" height="44" rx="12" fill="#102a2b" stroke="#31d892"/><text x="58" y="89" fill="#cdeee0">Source hashes</text>
+        <rect x="310" y="61" width="250" height="44" rx="12" fill="#10273a" stroke="#73d8ff"/><text x="334" y="89" fill="#d6edfa">Review receipt</text>
+        <rect x="586" y="61" width="250" height="44" rx="12" fill="#221e39" stroke="#a987ff"/><text x="610" y="89" fill="#e7ddff">Projection lineage</text>
+        <rect x="862" y="61" width="250" height="44" rx="12" fill="#302619" stroke="#f2ad45"/><text x="886" y="89" fill="#f6e0bb">Proof boundaries</text>
+      </g>
+      <text x="1588" y="82" fill="#dce9f1" font-size="17" font-weight="700" text-anchor="end">Fail closed when truth is missing.</text>
+      <text x="1588" y="105" fill="#7694a8" font-size="14" text-anchor="end">Models propose. Evidence and authority decide.</text>
     </g>
   </g>
 </svg>
