@@ -44,10 +44,10 @@ The current package contains:
 - explicit delivery-plan review with hash-bound receipts;
 - cycle, collision, write-budget, dependency, and tamper detection;
 - Task-Spec v3 draft materialization and Task Pack wrappers;
-- status, next, prepare, inspect, graph, report, and chat-context UX;
+- status, next, prepare, inspect, graph, report, and guided one-pass chat context;
 - receipt-owned Codex and Claude Code native-skill installers;
-- Codex and Claude plugin manifests that call the same CLI;
-- clean-room packaging, installer, proving-case, and release checks.
+- Codex and Claude plugin manifests plus repository marketplaces that call the same CLI;
+- clean-room packaging, installer, internal E2E, and release checks.
 
 Ordinary compilation never preflights, seals, dispatches, executes, accepts, or
 settles a task. Those authority transitions remain explicit.
@@ -93,15 +93,18 @@ not hand-edited.
 
 ## Task Pack boundary
 
-Phase 0 imported the complete tracked `skills/task-spec/` tree from Converge
+Phase 0 copied the complete tracked `skills/task-spec/` tree from Converge
 `v0.1.0`, commit `b585ca792418924182e1c6a87f660a5f8afa07bd`, Git tree
 `95dae33bf9c8da852ae50a7b6cfc44176cdaa5c8`.
 
-The import contains 125 files, including the template, parser helpers,
+The retained subsystem contains 119 files, including the template, parser helpers,
 validator, PRE/POST gates, HMAC envelope, lifecycle scripts, schemas, fixtures,
 and conformance harness. [`../vendor/task-pack-source.json`](../vendor/task-pack-source.json)
 records every file hash and executable mode. Seamwise wraps that subsystem; it
-does not rewrite its tokens or gate semantics.
+does not rewrite its tokens or gate semantics. The manifest records the local
+documentation/reference cleanup and the move of the still-tested cross-engine
+consumers; the upstream Task-Spec PDF is retained by provenance hash rather than
+duplicated in this repository.
 
 Converge's CLI, task loop, runtime binding, trackers, settlement, and learning
 passes were not imported. They remain external responsibilities.
@@ -112,17 +115,21 @@ One shared Agent Skills tree serves all hosts:
 
 - Codex project/user installs use `.agents/skills`.
 - Claude Code project/user installs use `.claude/skills`.
-- Supported plugin surfaces use the root host manifest.
+- Codex CLI/desktop and Claude Code use the checked-in repository marketplaces.
+- Codex IDE uses the native `.agents/skills` fallback because that surface does not load plugins.
 - Plain chat uses `seamwise agent-context --host chat` and cannot claim local execution.
+- Advisory workspace locks live in private runtime state outside `.git`, so a
+  host may protect Git metadata while the compiler serializes mutations.
 
-Marketplace publication, hosted ChatGPT installation, authenticated remote MCP,
-and external-service authorization are not part of the current release. Hooks,
-when added, may diagnose but may not approve or seal.
+The repository marketplace is implemented and locally lifecycle-tested. A
+universal public-directory listing, hosted browser-chat execution,
+authenticated remote MCP, and external-service authorization are not claimed.
+Hooks, when added, may diagnose but may not approve or seal.
 
-## Proving case
+## Verification data
 
-[`../examples/rate-limiting/recipe.yaml`](../examples/rate-limiting/recipe.yaml)
-compiles the blueprint's canonical steel thread:
+No public recipe example is shipped. Tests keep a private fixture under
+`tests/fixtures/` to exercise the blueprint's canonical steel thread:
 
 ```text
 policy schema valid
@@ -131,23 +138,29 @@ policy schema valid
   → stable reason and matching decision telemetry visible
 ```
 
-The proving run creates four seams, four owners, four capability legs, a
+The internal run creates four seams, four owners, four capability legs, a
 four-node critical path, complete lineage, and four Task-Spec v3 drafts. The
 drafts validate and preflight while remaining `signed_off: false` and
 `accepted: false`. The fictional target application is deliberately not
-presented as implemented.
+presented as implemented, and the fixture is excluded from the wheel.
 
 ## Development and sign-off
 
 ```bash
 uv sync --extra dev
 make check
+make check-hosts
 ```
 
 `make check` is the credential-free release boundary. It runs static checks,
 schemas, positive and adversarial tests, the full imported Task Pack suite in a
 disposable copy, package build, a fresh-environment wheel E2E, installer
 transactions, documentation checks, and the unchanged PDF hash check.
+
+`make check-hosts` is the explicit installed-host boundary. With both host CLIs
+available, it uses isolated configuration directories to test marketplace add,
+plugin install, enabled listing, cached contents, uninstall, and marketplace
+removal for Codex and Claude Code.
 
 Credentialed host probes are separate and explicit:
 

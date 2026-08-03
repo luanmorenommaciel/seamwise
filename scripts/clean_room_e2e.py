@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Prove the built wheel in an isolated venv and disposable workspaces.
 
-The authored proving fixture deliberately retains its host-tool contract:
-``shellcheck`` and ``pytest`` must already be available on ``PATH``.
+The internal test fixture deliberately retains its host-tool contract:
+``shellcheck`` and ``pytest`` must already be available on ``PATH``. It is test
+data, not a user-facing example and is not included in the wheel.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import zipfile
 from pathlib import Path
 
 
@@ -47,6 +49,18 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     wheel = args.wheel.resolve()
+    root = args.root.resolve()
+    with zipfile.ZipFile(wheel) as archive:
+        packaged = archive.namelist()
+    forbidden_package_paths = (
+        "/examples/",
+        "/TASK_PACK_VERSION",
+        "/TASK_PACK_CHANGELOG.md",
+        "/task-spec-v0.1.pdf",
+    )
+    for forbidden in forbidden_package_paths:
+        if any(forbidden in f"/{name}" for name in packaged):
+            raise RuntimeError(f"wheel retains obsolete package content: {forbidden}")
     missing_host_tools = [
         tool for tool in ("git", "bash", "shellcheck", "pytest") if shutil.which(tool) is None
     ]
@@ -58,6 +72,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="seamwise-clean-room-") as directory:
         clean = Path(directory)
         os.environ["SEAMWISE_STATE_HOME"] = str(clean / "runtime-state")
+        os.environ["SEAMWISE_LOCK_HOME"] = str(clean / "runtime-locks")
         venv = clean / "venv"
         run(["uv", "venv", str(venv)])
         python = venv / "bin/python"
@@ -81,15 +96,16 @@ def main() -> int:
         assert published_schema["$id"] == ("https://seamwise.dev/schemas/recipe-v1.json")
         assert '"format": "date-time"' in str(schema["data"]["schema"])
         recipe = workspace / "recipe.yaml"
-        assert (
-            envelope(
-                seamwise,
-                workspace,
-                ["recipe", "example", "--output", str(recipe)],
-            )["token"]
-            == "RECIPE_EXAMPLE=READY"
+        recipe_text = (root / "tests/fixtures/rate-limiting-recipe.yaml").read_text(
+            encoding="utf-8"
         )
-        recipe_text = recipe.read_text(encoding="utf-8")
+        recipe_text = recipe_text.replace(
+            "uri: docs/seamwise.pdf", "uri: seamwise-evidence/seamwise.pdf"
+        )
+        recipe.write_text(recipe_text, encoding="utf-8")
+        blueprint = workspace / "seamwise-evidence/seamwise.pdf"
+        blueprint.parent.mkdir(parents=True)
+        shutil.copyfile(root / "docs/seamwise.pdf", blueprint)
         assert "uri: seamwise-evidence/seamwise.pdf" in recipe_text
         remote_recipe = workspace / "remote-recipe.yaml"
         remote_recipe.write_text(
@@ -107,12 +123,13 @@ def main() -> int:
             expected=2,
         )
         assert remote["diagnostics"][0]["code"] == "remote_source_unverified"
-        blueprint = workspace / "seamwise-evidence/seamwise.pdf"
         assert hashlib.sha256(blueprint.read_bytes()).hexdigest() == (
             "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
         )
         pre_map_packet = envelope(seamwise, workspace, ["agent-context", "--host", "chat"])
         assert "recipe_authoring" in str(pre_map_packet["data"]["packet"])
+        assert "guided-one-pass" in str(pre_map_packet["data"]["packet"])
+        assert "example_yaml" not in str(pre_map_packet["data"]["packet"])
         blueprint_bytes = blueprint.read_bytes()
         blueprint.write_bytes(b"tampered blueprint")
         tampered = envelope(

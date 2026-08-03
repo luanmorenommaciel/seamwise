@@ -1,134 +1,117 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1774" height="887" viewBox="0 0 1774 887" role="img" aria-labelledby="title desc">
-  <title id="title">Task splitting compared with Seamwise</title>
-  <desc id="desc">A flat list keeps activities but loses architecture. Seamwise makes boundaries, ownership, capability states, dependencies, and proof explicit.</desc>
+  <title id="title">Task splitting compared with Seamwise decomposition</title>
+  <desc id="desc">Flat task splitting preserves activities but loses ownership, order, and proof. Seamwise preserves the natural seam and lowers the same outcome into four owned capability legs with visible proof.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#06111d"/>
-      <stop offset=".55" stop-color="#091827"/>
-      <stop offset="1" stop-color="#07111c"/>
-    </linearGradient>
-    <linearGradient id="left" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#141e2b"/>
-      <stop offset="1" stop-color="#0d1621"/>
-    </linearGradient>
-    <linearGradient id="right" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f9fcff"/>
-      <stop offset="1" stop-color="#e9f1f8"/>
-    </linearGradient>
-    <linearGradient id="seam" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#31d892"/>
-      <stop offset=".5" stop-color="#73d8ff"/>
-      <stop offset="1" stop-color="#a987ff"/>
-    </linearGradient>
     <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
-      <path d="M72 0H0V72" fill="none" stroke="#24435a" stroke-width="1" opacity=".22"/>
-      <circle cx="0" cy="0" r="1.8" fill="#416781" opacity=".3"/>
+      <path d="M72 0H0V72" fill="none" stroke="#24435a" stroke-width="1" opacity=".2"/>
+      <circle cx="0" cy="0" r="1.5" fill="#50738a" opacity=".28"/>
     </pattern>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="170%">
-      <feDropShadow dx="0" dy="12" stdDeviation="13" flood-color="#00040a" flood-opacity=".5"/>
+    <filter id="glow" x="-180%" y="-180%" width="460%" height="460%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="soft" x="-25%" y="-25%" width="150%" height="170%">
-      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#223c51" flood-opacity=".22"/>
-    </filter>
-    <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="10" result="blur"/>
-      <feFlood flood-color="#73d8ff" flood-opacity=".85"/>
-      <feComposite in2="blur" operator="in"/>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#00040a" flood-opacity=".5"/>
     </filter>
   </defs>
 
-  <rect width="1774" height="887" fill="#071421"/>
+  <rect width="1774" height="887" fill="#06111d"/>
   <rect width="1774" height="887" fill="url(#grid)"/>
 
-  <g font-family="Arial">
-    <text x="887" y="67" fill="#7e9db4" font-size="16" font-weight="700" text-anchor="middle" letter-spacing="4">SAME DELIVERY INTENT · DIFFERENT INFORMATION QUALITY</text>
-    <text x="887" y="116" fill="#f4f8fb" font-size="34" font-weight="700" text-anchor="middle">Smaller work should not mean a smaller system model.</text>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="887" y="67" fill="#7797ad" font-size="15" font-weight="700" text-anchor="middle" letter-spacing="3.5">SAME DELIVERY INTENT · DIFFERENT INFORMATION QUALITY</text>
+    <text x="887" y="116" fill="#f4f8fb" font-size="36" font-weight="700" text-anchor="middle">Smaller work should not mean a smaller system model.</text>
+    <text x="887" y="151" fill="#8faabd" font-size="17" text-anchor="middle">The difference is not task count. It is whether boundary, ownership, order, lineage, and proof survive.</text>
 
     <g filter="url(#shadow)">
-      <rect x="70" y="158" width="690" height="614" rx="32" fill="#0f1d2b" stroke="#57738a" stroke-width="2"/>
-      <rect x="1014" y="158" width="690" height="614" rx="32" fill="#f2f7fb" stroke="#adc1cf" stroke-width="2"/>
+      <rect x="70" y="188" width="690" height="570" rx="30" fill="#0d1d2b" stroke="#4b6578" stroke-width="2"/>
+      <rect x="1014" y="188" width="690" height="570" rx="30" fill="#0d1d2b" stroke="#35697c" stroke-width="2"/>
     </g>
 
-    <text x="112" y="205" fill="#f2ad45" font-size="14" font-weight="700" letter-spacing="2">TASK SPLITTING</text>
-    <text x="112" y="247" fill="#ffffff" font-size="28" font-weight="700">The activities survive.</text>
-    <text x="112" y="278" fill="#8faabd" font-size="17">The architecture becomes somebody else's guess.</text>
-    <line x1="112" y1="306" x2="718" y2="306" stroke="#334d61"/>
+    <text x="110" y="234" fill="#f2ad45" font-size="13" font-weight="700" letter-spacing="2">TASK SPLITTING</text>
+    <text x="110" y="274" fill="#f4f8fb" font-size="27" font-weight="700">Activities survive.</text>
+    <text x="110" y="304" fill="#8faabd" font-size="16">The architecture becomes somebody else&apos;s guess.</text>
+    <line x1="110" y1="326" x2="718" y2="326" stroke="#30495d"/>
 
-    <g filter="url(#soft)" font-size="19" font-weight="700" fill="#dce8ef">
-      <rect x="112" y="346" width="242" height="76" rx="16" fill="#17293a" stroke="#58748a"/><text x="148" y="392">Add schema</text>
-      <rect x="474" y="346" width="244" height="76" rx="16" fill="#17293a" stroke="#58748a"/><text x="510" y="392">Add endpoint</text>
-      <rect x="292" y="466" width="244" height="76" rx="16" fill="#17293a" stroke="#58748a"/><text x="328" y="512">Add tests</text>
-      <rect x="112" y="586" width="242" height="76" rx="16" fill="#17293a" stroke="#58748a"/><text x="148" y="632">Update docs</text>
-      <rect x="474" y="586" width="244" height="76" rx="16" fill="#17293a" stroke="#58748a"/><text x="510" y="632">Add metrics</text>
+    <g fill="none" stroke="#657f91" stroke-width="2" stroke-dasharray="6 9" opacity=".66">
+      <path d="M168 500C235 500 268 368 350 368"/>
+      <path d="M168 500C242 500 275 433 350 433"/>
+      <path d="M168 500C242 500 275 498 350 498"/>
+      <path d="M168 500C242 500 275 563 350 563"/>
+      <path d="M168 500C235 500 268 628 350 628"/>
+    </g>
+    <g>
+      <circle cx="168" cy="500" r="40" fill="#152838" stroke="#6c8799" stroke-width="2"/>
+      <circle cx="168" cy="500" r="9" fill="#f2ad45" filter="url(#glow)"/>
+      <text x="168" y="558" fill="#718ea2" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="1.4">FEATURE</text>
+    </g>
+    <g font-size="17" font-weight="700" fill="#dce8ef">
+      <rect x="350" y="340" width="310" height="56" rx="14" fill="#162a3b" stroke="#526f84"/><text x="382" y="374">Add schema</text>
+      <rect x="350" y="405" width="310" height="56" rx="14" fill="#162a3b" stroke="#526f84"/><text x="382" y="439">Add endpoint</text>
+      <rect x="350" y="470" width="310" height="56" rx="14" fill="#162a3b" stroke="#526f84"/><text x="382" y="504">Add tests</text>
+      <rect x="350" y="535" width="310" height="56" rx="14" fill="#162a3b" stroke="#526f84"/><text x="382" y="569">Update docs</text>
+      <rect x="350" y="600" width="310" height="56" rx="14" fill="#162a3b" stroke="#526f84"/><text x="382" y="634">Add metrics</text>
+    </g>
+    <g font-size="11" font-weight="700">
+      <rect x="108" y="686" width="104" height="34" rx="17" fill="#302619" stroke="#f2ad45"/><text x="160" y="707" fill="#f6d99d" text-anchor="middle">OWNER?</text>
+      <rect x="225" y="686" width="100" height="34" rx="17" fill="#302619" stroke="#f2ad45"/><text x="275" y="707" fill="#f6d99d" text-anchor="middle">ORDER?</text>
+      <rect x="338" y="686" width="100" height="34" rx="17" fill="#302619" stroke="#f2ad45"/><text x="388" y="707" fill="#f6d99d" text-anchor="middle">PROOF?</text>
+      <text x="718" y="707" fill="#d6b267" text-anchor="end">Readable list. Hidden system.</text>
     </g>
 
-    <g fill="none" stroke="#617d91" stroke-width="2" stroke-dasharray="7 10" opacity=".6">
-      <path d="M354 384H474"/>
-      <path d="M596 422C596 455 536 450 536 504"/>
-      <path d="M292 504C230 504 233 552 233 586"/>
-      <path d="M536 504C596 504 596 552 596 586"/>
-    </g>
-    <g fill="#f2ad45">
-      <circle cx="414" cy="384" r="6"/><circle cx="579" cy="451" r="6"/><circle cx="264" cy="546" r="6"/><circle cx="566" cy="546" r="6"/>
+    <g transform="translate(887 472)">
+      <path d="M0 -102V102" stroke="#73d8ff" stroke-width="3" opacity=".75" filter="url(#glow)"/>
+      <path d="M-72 -72L-16 -94V76L-72 56Z" fill="#f4f8fb"/>
+      <path d="M16 -72L72 -94V56L16 76Z" fill="#f4f8fb"/>
+      <text x="0" y="137" fill="#f4f8fb" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="4">SEAMWISE</text>
+      <text x="0" y="163" fill="#7897ab" font-size="12" text-anchor="middle">find the joint · preserve the chain</text>
     </g>
 
-    <g font-size="13" font-weight="700">
-      <rect x="112" y="688" width="116" height="36" rx="18" fill="#332514" stroke="#f2ad45"/><text x="170" y="711" fill="#ffd27b" text-anchor="middle">OWNER?</text>
-      <rect x="246" y="688" width="112" height="36" rx="18" fill="#332514" stroke="#f2ad45"/><text x="302" y="711" fill="#ffd27b" text-anchor="middle">ORDER?</text>
-      <rect x="376" y="688" width="112" height="36" rx="18" fill="#332514" stroke="#f2ad45"/><text x="432" y="711" fill="#ffd27b" text-anchor="middle">PROOF?</text>
-      <text x="718" y="711" fill="#e0b765" text-anchor="end">Readable list. Hidden system.</text>
-    </g>
+    <text x="1054" y="234" fill="#31d892" font-size="13" font-weight="700" letter-spacing="2">ARCHITECTURE-AWARE DECOMPOSITION</text>
+    <text x="1054" y="274" fill="#f4f8fb" font-size="27" font-weight="700">System meaning survives.</text>
+    <text x="1054" y="304" fill="#8faabd" font-size="16">The work gets smaller; boundary, owner, order, and proof remain.</text>
+    <line x1="1054" y1="326" x2="1664" y2="326" stroke="#30495d"/>
 
-    <g transform="translate(887 452)">
-      <path d="M-42 -170L10 -104V104L-42 170Z" fill="#0b2132" stroke="url(#seam)" stroke-width="3"/>
-      <path d="M42 -170L-10 -104V104L42 170Z" fill="#0b2132" stroke="url(#seam)" stroke-width="3"/>
-      <circle cx="0" cy="0" r="9" fill="#73d8ff" filter="url(#glow)"/>
-      <text x="0" y="212" fill="#dce9f1" font-size="15" font-weight="700" text-anchor="middle" letter-spacing="2">SEAMWISE</text>
-      <text x="0" y="238" fill="#7999af" font-size="13" text-anchor="middle">evidence + refutation</text>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1078 510L1168 372H1654" stroke="#31d892" stroke-width="3"/>
+      <path d="M1078 510L1182 464H1654" stroke="#64b9ff" stroke-width="3"/>
+      <path d="M1078 510L1182 556H1654" stroke="#a987ff" stroke-width="3"/>
+      <path d="M1078 510L1168 648H1654" stroke="#f2ad45" stroke-width="3"/>
+      <path d="M1458 372V648" stroke="#536c7e" stroke-width="1.4" stroke-dasharray="5 8" opacity=".65"/>
+      <path d="M1468 382L1570 454M1468 474L1570 546M1468 566L1570 638" stroke="#536c7e" stroke-width="1.2" stroke-dasharray="5 8" opacity=".48"/>
     </g>
-
-    <text x="1056" y="205" fill="#218666" font-size="14" font-weight="700" letter-spacing="2">SYSTEM-AWARE WORK</text>
-    <text x="1056" y="247" fill="#102435" font-size="28" font-weight="700">The work gets smaller.</text>
-    <text x="1056" y="278" fill="#60798a" font-size="17">The boundaries, order, and proof remain explicit.</text>
-    <line x1="1056" y1="306" x2="1662" y2="306" stroke="#cbd8e1"/>
-
-    <g fill="#61798a" font-size="12" font-weight="700" letter-spacing="1.2">
-      <text x="1084" y="338">SYSTEM JOINT</text><text x="1252" y="338">OWNER</text><text x="1380" y="338">CAPABILITY STATE</text><text x="1595" y="338">PROOF</text>
-    </g>
-
-    <g filter="url(#soft)">
-      <rect x="1056" y="358" width="606" height="72" rx="16" fill="#ffffff" stroke="#72d8af"/>
-      <rect x="1056" y="446" width="606" height="72" rx="16" fill="#ffffff" stroke="#72c5f5"/>
-      <rect x="1056" y="534" width="606" height="72" rx="16" fill="#ffffff" stroke="#aa91ed"/>
-      <rect x="1056" y="622" width="606" height="72" rx="16" fill="#ffffff" stroke="#e6b663"/>
-    </g>
-    <g stroke="#d6e1e8"><path d="M1228 358V694"/><path d="M1354 358V694"/><path d="M1564 358V694"/></g>
-
-    <g font-size="14" font-weight="700">
-      <text x="1080" y="400" fill="#177552">Policy contract</text><text x="1252" y="400" fill="#244156">Contract</text><text x="1378" y="400" fill="#536d7f">Schema is valid</text>
-      <text x="1080" y="488" fill="#176791">Resolution</text><text x="1252" y="488" fill="#244156">Policy</text><text x="1378" y="488" fill="#536d7f">Policy resolves</text>
-      <text x="1080" y="576" fill="#6048a2">Enforcement</text><text x="1252" y="576" fill="#244156">Request</text><text x="1378" y="576" fill="#536d7f">101 is denied</text>
-      <text x="1080" y="664" fill="#8c6024">Visibility</text><text x="1252" y="664" fill="#244156">Telemetry</text><text x="1378" y="664" fill="#536d7f">Reason is visible</text>
-    </g>
+    <circle cx="1078" cy="510" r="31" fill="#132737" stroke="#73d8ff" stroke-width="2"/>
+    <circle cx="1078" cy="510" r="8" fill="#e2f6ff" filter="url(#glow)"/>
 
     <g>
-      <rect x="1588" y="376" width="44" height="36" rx="10" fill="#e9f9f2" stroke="#54c998"/>
-      <rect x="1588" y="464" width="44" height="36" rx="10" fill="#e7f6ff" stroke="#59b8ec"/>
-      <rect x="1588" y="552" width="44" height="36" rx="10" fill="#f0ebff" stroke="#9c7ce8"/>
-      <rect x="1588" y="640" width="44" height="36" rx="10" fill="#fff4df" stroke="#dfa64d"/>
-      <g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M1599 394L1607 402L1621 386" stroke="#2bb47f"/><path d="M1599 482L1607 490L1621 474" stroke="#329fd6"/>
-        <path d="M1599 570L1607 578L1621 562" stroke="#7e5fc8"/><path d="M1599 658L1607 666L1621 650" stroke="#ca8d2d"/>
-      </g>
+      <g transform="translate(1190 345)"><text fill="#68dda9" font-size="11" font-weight="700" letter-spacing="1.2">OWNER · CONTRACT</text><text y="26" fill="#f4f8fb" font-size="19" font-weight="700">Schema is valid</text></g>
+      <g transform="translate(1204 437)"><text fill="#7bc9ff" font-size="11" font-weight="700" letter-spacing="1.2">OWNER · POLICY</text><text y="26" fill="#f4f8fb" font-size="19" font-weight="700">Policy resolves</text></g>
+      <g transform="translate(1204 529)"><text fill="#bdabff" font-size="11" font-weight="700" letter-spacing="1.2">OWNER · REQUEST</text><text y="26" fill="#f4f8fb" font-size="19" font-weight="700">Request 101 is denied</text></g>
+      <g transform="translate(1190 621)"><text fill="#f3c371" font-size="11" font-weight="700" letter-spacing="1.2">OWNER · TELEMETRY</text><text y="26" fill="#f4f8fb" font-size="19" font-weight="700">Reason is visible</text></g>
+    </g>
+    <g>
+      <g transform="translate(1458 372)"><circle r="20" fill="#142431" stroke="#5d7586"/><circle r="7" fill="#31d892" filter="url(#glow)"/></g>
+      <g transform="translate(1458 464)"><circle r="20" fill="#142431" stroke="#5d7586"/><circle r="7" fill="#64b9ff" filter="url(#glow)"/></g>
+      <g transform="translate(1458 556)"><circle r="20" fill="#142431" stroke="#5d7586"/><circle r="7" fill="#a987ff" filter="url(#glow)"/></g>
+      <g transform="translate(1458 648)"><circle r="20" fill="#142431" stroke="#5d7586"/><circle r="7" fill="#f2ad45" filter="url(#glow)"/></g>
+    </g>
+    <g>
+      <g transform="translate(1654 372)"><circle r="18" fill="none" stroke="#31d892" opacity=".35"/><circle r="7" fill="#dcffed" filter="url(#glow)"/></g>
+      <g transform="translate(1654 464)"><circle r="18" fill="none" stroke="#64b9ff" opacity=".35"/><circle r="7" fill="#e1f4ff" filter="url(#glow)"/></g>
+      <g transform="translate(1654 556)"><circle r="18" fill="none" stroke="#a987ff" opacity=".35"/><circle r="7" fill="#eee8ff" filter="url(#glow)"/></g>
+      <g transform="translate(1654 648)"><circle r="18" fill="none" stroke="#f2ad45" opacity=".35"/><circle r="7" fill="#fff0d3" filter="url(#glow)"/></g>
+    </g>
+    <g font-size="10" font-weight="700" letter-spacing="1.2" fill="#718ea2">
+      <text x="1458" y="703" text-anchor="middle">STATE CHECKPOINT</text>
+      <text x="1654" y="703" text-anchor="middle">PROOF</text>
     </g>
 
-    <g transform="translate(70 808)">
-      <text x="0" y="0" fill="#7897ad" font-size="14" font-weight="700" letter-spacing="1.5">FLAT</text>
-      <text x="70" y="0" fill="#d8e5ed" font-size="16">architecture implicit · concurrency guessed · done subjective</text>
-      <line x1="778" y1="-8" x2="846" y2="-8" stroke="url(#seam)" stroke-width="3"/>
-      <text x="900" y="0" fill="#78d9b2" font-size="14" font-weight="700" letter-spacing="1.5">SEAMWISE</text>
-      <text x="1024" y="0" fill="#d8e5ed" font-size="16">boundaries explicit · dependencies proven · evals runnable</text>
+    <g transform="translate(70 815)">
+      <text fill="#7897ad" font-size="13" font-weight="700" letter-spacing="1.8">FLAT</text>
+      <text x="66" fill="#d8e5ed" font-size="15">activities grouped · ownership guessed · completion subjective</text>
+      <line x1="764" y1="-7" x2="850" y2="-7" stroke="#73d8ff" stroke-width="2"/>
+      <text x="900" fill="#70d9b0" font-size="13" font-weight="700" letter-spacing="1.8">SEAMWISE</text>
+      <text x="1028" fill="#d8e5ed" font-size="15">structure preserved · dependencies explicit · evals runnable</text>
     </g>
   </g>
 </svg>

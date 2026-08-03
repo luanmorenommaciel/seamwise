@@ -34,8 +34,6 @@ from seamwise.engine import (
 from seamwise.installer import install as run_install
 from seamwise.installer import uninstall as run_uninstall
 from seamwise.io import (
-    TransactionWriter,
-    UnsafeWriteTargetError,
     load_yaml,
     sha256_file,
     workspace_lock,
@@ -43,10 +41,8 @@ from seamwise.io import (
 from seamwise.reporting import agent_context as build_agent_context
 from seamwise.reporting import build_report
 from seamwise.result import Diagnostic, Result
-from seamwise.safety import workspace_boundary_diagnostics
 from seamwise.taskpack import (
     _verify_task_bundle_unlocked,
-    assets_root,
     setup_signing_key,
     task_pack_root,
     validate_task_specs,
@@ -255,179 +251,7 @@ def init_command(state: State, force: bool) -> NoReturn:
 
 @cli.group("recipe")
 def recipe_group() -> None:
-    """Discover the authored recipe contract and a complete editable example."""
-
-
-@recipe_group.command("example")
-@click.option(
-    "--output",
-    type=click.Path(path_type=Path, dir_okay=False),
-    default=Path("seamwise-recipe.yaml"),
-    show_default=True,
-)
-@pass_state
-def recipe_example_command(state: State, output: Path) -> NoReturn:
-    """Copy the complete rate-limit recipe as a non-clobbering authoring reference."""
-
-    destination = output if output.is_absolute() else state.workspace / output
-    destination = destination.resolve()
-    if destination.exists():
-        emit_result(
-            state,
-            Result(
-                "recipe example",
-                "RECIPE_EXAMPLE=BLOCKED",
-                EXIT_INVALID,
-                state.workspace,
-                diagnostics=[
-                    Diagnostic(
-                        "recipe_destination_exists",
-                        "Refusing to replace the output file.",
-                        str(destination),
-                    )
-                ],
-            ),
-        )
-    source = assets_root() / "examples" / "rate-limiting" / "recipe.yaml"
-    blueprint = assets_root() / "docs" / "seamwise.pdf"
-    if not source.is_file() or not blueprint.is_file():
-        emit_result(
-            state,
-            Result(
-                "recipe example",
-                "RECIPE_EXAMPLE=ERROR",
-                5,
-                state.workspace,
-                diagnostics=[
-                    Diagnostic(
-                        "recipe_example_unavailable",
-                        "Bundled example or canonical evidence copy is missing.",
-                    )
-                ],
-            ),
-        )
-    evidence_destination = destination.parent / "seamwise-evidence" / "seamwise.pdf"
-    boundary_diagnostics = workspace_boundary_diagnostics(
-        state.workspace, extra_paths=[destination, evidence_destination]
-    )
-    if boundary_diagnostics:
-        emit_result(
-            state,
-            Result(
-                "recipe example",
-                "RECIPE_EXAMPLE=BLOCKED",
-                4,
-                state.workspace,
-                diagnostics=boundary_diagnostics,
-            ),
-        )
-    expected_blueprint_sha = "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
-    if sha256_file(blueprint) != expected_blueprint_sha:
-        emit_result(
-            state,
-            Result(
-                "recipe example",
-                "RECIPE_EXAMPLE=ERROR",
-                4,
-                state.workspace,
-                diagnostics=[
-                    Diagnostic(
-                        "bundled_blueprint_hash_mismatch",
-                        "The bundled canonical evidence copy failed its pinned hash.",
-                    )
-                ],
-            ),
-        )
-    if (
-        evidence_destination.exists()
-        and sha256_file(evidence_destination) != expected_blueprint_sha
-    ):
-        emit_result(
-            state,
-            Result(
-                "recipe example",
-                "RECIPE_EXAMPLE=BLOCKED",
-                EXIT_INVALID,
-                state.workspace,
-                diagnostics=[
-                    Diagnostic(
-                        "recipe_evidence_destination_exists",
-                        "Refusing to replace a different evidence file.",
-                        str(evidence_destination),
-                    )
-                ],
-            ),
-        )
-    recipe_text = source.read_text(encoding="utf-8").replace(
-        "docs/seamwise.pdf", "seamwise-evidence/seamwise.pdf"
-    )
-    writer = TransactionWriter(dry_run=state.dry_run)
-    writer.text(destination, recipe_text)
-    if not evidence_destination.exists():
-        writer.bytes(evidence_destination, blueprint.read_bytes())
-    with workspace_lock(state.workspace, dry_run=state.dry_run):
-        locked_boundary = workspace_boundary_diagnostics(
-            state.workspace, extra_paths=[destination, evidence_destination]
-        )
-        if locked_boundary:
-            emit_result(
-                state,
-                Result(
-                    "recipe example",
-                    "RECIPE_EXAMPLE=BLOCKED",
-                    4,
-                    state.workspace,
-                    diagnostics=locked_boundary,
-                ),
-            )
-        if destination.exists():
-            emit_result(
-                state,
-                Result(
-                    "recipe example",
-                    "RECIPE_EXAMPLE=BLOCKED",
-                    EXIT_INVALID,
-                    state.workspace,
-                    diagnostics=[
-                        Diagnostic(
-                            "recipe_destination_exists",
-                            "Recipe destination appeared while materializing the example.",
-                            str(destination),
-                        )
-                    ],
-                ),
-            )
-        try:
-            writer.commit()
-        except UnsafeWriteTargetError as error:
-            emit_result(
-                state,
-                Result(
-                    "recipe example",
-                    "RECIPE_EXAMPLE=BLOCKED",
-                    4,
-                    state.workspace,
-                    diagnostics=[Diagnostic("unsafe_write_target", str(error))],
-                ),
-            )
-    emit_result(
-        state,
-        Result(
-            "recipe example",
-            "RECIPE_EXAMPLE=READY",
-            EXIT_OK,
-            state.workspace,
-            artifacts=writer.touched,
-            next_steps=[
-                f"Edit {destination.name}; replace every example fact, then run seamwise map --source {destination.name}"
-            ],
-            data={
-                "dry_run": state.dry_run,
-                "schema": str(schema_path("recipe")),
-                "evidence_sha256": expected_blueprint_sha,
-            },
-        ),
-    )
+    """Inspect the exact authored recipe contract accepted by mapping."""
 
 
 @recipe_group.command("schema")

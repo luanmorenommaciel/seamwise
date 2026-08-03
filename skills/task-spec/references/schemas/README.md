@@ -125,5 +125,5 @@ The schema `$id` includes the Task-Spec format version. Breaking schema changes 
 
 - `references/concepts/agent-contract.md` — human-readable field reference for `agent_contract` v2
 - `references/concepts/task-spec-v1.md` — format definition (zones, frontmatter, validation card)
-- `examples/consume-task-spec.py` — minimal Python consumer
-- `examples/consume-task-spec.ts` — minimal TypeScript consumer
+- `../consumers/consume-task-spec.py` — minimal Python consumer
+- `../consumers/consume-task-spec.ts` — minimal TypeScript consumer

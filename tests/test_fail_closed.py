@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 import yaml
 from click.testing import CliRunner
-from conftest import compile_fixture, write_recipe
+from conftest import RECIPE, compile_fixture, write_recipe
 
 from seamwise.cli import cli
 from seamwise.engine import (
@@ -32,9 +32,7 @@ def test_missing_evidence_needs_discovery(tmp_path: Path, recipe: dict[str, Any]
 
 
 def test_recipe_duplicate_authority_keys_are_rejected(tmp_path: Path) -> None:
-    source_text = (Path(__file__).parents[1] / "examples/rate-limiting/recipe.yaml").read_text(
-        encoding="utf-8"
-    )
+    source_text = RECIPE.read_text(encoding="utf-8")
     source_text = source_text.replace(
         "    owner: platform-contracts\n",
         "    owner: hidden-owner\n    owner: platform-contracts\n",
@@ -524,24 +522,3 @@ def test_coordinated_projection_rebinding_cannot_erase_reviewed_tasks(
         item.code in {"task_graph_projection_mismatch", "task_lineage_projection_mismatch"}
         for item in status.diagnostics
     )
-
-
-def test_recipe_example_refuses_symlinked_output_ancestor(tmp_path: Path) -> None:
-    root = tmp_path / "workspace"
-    outside = tmp_path / "outside"
-    root.mkdir()
-    outside.mkdir()
-    (root / "redirect").symlink_to(outside, target_is_directory=True)
-    result = CliRunner().invoke(
-        cli,
-        [
-            "--workspace",
-            str(root),
-            "recipe",
-            "example",
-            "--output",
-            "redirect/recipe.yaml",
-        ],
-    )
-    assert result.exit_code == 4
-    assert list(outside.iterdir()) == []

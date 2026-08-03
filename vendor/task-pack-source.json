@@ -1,6 +1,6 @@
 {
   "destination": "skills/task-spec",
-  "file_count": 125,
+  "file_count": 119,
   "files": {
     ".markdownlintrc": {
       "mode": "0644",
@@ -9,8 +9,8 @@
     },
     "README.md": {
       "mode": "0644",
-      "sha256": "6f5c78e9b563e8c934ee84bbd66d8fede816bf0656555db815316a8093e343e3",
-      "size": 15568
+      "sha256": "605a0a239bc0263c347b1234199dfa299da5042c0606187bb87994b3a4fb58a7",
+      "size": 15342
     },
     "SKILL.md": {
       "mode": "0644",
@@ -102,60 +102,30 @@
       "sha256": "ee92912778e00c41dc59af18367897032ead85e80dbda27a8efc1a05f8830f47",
       "size": 27656
     },
-    "references/examples/.gitignore": {
+    "references/consumers/.gitignore": {
       "mode": "0644",
       "sha256": "6ccd614ab618439991f23dbf52dcefd30766a6944f27e460ae85a84d27b8a70f",
       "size": 152
     },
-    "references/examples/T-20260721-ex-l-capture-steelthread.md": {
-      "mode": "0644",
-      "sha256": "1fcd260e0e4087972da5afa918ccd5a820082289de1323cc6c25aac6a818c34a",
-      "size": 2050
-    },
-    "references/examples/T-20260721-ex-m-silver-dedup.md": {
-      "mode": "0644",
-      "sha256": "4757eab711ebcd4a6c512f0465af5ca92dea9df6b062aa0474a0c413ba76ad17",
-      "size": 2251
-    },
-    "references/examples/T-20260721-ex-s-health-endpoint.md": {
-      "mode": "0644",
-      "sha256": "d54fd4565912199a5ba3cc7b513556db9165be2cb1266a08850d19a8b738696b",
-      "size": 1711
-    },
-    "references/examples/T-20260721-ex-xl-swimlane-transform.md": {
-      "mode": "0644",
-      "sha256": "e5e17fff793f2d2f855e133d2afc49281f774477ebcbcf0e795c03ba4621cafa",
-      "size": 1949
-    },
-    "references/examples/T-20260721-ex-xs-staleness-config.md": {
-      "mode": "0644",
-      "sha256": "9470f9bbb08846b59888438bc2fd99348375bedbd4b81e75cc0b8fd113b82ec9",
-      "size": 1440
-    },
-    "references/examples/T-20260721-ex-xxl-analytical-backbone.md": {
-      "mode": "0644",
-      "sha256": "dd782bf2ca82be00088e6071cacee408bbc2857af67f70223b563b0f2d8ba50d",
-      "size": 1995
-    },
-    "references/examples/consume-task-spec.py": {
+    "references/consumers/consume-task-spec.py": {
       "mode": "0755",
       "sha256": "07b73edb76cce0a3530f54df42698898183d6e7d72e246fb3668156304f9d010",
       "size": 5581
     },
-    "references/examples/consume-task-spec.ts": {
+    "references/consumers/consume-task-spec.ts": {
       "mode": "0644",
-      "sha256": "2eb8e93fe65b91a6b7c0c7c6ebe328e8332093898f723c0b3b5fc70e07bec18d",
-      "size": 5430
+      "sha256": "0ef1b7f8a112af10066602f5d3c40f2dae0e68024dd21fff7be622cd32ffda5b",
+      "size": 5431
     },
-    "references/examples/package-lock.json": {
+    "references/consumers/package-lock.json": {
       "mode": "0644",
-      "sha256": "130c74344313f69d6e8e5cd89b168fee290a8b25a819703edacee2d64d205715",
-      "size": 11159
+      "sha256": "ee662f0dcc0cc05d403314c76613ea26bf9b8f25d5377d66cd2931290190b439",
+      "size": 11155
     },
-    "references/examples/package.json": {
+    "references/consumers/package.json": {
       "mode": "0644",
-      "sha256": "f0c8330b48e4243e2d494f234607685bd108cd5c012c03ef72d346953cfcd447",
-      "size": 428
+      "sha256": "14a72524514109c654ba17c6beafafb133e7a3e20ee76a26549c44bb5f0827d4",
+      "size": 426
     },
     "references/index.md": {
       "mode": "0644",
@@ -199,8 +169,8 @@
     },
     "references/schemas/README.md": {
       "mode": "0644",
-      "sha256": "c608c88fbed10ab8a40ce6c15f482200197b99ba86c5db1c681c7a62c9d80633",
-      "size": 4713
+      "sha256": "02bc9066ba52151a96ac1b345171906e4d66b75e21e20cf5ebfd9f9f8f12cb28",
+      "size": 4721
     },
     "references/schemas/agent-contract.schema.json": {
       "mode": "0644",
@@ -614,8 +584,8 @@
     },
     "tests/test-portability-e2e.sh": {
       "mode": "0755",
-      "sha256": "20460c26a774d743d0ab47fa33781ee333e32dabc7bc1f5c9812f056d431b33b",
-      "size": 16409
+      "sha256": "dec4248e184f65f245f465d6204a4f6769a973b728dce2603e2fd9dfe55b9f24",
+      "size": 16416
     },
     "tests/test-task-spec-skill.sh": {
       "mode": "0755",
@@ -630,13 +600,30 @@
   },
   "imported_at": "2026-08-02",
   "license": "MIT",
+  "local_changes": [
+    {
+      "kind": "documentation-only",
+      "path": "README.md",
+      "reason": "Removed links to Task Pack package artifacts not shipped by Seamwise."
+    },
+    {
+      "kind": "reference-cleanup",
+      "path": "references/examples",
+      "reason": "Removed six illustrative Task-Specs; they are not runtime or conformance inputs."
+    },
+    {
+      "kind": "reference-move",
+      "path": "references/consumers",
+      "reason": "Moved the load-bearing cross-engine consumers out of the removed examples directory."
+    }
+  ],
   "schema_version": 1,
   "source": "https://github.com/luanmorenommaciel/converge",
   "source_commit": "b585ca792418924182e1c6a87f660a5f8afa07bd",
   "source_document": {
-    "destination": "docs/task-spec-v0.1.pdf",
-    "path": "docs/task-spec-v0.1.pdf",
-    "sha256": "1737ace66228bebb131803256bfb7df633ba631fbb19bd88a8ff91520eb7f72a"
+    "included": false,
+    "sha256": "1737ace66228bebb131803256bfb7df633ba631fbb19bd88a8ff91520eb7f72a",
+    "upstream_path": "docs/task-spec-v0.1.pdf"
   },
   "source_ref": "v0.1.0",
   "source_tree": "95dae33bf9c8da852ae50a7b6cfc44176cdaa5c8",

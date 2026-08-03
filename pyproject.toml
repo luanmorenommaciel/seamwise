@@ -57,19 +57,15 @@ packages = ["src/seamwise"]
 ".codex-plugin" = "seamwise/assets/.codex-plugin"
 ".claude-plugin" = "seamwise/assets/.claude-plugin"
 "vendor" = "seamwise/assets/vendor"
-"examples" = "seamwise/assets/examples"
-"docs/seamwise.pdf" = "seamwise/assets/docs/seamwise.pdf"
 "VERSION" = "seamwise/assets/VERSION"
-"TASK_PACK_VERSION" = "seamwise/assets/TASK_PACK_VERSION"
 "LICENSE" = "seamwise/assets/LICENSE"
 
 [tool.hatch.build.targets.sdist]
 include = [
+  "/.agents",
   "/.claude-plugin",
   "/.codex-plugin",
-  "/bin",
   "/docs",
-  "/examples",
   "/schemas",
   "/scripts",
   "/skills",
@@ -78,8 +74,6 @@ include = [
   "/vendor",
   "/LICENSE",
   "/README.md",
-  "/TASK_PACK_CHANGELOG.md",
-  "/TASK_PACK_VERSION",
   "/VERSION",
 ]
 

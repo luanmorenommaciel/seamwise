@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-set -eu
-seamwise_bin_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-PYTHONPATH="$seamwise_bin_root/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m seamwise.cli "$@"

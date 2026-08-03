@@ -20,12 +20,23 @@ def main() -> int:
     root = args.root.resolve()
     documents = [
         root / "README.md",
-        root / "PLAN.md",
         root / "docs/project.md",
         *sorted((root / "docs/decisions").glob("*.md")),
-        *sorted((root / "examples").glob("**/*.md")),
+        *sorted((root / "skills").glob("*/SKILL.md")),
     ]
     errors: list[str] = []
+    forbidden = (
+        root / "PLAN.md",
+        root / "TASK_PACK_CHANGELOG.md",
+        root / "TASK_PACK_VERSION",
+        root / "docs/task-spec-v0.1.pdf",
+        root / "examples",
+        root / "skills/task-spec/references/examples",
+        root / "bin",
+    )
+    for path in forbidden:
+        if path.exists():
+            errors.append(f"obsolete public artifact remains: {path}")
     for document in documents:
         text = document.read_text(encoding="utf-8")
         if text.count("```mermaid") > text.count("```") // 2:
@@ -74,11 +85,9 @@ def main() -> int:
     expected = "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
     if digest != expected:
         errors.append(f"canonical blueprint changed: {digest}")
-    task_pack_pdf = root / "docs/task-spec-v0.1.pdf"
     provenance = json.loads((root / "vendor/task-pack-source.json").read_text(encoding="utf-8"))
-    task_pack_digest = hashlib.sha256(task_pack_pdf.read_bytes()).hexdigest()
-    if task_pack_digest != provenance["source_document"]["sha256"]:
-        errors.append(f"Task Pack PDF changed: {task_pack_digest}")
+    if provenance["source_document"].get("included") is not False:
+        errors.append("Task Pack source PDF must remain provenance-only, not checked in")
     for asset in sorted((root / "assets").glob("*.svg")):
         ET.parse(asset)
     if errors:

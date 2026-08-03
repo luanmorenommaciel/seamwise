@@ -1,137 +1,128 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1774" height="887" viewBox="0 0 1774 887" role="img" aria-labelledby="title desc">
-  <title id="title">Seamwise lowering chain</title>
-  <desc id="desc">Delivery intent and evidence pass through seam mapping, an ownership plan, explicit review, a dependency graph, and proof-bearing unsealed Task-Specs.</desc>
+  <title id="title">Seamwise architecture-aware lowering</title>
+  <desc id="desc">Delivery intent and evidence reach a natural system seam, then become four owned, ordered, independently provable capability legs while lineage stays attached.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#06111d"/>
-      <stop offset="0.55" stop-color="#091827"/>
-      <stop offset="1" stop-color="#07111c"/>
-    </linearGradient>
-    <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#31d892"/>
-      <stop offset="0.35" stop-color="#73d8ff"/>
-      <stop offset="0.68" stop-color="#a987ff"/>
-      <stop offset="1" stop-color="#f2ad45"/>
-    </linearGradient>
-    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#11283a"/>
-      <stop offset="1" stop-color="#0b1b2a"/>
-    </linearGradient>
-    <linearGradient id="finalCard" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f7fbff"/>
-      <stop offset="1" stop-color="#e8f1f8"/>
-    </linearGradient>
     <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
-      <path d="M72 0H0V72" fill="none" stroke="#24435a" stroke-width="1" opacity=".22"/>
-      <circle cx="0" cy="0" r="1.8" fill="#416781" opacity=".3"/>
+      <path d="M72 0H0V72" fill="none" stroke="#24435a" stroke-width="1" opacity=".2"/>
+      <circle cx="0" cy="0" r="1.5" fill="#50738a" opacity=".28"/>
     </pattern>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="170%">
-      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#00040a" flood-opacity=".52"/>
+    <filter id="glow" x="-180%" y="-180%" width="460%" height="460%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="9" result="blur"/>
-      <feFlood flood-color="#73d8ff" flood-opacity=".8"/>
-      <feComposite in2="blur" operator="in"/>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#00040a" flood-opacity=".52"/>
     </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#79d9ff"/>
-    </marker>
   </defs>
 
-  <rect width="1774" height="887" fill="#071421"/>
+  <rect width="1774" height="887" fill="#06111d"/>
   <rect width="1774" height="887" fill="url(#grid)"/>
-  <circle cx="271" cy="447" r="300" fill="#133450" opacity=".12"/>
-  <circle cx="1508" cy="447" r="310" fill="#243052" opacity=".1"/>
+  <circle cx="114" cy="468" r="285" fill="#102a40" opacity=".14"/>
+  <circle cx="1618" cy="468" r="300" fill="#1b2842" opacity=".11"/>
 
-  <g font-family="Arial">
-    <text x="76" y="76" fill="#80a2ba" font-size="18" font-weight="700" letter-spacing="4">THE LOWERING CHAIN</text>
-    <text x="76" y="126" fill="#f4f8fb" font-size="35" font-weight="700">From delivery intent to proof-bearing work.</text>
-    <text x="1698" y="78" fill="#66869d" font-size="15" text-anchor="end" letter-spacing="2">ONE COMPILER · ONE SOURCE OF TRUTH</text>
-    <text x="76" y="164" fill="#91acbf" font-size="18">Boundaries, ownership, causality, and proof survive every transformation.</text>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <g transform="translate(70 39)">
+      <path d="M34 7V65" stroke="#73d8ff" stroke-width="2" opacity=".75"/>
+      <path d="M5 17L27 9V64L5 56Z" fill="#f4f8fb"/>
+      <path d="M41 17L63 9V56L41 64Z" fill="#f4f8fb"/>
+      <text x="84" y="43" fill="#f4f8fb" font-size="19" font-weight="700" letter-spacing="5">SEAMWISE</text>
+    </g>
+    <text x="1704" y="77" fill="#6f8da2" font-size="14" font-weight="700" text-anchor="end" letter-spacing="2.5">ARCHITECTURE-AWARE LOWERING</text>
+    <text x="70" y="142" fill="#f4f8fb" font-size="37" font-weight="700">From one intent to four provable capability states.</text>
+    <text x="70" y="178" fill="#8faabd" font-size="18">The compiler preserves the boundary, owner, progression, dependency, lineage, and proof behind every task.</text>
 
-    <path d="M126 455H1644" fill="none" stroke="#173a50" stroke-width="14" stroke-linecap="round"/>
-    <path d="M126 455H1644" fill="none" stroke="url(#rail)" stroke-width="3" stroke-linecap="round" opacity=".92"/>
+    <g font-size="12" font-weight="700" letter-spacing="1.2">
+      <rect x="70" y="206" width="194" height="38" rx="19" fill="#0d2a29" stroke="#31d892"/>
+      <text x="167" y="230" fill="#bdeedb" text-anchor="middle">1 · MAP JOINTS</text>
+      <rect x="278" y="206" width="226" height="38" rx="19" fill="#10283b" stroke="#64b9ff"/>
+      <text x="391" y="230" fill="#c7e8ff" text-anchor="middle">2 · PLAN OWNERSHIP</text>
+      <path d="M539 206L558 225L539 244L520 225Z" fill="#302619" stroke="#f2ad45"/>
+      <text x="579" y="230" fill="#f2c87c">EXPLICIT REVIEW</text>
+      <rect x="714" y="206" width="194" height="38" rx="19" fill="#211d38" stroke="#a987ff"/>
+      <text x="811" y="230" fill="#ddd2ff" text-anchor="middle">3 · ORDER WORK</text>
+      <rect x="922" y="206" width="240" height="38" rx="19" fill="#302619" stroke="#f2ad45"/>
+      <text x="1042" y="230" fill="#f6dfb9" text-anchor="middle">4 · MATERIALIZE SPECS</text>
+      <text x="1704" y="230" fill="#7f9bb0" text-anchor="end">VALIDATED · STILL UNSEALED</text>
+    </g>
+
+    <g>
+      <text x="70" y="310" fill="#7f9bb0" font-size="13" font-weight="700" letter-spacing="2">DELIVERY INTENT + EVIDENCE</text>
+      <text x="70" y="344" fill="#f4f8fb" font-size="23" font-weight="700">One outcome to make true.</text>
+      <text x="70" y="373" fill="#839fb3" font-size="15">actor · trigger · scope · constraints</text>
+
+      <g fill="none" stroke="#45657a" stroke-width="1.5" opacity=".7">
+        <path d="M35 405H125L176 458"/><path d="M35 462H176"/><path d="M35 519H125L176 466"/>
+        <path d="M176 462H428"/><path d="M245 462V400"/><path d="M245 462V526"/><path d="M326 462V430"/><path d="M326 462V500"/>
+      </g>
+      <g fill="#6e8ca1"><circle cx="35" cy="405" r="3"/><circle cx="35" cy="462" r="3"/><circle cx="35" cy="519" r="3"/><circle cx="245" cy="400" r="4"/><circle cx="245" cy="526" r="4"/><circle cx="326" cy="430" r="4"/><circle cx="326" cy="500" r="4"/></g>
+      <circle cx="176" cy="462" r="34" fill="#10273a" stroke="#7898ae" stroke-width="2"/>
+      <circle cx="176" cy="462" r="10" fill="#dff5ff" filter="url(#glow)"/>
+      <circle cx="176" cy="462" r="3" fill="#ffffff"/>
+    </g>
 
     <g filter="url(#shadow)">
-      <rect x="76" y="312" width="244" height="286" rx="30" fill="#0d2030" stroke="#31d892" stroke-width="2.5"/>
-      <rect x="380" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#50c9d9" stroke-width="2.5"/>
-      <rect x="678" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#8e86ff" stroke-width="2.5"/>
-      <rect x="1088" y="338" width="238" height="234" rx="26" fill="#0d2030" stroke="#64b9ff" stroke-width="2.5"/>
-      <rect x="1386" y="312" width="312" height="286" rx="30" fill="#f2f7fb" stroke="#f2ad45" stroke-width="2.5"/>
+      <path d="M428 270H792V355L736 430V494L792 569V690H428Z" fill="#0b1824" stroke="#263f51" stroke-width="2"/>
+      <path d="M820 270V355L764 430V494L820 569V690" fill="none" stroke="#324d60" stroke-width="38" opacity=".32"/>
+      <path d="M806 270V352L747 427V497L806 572V690" fill="none" stroke="#73d8ff" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+    </g>
+    <text x="602" y="305" fill="#6f8da2" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="2">NATURAL SYSTEM JOINT</text>
+    <text x="602" y="330" fill="#d7e5ed" font-size="16" font-weight="700" text-anchor="middle">Evidence-backed seam</text>
+    <text x="602" y="657" fill="#7897ab" font-size="13" text-anchor="middle">The structure opens where it is already jointed.</text>
+
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M764 430L914 324H1660" stroke="#31d892" stroke-width="3"/>
+      <path d="M764 452L930 424H1660" stroke="#64b9ff" stroke-width="3"/>
+      <path d="M764 472L930 524H1660" stroke="#a987ff" stroke-width="3"/>
+      <path d="M764 494L914 624H1660" stroke="#f2ad45" stroke-width="3"/>
+      <path d="M1278 324L1278 424L1278 524L1278 624" stroke="#536c7e" stroke-width="1.5" stroke-dasharray="5 8" opacity=".68"/>
+      <path d="M1288 334L1510 414M1288 434L1510 514M1288 534L1510 614" stroke="#536c7e" stroke-width="1.2" stroke-dasharray="5 8" opacity=".5"/>
     </g>
 
     <g>
-      <circle cx="198" cy="362" r="18" fill="#31d892" opacity=".18"/>
-      <circle cx="198" cy="362" r="7" fill="#3be5a0"/>
-      <text x="116" y="414" fill="#80a2ba" font-size="14" font-weight="700" letter-spacing="2">INPUT</text>
-      <text x="116" y="454" fill="#ffffff" font-size="26" font-weight="700">Delivery intent</text>
-      <text x="116" y="486" fill="#ffffff" font-size="26" font-weight="700">+ evidence</text>
-      <line x1="116" y1="516" x2="280" y2="516" stroke="#34566d"/>
-      <text x="116" y="548" fill="#91acbf" font-size="15">outcome · constraints</text>
-      <text x="116" y="573" fill="#91acbf" font-size="15">source · freshness · hash</text>
-    </g>
-
-    <g>
-      <text x="420" y="390" fill="#78cbd7" font-size="13" font-weight="700" letter-spacing="2">01 · FIND</text>
-      <text x="420" y="438" fill="#ffffff" font-size="26" font-weight="700">Seam map</text>
-      <text x="420" y="477" fill="#9bb4c6" font-size="16">Defensible system</text>
-      <text x="420" y="502" fill="#9bb4c6" font-size="16">joints, not folders.</text>
-      <rect x="420" y="528" width="122" height="4" rx="2" fill="#50c9d9"/>
-    </g>
-
-    <g>
-      <text x="718" y="390" fill="#a79fff" font-size="13" font-weight="700" letter-spacing="2">02 · FORM</text>
-      <text x="718" y="438" fill="#ffffff" font-size="26" font-weight="700">Delivery plan</text>
-      <text x="718" y="477" fill="#9bb4c6" font-size="16">One owner. Observable</text>
-      <text x="718" y="502" fill="#9bb4c6" font-size="16">capability states.</text>
-      <rect x="718" y="528" width="122" height="4" rx="2" fill="#a987ff"/>
-    </g>
-
-    <g transform="translate(999 455)">
-      <path d="M0 -65L54 0L0 65L-54 0Z" fill="#2e2518" stroke="#f2ad45" stroke-width="2.5" filter="url(#shadow)"/>
-      <circle cx="0" cy="0" r="8" fill="#ffd27b" filter="url(#glow)"/>
-      <text x="0" y="92" fill="#f1c876" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">EXPLICIT REVIEW</text>
-      <text x="0" y="115" fill="#829fb3" font-size="13" text-anchor="middle">never inferred</text>
-    </g>
-
-    <g>
-      <text x="1128" y="390" fill="#7bc8ff" font-size="13" font-weight="700" letter-spacing="2">03 · ORDER</text>
-      <text x="1128" y="438" fill="#ffffff" font-size="26" font-weight="700">Task graph</text>
-      <text x="1128" y="477" fill="#9bb4c6" font-size="16">Dependencies, contention,</text>
-      <text x="1128" y="502" fill="#9bb4c6" font-size="16">and safe concurrency.</text>
-      <rect x="1128" y="528" width="122" height="4" rx="2" fill="#64b9ff"/>
-    </g>
-
-    <g>
-      <text x="1428" y="366" fill="#8c6024" font-size="13" font-weight="700" letter-spacing="2">04 · PROVE</text>
-      <text x="1428" y="415" fill="#102435" font-size="28" font-weight="700">Task-Specs</text>
-      <text x="1428" y="454" fill="#526d7f" font-size="16">Scope · behavior · evals</text>
-      <text x="1428" y="481" fill="#526d7f" font-size="16">dependencies · rollback</text>
-      <line x1="1428" y1="510" x2="1656" y2="510" stroke="#c8d7e1"/>
-      <text x="1428" y="544" fill="#2e8e68" font-size="14" font-weight="700">VALIDATED</text>
-      <text x="1656" y="544" fill="#9a5f17" font-size="14" font-weight="700" text-anchor="end">UNSEALED</text>
-    </g>
-
-    <g fill="none" stroke="#79d9ff" stroke-width="2.4" marker-end="url(#arrow)">
-      <path d="M320 455H366"/>
-      <path d="M618 455H664"/>
-      <path d="M916 455H931"/>
-      <path d="M1067 455H1074"/>
-      <path d="M1326 455H1372"/>
-    </g>
-
-    <g transform="translate(76 680)">
-      <rect width="1622" height="132" rx="24" fill="#0b1d2b" stroke="#294a60"/>
-      <text x="34" y="38" fill="#7295ad" font-size="13" font-weight="700" letter-spacing="2">TRUST RAIL · EACH GATE RECHECKS THE CHAIN</text>
-      <g font-size="16" font-weight="700">
-        <rect x="34" y="61" width="250" height="44" rx="12" fill="#102a2b" stroke="#31d892"/><text x="58" y="89" fill="#cdeee0">Source hashes</text>
-        <rect x="310" y="61" width="250" height="44" rx="12" fill="#10273a" stroke="#73d8ff"/><text x="334" y="89" fill="#d6edfa">Review receipt</text>
-        <rect x="586" y="61" width="250" height="44" rx="12" fill="#221e39" stroke="#a987ff"/><text x="610" y="89" fill="#e7ddff">Projection lineage</text>
-        <rect x="862" y="61" width="250" height="44" rx="12" fill="#302619" stroke="#f2ad45"/><text x="886" y="89" fill="#f6e0bb">Proof boundaries</text>
+      <g transform="translate(930 283)">
+        <text fill="#65dda8" font-size="12" font-weight="700" letter-spacing="1.4">LEG 01 · OWNER CONTRACT</text>
+        <text y="29" fill="#f4f8fb" font-size="22" font-weight="700">Schema is valid</text>
       </g>
-      <text x="1588" y="82" fill="#dce9f1" font-size="17" font-weight="700" text-anchor="end">Fail closed when truth is missing.</text>
-      <text x="1588" y="105" fill="#7694a8" font-size="14" text-anchor="end">Models propose. Evidence and authority decide.</text>
+      <g transform="translate(946 383)">
+        <text fill="#79caff" font-size="12" font-weight="700" letter-spacing="1.4">LEG 02 · OWNER POLICY</text>
+        <text y="29" fill="#f4f8fb" font-size="22" font-weight="700">Policy resolves</text>
+      </g>
+      <g transform="translate(946 483)">
+        <text fill="#bdabff" font-size="12" font-weight="700" letter-spacing="1.4">LEG 03 · OWNER REQUEST</text>
+        <text y="29" fill="#f4f8fb" font-size="22" font-weight="700">Request 101 is denied</text>
+      </g>
+      <g transform="translate(930 583)">
+        <text fill="#f3c371" font-size="12" font-weight="700" letter-spacing="1.4">LEG 04 · OWNER TELEMETRY</text>
+        <text y="29" fill="#f4f8fb" font-size="22" font-weight="700">Reason is visible</text>
+      </g>
+    </g>
+
+    <g>
+      <g transform="translate(1278 324)"><circle r="25" fill="#142431" stroke="#5d7586" stroke-width="2"/><circle r="9" fill="#31d892" filter="url(#glow)"/><circle r="3" fill="#eafff7"/></g>
+      <g transform="translate(1278 424)"><circle r="25" fill="#142431" stroke="#5d7586" stroke-width="2"/><circle r="9" fill="#64b9ff" filter="url(#glow)"/><circle r="3" fill="#f1faff"/></g>
+      <g transform="translate(1278 524)"><circle r="25" fill="#142431" stroke="#5d7586" stroke-width="2"/><circle r="9" fill="#a987ff" filter="url(#glow)"/><circle r="3" fill="#f7f3ff"/></g>
+      <g transform="translate(1278 624)"><circle r="25" fill="#142431" stroke="#5d7586" stroke-width="2"/><circle r="9" fill="#f2ad45" filter="url(#glow)"/><circle r="3" fill="#fff8ea"/></g>
+      <text x="1278" y="674" fill="#708da2" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="1.5">OWNERSHIP + STATE</text>
+    </g>
+
+    <g>
+      <g transform="translate(1660 324)"><circle r="22" fill="none" stroke="#31d892" opacity=".28"/><circle r="9" fill="#dfffee" filter="url(#glow)"/></g>
+      <g transform="translate(1660 424)"><circle r="22" fill="none" stroke="#64b9ff" opacity=".28"/><circle r="9" fill="#e3f5ff" filter="url(#glow)"/></g>
+      <g transform="translate(1660 524)"><circle r="22" fill="none" stroke="#a987ff" opacity=".28"/><circle r="9" fill="#eee8ff" filter="url(#glow)"/></g>
+      <g transform="translate(1660 624)"><circle r="22" fill="none" stroke="#f2ad45" opacity=".28"/><circle r="9" fill="#fff0d3" filter="url(#glow)"/></g>
+      <text x="1660" y="674" fill="#708da2" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="1.5">INDEPENDENT PROOF</text>
+    </g>
+
+    <g transform="translate(70 752)">
+      <rect width="1634" height="84" rx="22" fill="#0b1d2b" stroke="#29485d"/>
+      <text x="31" y="31" fill="#6f90a7" font-size="11" font-weight="700" letter-spacing="2">EVERY TASK INHERITS</text>
+      <g font-size="14" font-weight="700">
+        <circle cx="260" cy="47" r="5" fill="#73d8ff"/><text x="274" y="52" fill="#d9e9f2">boundary from the seam</text>
+        <circle cx="565" cy="47" r="5" fill="#64b9ff"/><text x="579" y="52" fill="#d9e9f2">coordination from the lane</text>
+        <circle cx="900" cy="47" r="5" fill="#a987ff"/><text x="914" y="52" fill="#d9e9f2">why from the leg</text>
+        <circle cx="1160" cy="47" r="5" fill="#f2ad45"/><text x="1174" y="52" fill="#d9e9f2">proof from Task Pack</text>
+      </g>
+      <text x="1602" y="52" fill="#7897ab" font-size="12" text-anchor="end">Validation observes. Authority remains explicit.</text>
     </g>
   </g>
 </svg>

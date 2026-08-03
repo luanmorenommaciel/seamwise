@@ -12,5 +12,26 @@ def test_task_pack_matches_pinned_phase_zero_manifest() -> None:
     )
     assert manifest["source_commit"] == "b585ca792418924182e1c6a87f660a5f8afa07bd"
     assert manifest["source_tree"] == "95dae33bf9c8da852ae50a7b6cfc44176cdaa5c8"
-    assert manifest["file_count"] == 125
+    assert manifest["source_document"]["included"] is False
+    assert manifest["source_document"]["sha256"] == (
+        "1737ace66228bebb131803256bfb7df633ba631fbb19bd88a8ff91520eb7f72a"
+    )
+    assert manifest["local_changes"] == [
+        {
+            "kind": "documentation-only",
+            "path": "README.md",
+            "reason": "Removed links to Task Pack package artifacts not shipped by Seamwise.",
+        },
+        {
+            "kind": "reference-cleanup",
+            "path": "references/examples",
+            "reason": "Removed six illustrative Task-Specs; they are not runtime or conformance inputs.",
+        },
+        {
+            "kind": "reference-move",
+            "path": "references/consumers",
+            "reason": "Moved the load-bearing cross-engine consumers out of the removed examples directory.",
+        },
+    ]
+    assert manifest["file_count"] == 119
     assert sum(item["mode"] == "0755" for item in manifest["files"].values()) == 32

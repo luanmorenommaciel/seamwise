@@ -2,6 +2,8 @@
 
 [![Seamwise — an architecture-aware intent-to-task compiler that finds natural system joints and preserves them through proof-bearing work.](assets/seamwise-banner.png)](https://github.com/luanmorenommaciel/seamwise)
 
+<sub>Intent and evidence meet a natural system joint; owned capability legs continue to independent proof.</sub>
+
 # Seamwise
 
 **Find the joints. Preserve the system. Prove the work.**
@@ -10,10 +12,10 @@
 
 [![Candidate: v0.1.0-alpha](https://img.shields.io/badge/candidate-v0.1.0--alpha-31D892)](#verified-candidate-surface)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-73D8FF)](pyproject.toml)
-[![Task-Spec: v3](https://img.shields.io/badge/Task--Spec-v3-C18DFF)](docs/task-spec-v0.1.pdf)
+[![Task-Spec: v3](https://img.shields.io/badge/Task--Spec-v3-C18DFF)](skills/task-spec/SKILL.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F2AD45)](LICENSE)
 
-[Install](#install) · [Prove it](#prove-it-in-one-workspace) · [Compiler](#the-compiler) · [Codex](#codex) · [Claude Code](#claude-code) · [CLI](#cli-map)
+[Start](#start-in-a-chat) · [Guided flow](#one-pass-at-a-time) · [Compiler](#the-compiler) · [Codex](#codex) · [Claude Code](#claude-code) · [CLI](#cli-map)
 
 </div>
 
@@ -33,26 +35,55 @@ Seamwise is not a backlog generator. It preserves the system model, ownership,
 causal order, contention, lineage, and proof boundaries that flat task splitting
 usually erases.
 
-## Install
+## Start in a chat
 
 Requirements: macOS, Linux, or Linux under WSL; Python 3.11+; Git; and Bash.
 Native Windows Python is not supported in this alpha because workspace locking
 and the embedded Task Pack are POSIX/Bash based. The explicit Task-Spec
 preflight gate also requires `shellcheck` plus every tool named by the authored
-specs. The included rate-limiting proof names `pytest`; put both `shellcheck`
-and a `pytest` executable on `PATH` before running its preflight. Neither is
-required for installation, mapping, planning, compilation, or validation.
+specs. Those tools are not required for installation, mapping, planning,
+compilation, or structural validation. Install [`uv`](https://docs.astral.sh/uv/)
+once, then choose a host.
 
-With [`uv`](https://docs.astral.sh/uv/):
+### Codex CLI or desktop
 
 ```bash
-git clone https://github.com/luanmorenommaciel/seamwise.git
-cd seamwise
-uv tool install .
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
+codex plugin marketplace add luanmorenommaciel/seamwise
+codex plugin add seamwise@seamwise
 seamwise doctor
 ```
 
-For repository development:
+Open a new Codex session, then say:
+
+```text
+Use $seamwise. Work one confirmed pass at a time, ask me exactly one question,
+and stop after each CLI token before continuing.
+```
+
+### Claude Code
+
+```bash
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
+claude plugin marketplace add luanmorenommaciel/seamwise --scope user
+claude plugin install seamwise@seamwise --scope user
+seamwise doctor
+```
+
+Run `/reload-plugins` in the current session, or open a new one, then say:
+
+```text
+Use /seamwise:seamwise. Work one confirmed pass at a time, ask me exactly one
+question, and stop after each CLI token before continuing.
+```
+
+The plugin and CLI are separate on purpose: the plugin teaches the host how to
+guide the conversation; the CLI owns schemas, lineage, stable tokens, and
+fail-closed validation. If the plugin is present but the CLI is not, the main
+skill offers the same `uv tool install` command and waits for installation
+authority.
+
+For repository development, install from the checkout instead:
 
 ```bash
 git clone https://github.com/luanmorenommaciel/seamwise.git
@@ -64,56 +95,36 @@ uv run seamwise --help
 The package installs two executables: `seamwise` for the complete compiler and
 `task-spec` for the atomic Task Pack surface.
 
-## Author the first recipe without guessing
+## One pass at a time
 
-From the target repository:
+The default agent experience is deliberately conversational. No public example
+recipe is shipped or copied into a project. The host reads the exact schema,
+collects real project evidence, and builds only the artifact you confirm.
 
-```bash
-seamwise init
-seamwise recipe schema
-seamwise recipe example --output seamwise-recipe.yaml
-```
+| Pass | The agent asks for | Command after confirmation | Stop token |
+| ---: | --- | --- | --- |
+| 0 | workspace and installation scope | `seamwise init` | `WORKSPACE=READY` |
+| 1 | observable Delivery Intent | none; proposal only | human confirmation |
+| 2 | immutable evidence and current system boundaries | none; proposal only | human confirmation |
+| 3 | seams, rejected alternatives, and one owner per seam | `seamwise map --source seamwise-recipe.yaml` | `SEAM_MAP=READY` |
+| 4 | capability legs, dependencies, contention, and objections | `seamwise plan` | `DELIVERY_PLAN=NEEDS_REVIEW` |
+| 5 | explicit review, atomic proof, and write surfaces | `seamwise review`, then `seamwise compile` | `TASK_GRAPH=READY` |
+| 6 | every generated behavior and eval | `seamwise tasks validate` | `TASK_SPECS=VALID` |
 
-The example command is non-clobbering. It also materializes the exact
-SHA-256-pinned blueprint at `seamwise-evidence/seamwise.pdf`, so its source is
-resolvable offline even from a wheel-only install. Replace every fixture fact
-with current project evidence before mapping; the example is not project truth.
-v0.1 accepts only local paths or local `file:` URIs whose bytes match the
-declared SHA-256. Capture HTTP, provider, Exa, Tavily, or Firecrawl discoveries
-as immutable local snapshots before citing them; remote text is never promoted
-to verified compilation evidence directly.
-
-## Prove it in one workspace
-
-The included rate-limiting case follows the canonical steel thread in the
-blueprint: schema → effective policy → request 101 enforcement → visible reason
-and decision telemetry.
+The agent begins with:
 
 ```bash
-demo_workspace="$(mktemp -d)"
-git -C "$demo_workspace" init -q
-
-seamwise --workspace "$demo_workspace" init
-seamwise --workspace "$demo_workspace" map \
-  --source examples/rate-limiting/recipe.yaml
-
-# This intentionally exits 2: a plan cannot approve itself.
-seamwise --workspace "$demo_workspace" plan
-
-# A real reviewer makes the explicit transition. --fixture is test evidence only.
-seamwise --workspace "$demo_workspace" review --accept \
-  --reviewer example-reviewer \
-  --reason "Accept the documented proving fixture" \
-  --fixture
-
-seamwise --workspace "$demo_workspace" compile
-seamwise --workspace "$demo_workspace" tasks validate
-seamwise --workspace "$demo_workspace" tasks preflight \
-  --acknowledge-eval-execution
-seamwise --workspace "$demo_workspace" graph
+seamwise --workspace "/path/to/project" --json status
+seamwise --workspace "/path/to/project" --json agent-context --host codex
 ```
 
-Expected gate sequence:
+Before mapping, the context packet contains the exact recipe schema and a
+five-pass question sequence, never fictional project data. v0.1 accepts only
+local paths or local `file:` URIs whose bytes match their declared SHA-256.
+Capture web or provider discoveries as immutable local snapshots before citing
+them; retrieved text never becomes verified compilation evidence directly.
+
+The normal end state is:
 
 ```text
 WORKSPACE=READY
@@ -122,7 +133,6 @@ DELIVERY_PLAN=NEEDS_REVIEW   # exit 2, by design
 DELIVERY_PLAN=READY
 TASK_GRAPH=READY
 TASK_SPECS=VALID
-TASK_SPECS=PREFLIGHT_READY
 ```
 
 Every emitted draft still contains:
@@ -132,9 +142,9 @@ signed_off: false
 accepted: false
 ```
 
-Validation and preflight do not create dispatch authority. Only the explicit
-seal path may do so. Preflight executes the eval Bash written into every draft;
-the acknowledgement is intentionally required.
+Validation does not create dispatch authority. Optional preflight executes the
+eval Bash written into every draft and therefore requires an explicit
+acknowledgement. Only the separate seal path may create dispatch authority.
 
 For a non-fixture plan, provision the repo-local HMAC key outside Git and seal
 only under explicit authority:
@@ -154,6 +164,11 @@ evals according to Task Pack semantics. Fixture reviews can never be sealed.
 ## The compiler
 
 ![Seamwise lowers delivery intent through evidence-backed system joints, explicit ownership and review, dependency-aware ordering, and independently provable unsealed Task-Specs.](assets/seamwise-hero.svg)
+
+Read left to right: evidence reaches a natural joint; one owning swimlane orders
+observable capability legs; each leg retains lineage to independently runnable
+proof. The colored rails illustrate capability flow, not generic compiler
+stages. Validation observes the result; it does not seal it.
 
 <details>
 <summary><strong>Portable Mermaid view</strong></summary>
@@ -196,6 +211,10 @@ Every Task-Spec inherits its purpose from the leg, coordination from the lane,
 boundary from the seam, and proof contract from the embedded Task Pack.
 
 ![A flat activity list compared with architecture-aware Seamwise decomposition.](assets/seamwise-before-after.svg)
+
+Both sides make work smaller. Only the Seamwise side preserves the system joint,
+owner, capability state, causal order, and proof boundary needed to execute that
+work without reconstructing the architecture from a flat list.
 
 ## Four gates, four failure routes
 
@@ -283,18 +302,22 @@ telemetry are also derived; telemetry observes and never authorizes.
 
 ## Codex
 
-Install the native project skills after previewing every destination:
+Codex CLI and desktop use the repository marketplace shown in
+[`marketplace.json`](.agents/plugins/marketplace.json). A new session is
+required after installation. Codex IDE does not currently load plugins, so use
+the receipt-owned native project skills there:
 
 ```bash
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
 seamwise --workspace /path/to/consumer --dry-run install codex --scope project
 seamwise --workspace /path/to/consumer install codex --scope project
 seamwise --workspace /path/to/consumer doctor --host codex --scope project
 ```
 
-Restart the session, then invoke `$seamwise`. Codex IDE uses the same standalone
-skills under `.agents/skills/`. The root [Codex plugin manifest](.codex-plugin/plugin.json)
-is validated and ready for a supported plugin/marketplace workflow, but this
-repository does not claim that a marketplace listing has been published.
+Restart the session, then invoke `$seamwise`. The marketplace install and native
+fallback load the same shared skills and call the same CLI. This repository is
+a working repo marketplace; a listing in OpenAI's universal public directory
+is not claimed.
 
 The direct, much larger Task Pack skill is intentionally opt-in to protect the
 host's skill-context budget: add `--with-task-spec` only when you also want
@@ -304,7 +327,15 @@ including the Task Pack; the native installer defaults to the five thin skills.
 
 ## Claude Code
 
+Claude Code uses the repository marketplace shown in
+[`marketplace.json`](.claude-plugin/marketplace.json). The commands in
+[Start in a chat](#start-in-a-chat) install the namespaced plugin; use
+`/reload-plugins` before invoking `/seamwise:seamwise` in the same session.
+
+The receipt-owned native fallback is:
+
 ```bash
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
 seamwise --workspace /path/to/consumer --dry-run install claude --scope project
 seamwise --workspace /path/to/consumer install claude --scope project
 seamwise --workspace /path/to/consumer doctor --host claude --scope project
@@ -332,11 +363,14 @@ seamwise --workspace "/path/to/workspace" agent-context --host chat
 
 Paste the packet into the conversation. It carries current stage state, the
 canonical chain, trust boundaries, and the exact next command. Before mapping it
-includes the exact recipe schema and editable example; after compilation it
-includes bounded, hash-matched seam/lane/leg and Task-Spec text so evals can be
-reviewed. Oversized artifacts are named by hash for separate attachment. Chat
-may propose artifacts; only a local CLI result can validate them. An
-authenticated remote MCP service is deliberately outside this alpha candidate.
+includes the exact recipe schema and one-question-at-a-time authoring passes;
+after compilation it includes bounded, hash-matched seam/lane/leg and Task-Spec
+text so evals can be reviewed. Oversized artifacts are named by hash for
+separate attachment. Chat may propose artifacts; only a local CLI result can
+validate them. Local Codex and Claude Code can complete this loop entirely in
+their chat because they can execute the CLI. A browser-only chat needs the
+packet and cannot claim execution; an authenticated remote MCP service remains
+outside this alpha candidate.
 
 ## Safe install and uninstall
 
@@ -349,6 +383,11 @@ target their documented home equivalents. Every install:
 - rolls the whole transaction back on failure;
 - records versioned ownership receipts;
 - supports idempotent reinstall and upgrade.
+
+Compiler mutations use a user-private advisory lock in the operating system's
+runtime directory, not under `.git`. Codex and Claude may therefore keep Git
+metadata sandbox-protected without preventing normal `init`, `status`, mapping,
+planning, compilation, or validation.
 
 Uninstall removes only unchanged, receipt-owned directories:
 
@@ -385,7 +424,7 @@ and `10` internal mechanism failure. Schemas live in [`schemas/`](schemas/).
 
 ```text
 seamwise init
-seamwise recipe schema | recipe example [--output "/path/to/recipe.yaml"]
+seamwise recipe schema
 seamwise map --source "/path/to/recipe.yaml"
 seamwise plan
 seamwise review --accept --reviewer "reviewer-name" --reason "review rationale"
@@ -423,12 +462,24 @@ It verifies:
   stale-hash, tamper, cycle, collision, unprovable-node, and dry-run routes;
 - the pinned Task Pack's core, Bash portability, effort, fuzz, HMAC, portable
   E2E, closed-loop, and conformance suites in a disposable copy;
-- deterministic compilation and four valid, unsealed rate-limiting Task-Specs;
+- deterministic compilation and valid, unsealed Task-Specs from internal test data;
 - transactional install, reinstall, rollback, modified-file refusal, and
   receipt-owned uninstall;
 - wheel/sdist build plus a fresh-venv wheel install and complete clean-room E2E;
 - plugin/skill manifests, local links, Mermaid fences, SVGs, and the unchanged
   canonical PDF hash.
+
+Real host marketplace lifecycle checks are intentionally separate because CI
+does not install third-party host CLIs:
+
+```bash
+make check-hosts
+```
+
+That command uses isolated Codex and Claude configuration directories and
+requires both CLIs. It proves marketplace add, plugin install, enabled listing,
+cached plugin contents, uninstall, and marketplace removal without touching the
+user's normal host configuration.
 
 Credentialed live-host probes are explicit: `seamwise doctor --host all --live`.
 They are reported separately from the credential-free release gate. Claude's
@@ -441,8 +492,8 @@ does not consume ordinary OAuth/keychain subscription state.
 | --- | --- |
 | Compiler, CLI, schemas, lineage, reports, installers | Implemented and tested in this repository |
 | Canonical target blueprint | [`docs/seamwise.pdf`](docs/seamwise.pdf), SHA-256 `cad353a…e5ee` |
-| Embedded Task Pack | Byte/mode-pinned from Converge `v0.1.0`; provenance in [`vendor/task-pack-source.json`](vendor/task-pack-source.json) |
-| Generated rate-limit work | Validated proving fixture; the fictional target application is not implemented |
+| Embedded Task Pack | Runtime scripts, contracts, fixtures, and conformance evidence pinned from Converge `v0.1.0`; provenance in [`vendor/task-pack-source.json`](vendor/task-pack-source.json) |
+| Generated test work | Validated from internal, unshipped test data; no target application is presented as implemented |
 | Task-Spec sealing or acceptance | Never performed by ordinary Seamwise compilation |
 | GitHub release, package index, tag, or Codex/Claude marketplace publication | Not claimed |
 | Plain-chat local execution | Not possible; packet is proposal context only |
@@ -456,10 +507,12 @@ recorded in [`docs/decisions/`](docs/decisions/).
 
 ## Repository guide
 
-- [`PLAN.md`](PLAN.md) — concise end-to-end build and sign-off plan
 - [`docs/project.md`](docs/project.md) — agent-oriented project orientation
 - [`docs/seamwise.pdf`](docs/seamwise.pdf) — canonical target blueprint
-- [`examples/rate-limiting/`](examples/rate-limiting/) — complete proving recipe
+- [`assets/seamwise-mark.svg`](assets/seamwise-mark.svg) — reusable plate-and-seam symbol
+- [`assets/seamwise-logo.svg`](assets/seamwise-logo.svg) — horizontal wordmark lockup
+- [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) — Codex repo marketplace
+- [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) — Claude Code marketplace
 - [`skills/`](skills/) — shared Agent Skills plus the embedded Task Pack
 - [`src/seamwise/`](src/seamwise/) — compiler, CLI, installers, and reports
 - [`tests/`](tests/) — contract, failure-route, installer, and E2E proof
@@ -467,6 +520,8 @@ recorded in [`docs/decisions/`](docs/decisions/).
 ## License and provenance
 
 Seamwise is licensed under the [MIT License](LICENSE). The Phase-0 Task Pack was
-imported unchanged from the pinned private Converge source commit
-`b585ca792418924182e1c6a87f660a5f8afa07bd`; its 125-file inventory, modes, and
-hashes are independently checked on every release.
+copied from the pinned private Converge source commit
+`b585ca792418924182e1c6a87f660a5f8afa07bd`. Its 119-file inventory, modes, and
+hashes are independently checked on every release; the provenance manifest also
+records the documentation/reference cleanup and the retained consumer move. The
+upstream Task-Spec PDF is recorded by hash but is not duplicated in this repository.

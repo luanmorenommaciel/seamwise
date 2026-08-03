@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Seamwise mark</title>
+  <desc id="desc">Two opposing architectural plates separated by a narrow cyan seam.</desc>
+  <defs>
+    <filter id="glow" x="-200%" y="-50%" width="500%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="34" fill="#06111d"/>
+  <path d="M128 41V197" stroke="#73d8ff" stroke-width="3" stroke-linecap="round" opacity=".72" filter="url(#glow)"/>
+  <path d="M56 65L112 43V193L56 173Z" fill="#f4f8fb"/>
+  <path d="M144 65L200 43V173L144 193Z" fill="#f4f8fb"/>
+</svg>

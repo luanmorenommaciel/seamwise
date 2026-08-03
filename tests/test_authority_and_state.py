@@ -13,6 +13,7 @@ from conftest import git_init, write_recipe
 import seamwise.taskpack as taskpack_module
 from seamwise.cli import cli
 from seamwise.engine import accept_plan, build_plan, compile_graph, map_recipe
+from seamwise.io import UnsafeWriteTargetError, workspace_lock, workspace_lock_path
 from seamwise.reporting import CONTEXT_PACKET_LIMIT, agent_context, build_report
 from seamwise.taskpack import setup_signing_key, task_pack_root, validate_task_specs
 from seamwise.workspace import init_workspace, status_result
@@ -28,6 +29,49 @@ def compile_reviewed(root: Path, recipe: dict[str, Any], *, fixture: bool = Fals
         root, reviewer="pytest", reason="explicit regression review", fixture=fixture
     ).ok
     assert compile_graph(root, task_pack_root=task_pack_root()).ok
+
+
+def test_workspace_lock_uses_runtime_state_not_git_metadata(tmp_path: Path) -> None:
+    git_init(tmp_path)
+    lock = workspace_lock_path(tmp_path)
+    assert not lock.is_relative_to(tmp_path / ".git")
+    with workspace_lock(tmp_path):
+        assert lock.is_file()
+    assert not (tmp_path / ".git/seamwise").exists()
+
+
+def test_workspace_lock_rejects_symlinked_runtime_home(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    outside = tmp_path / "outside-lock-home"
+    outside.mkdir()
+    linked_home = tmp_path / "linked-lock-home"
+    linked_home.symlink_to(outside, target_is_directory=True)
+    monkeypatch.setenv("SEAMWISE_LOCK_HOME", str(linked_home))
+
+    with (
+        pytest.raises(UnsafeWriteTargetError, match="Unsafe workspace lock directory"),
+        workspace_lock(tmp_path),
+    ):
+        pass
+    assert list(outside.iterdir()) == []
+
+
+def test_workspace_lock_rejects_symlinked_lock_file(tmp_path: Path) -> None:
+    lock = workspace_lock_path(tmp_path)
+    with workspace_lock(tmp_path):
+        pass
+    lock.unlink()
+    outside = tmp_path / "outside-lock-file"
+    outside.write_text("untouched", encoding="utf-8")
+    lock.symlink_to(outside)
+
+    with (
+        pytest.raises(UnsafeWriteTargetError, match="Unsafe workspace lock file"),
+        workspace_lock(tmp_path),
+    ):
+        pass
+    assert outside.read_text(encoding="utf-8") == "untouched"
 
 
 def spec_hashes(root: Path) -> dict[str, str]:
@@ -165,7 +209,10 @@ def test_pre_map_chat_packet_contains_the_recipe_contract(
     assert result.ok
     assert '"recipe_authoring"' in packet
     assert '"$schema": "https://json-schema.org/draft/2020-12/schema"' in packet
-    assert "SEAM-POLICY-CONTRACT" in packet
+    assert '"mode": "guided-one-pass"' in packet
+    assert "What observable delivery outcome should be true" in packet
+    assert "Ask exactly one concise unanswered question at a time" in packet
+    assert '"example_yaml"' not in packet
     assert "seamwise map --source <recipe.yaml>" in packet
 
 

@@ -27,8 +27,9 @@
       "Write"
     ],
     "websiteURL": "https://github.com/luanmorenommaciel/seamwise",
+    "brandColor": "#31D892",
     "defaultPrompt": [
-      "Use $seamwise to turn this delivery intent into trustworthy tasks.",
+      "Use $seamwise to guide me one confirmed pass at a time from delivery intent to validated, unsealed tasks.",
       "Use $to-seam-map to identify the real system seams.",
       "Use $to-delivery-plan to build an ownership-safe delivery plan."
     ]

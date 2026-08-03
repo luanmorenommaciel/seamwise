@@ -13,12 +13,13 @@ from seamwise.taskpack import task_pack_root
 from seamwise.workspace import init_workspace
 
 REPOSITORY = Path(__file__).resolve().parents[1]
-RECIPE = REPOSITORY / "examples" / "rate-limiting" / "recipe.yaml"
+RECIPE = Path(__file__).resolve().parent / "fixtures" / "rate-limiting-recipe.yaml"
 
 
 @pytest.fixture(autouse=True)
 def isolated_seamwise_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SEAMWISE_STATE_HOME", str(tmp_path / ".runtime-state"))
+    monkeypatch.setenv("SEAMWISE_LOCK_HOME", str(tmp_path / ".runtime-locks"))
 
 
 @pytest.fixture

@@ -66,6 +66,13 @@ def test_cli_json_is_exactly_one_valid_envelope(tmp_path: Path) -> None:
     assert payload["next"] == ["seamwise init"]
 
 
+def test_recipe_surface_publishes_schema_without_a_bundled_example() -> None:
+    result = CliRunner().invoke(cli, ["recipe", "--help"])
+    assert result.exit_code == 0
+    assert "schema" in result.output
+    assert "example" not in result.output.lower()
+
+
 def test_init_is_non_clobbering(tmp_path: Path) -> None:
     assert init_workspace(tmp_path).ok
     intent = tmp_path / "seamwise/intent.md"

@@ -352,7 +352,7 @@ fi
 echo ""
 echo "═══ Step 6: Schema fidelity (Python consumer) ═══"
 # Validate that the reference Python consumer can parse a v2.1 spec and exits 0.
-# The installer copies references/schemas/ + references/examples/, so we point
+# The installer copies references/schemas/ + references/consumers/, so we point
 # the consumer at the installed copy and run it against the canonical golden fixture.
 GOLDEN_SRC="$SKILL_DIR/tests/fixtures/T-20260602-golden.md"
 GOLDEN_DST="$TMP/T-20260602-golden.md"
@@ -363,12 +363,12 @@ else
   fail "missing golden fixture at $GOLDEN_SRC"
 fi
 
-PY_CONSUMER="$INSTALLED/references/examples/consume-task-spec.py"
+PY_CONSUMER="$INSTALLED/references/consumers/consume-task-spec.py"
 if [[ -f "$PY_CONSUMER" ]]; then
-  pass "python consumer present at references/examples/consume-task-spec.py"
+  pass "python consumer present at references/consumers/consume-task-spec.py"
 else
   # Fall back to source copy if installer did not propagate references/.
-  PY_CONSUMER="$SKILL_DIR/references/examples/consume-task-spec.py"
+  PY_CONSUMER="$SKILL_DIR/references/consumers/consume-task-spec.py"
   if [[ -f "$PY_CONSUMER" ]]; then
     pass "python consumer present (source copy)"
   else
@@ -400,17 +400,17 @@ echo "═══ Step 7: Cross-engine equivalence (Python vs TypeScript) ══�
 #
 # Floor preservation: local users without Node may skip this optional reference
 # proof. CI sets TASK_SPEC_STRICT_CROSS_ENGINE=1, making every skip a failure.
-TS_DIR="$INSTALLED/references/examples"
+TS_DIR="$INSTALLED/references/consumers"
 TS_CONSUMER="$TS_DIR/consume-task-spec.ts"
 if [[ ! -f "$TS_CONSUMER" ]]; then
-  TS_DIR="$SKILL_DIR/references/examples"
+  TS_DIR="$SKILL_DIR/references/consumers"
   TS_CONSUMER="$TS_DIR/consume-task-spec.ts"
 fi
 
 if ! command -v node >/dev/null 2>&1; then
   skip_cross_engine "cross-engine proof skipped: node not present (any-agent floor preserved)"
 elif [[ ! -f "$TS_CONSUMER" ]]; then
-  skip_cross_engine "cross-engine proof skipped: TS consumer not found at references/examples/"
+  skip_cross_engine "cross-engine proof skipped: TS consumer not found at references/consumers/"
 elif [[ -z "$PY_JSON" ]]; then
   skip_cross_engine "cross-engine proof skipped: python consumer produced no JSON to compare against"
 else

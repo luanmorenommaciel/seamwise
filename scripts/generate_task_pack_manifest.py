@@ -33,14 +33,31 @@ def main() -> int:
         "source_ref": "v0.1.0",
         "source_commit": "b585ca792418924182e1c6a87f660a5f8afa07bd",
         "source_document": {
-            "destination": "docs/task-spec-v0.1.pdf",
-            "path": "docs/task-spec-v0.1.pdf",
+            "included": False,
+            "upstream_path": "docs/task-spec-v0.1.pdf",
             "sha256": "1737ace66228bebb131803256bfb7df633ba631fbb19bd88a8ff91520eb7f72a",
         },
         "source_tree": "95dae33bf9c8da852ae50a7b6cfc44176cdaa5c8",
         "imported_at": "2026-08-02",
         "license": "MIT",
         "destination": "skills/task-spec",
+        "local_changes": [
+            {
+                "kind": "documentation-only",
+                "path": "README.md",
+                "reason": "Removed links to Task Pack package artifacts not shipped by Seamwise.",
+            },
+            {
+                "kind": "reference-cleanup",
+                "path": "references/examples",
+                "reason": "Removed six illustrative Task-Specs; they are not runtime or conformance inputs.",
+            },
+            {
+                "kind": "reference-move",
+                "path": "references/consumers",
+                "reason": "Moved the load-bearing cross-engine consumers out of the removed examples directory.",
+            },
+        ],
         "file_count": len(files),
         "files": files,
     }

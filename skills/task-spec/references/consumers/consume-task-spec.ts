@@ -8,7 +8,7 @@
  * prints a structured TaskSpec record.
  *
  * Runtime: Node 18+. Third-party deps: `yaml` (parser) and `ajv` (validator),
- * pinned in references/examples/package.json. Schemas are resolved relative
+ * pinned in references/consumers/package.json. Schemas are resolved relative
  * to this file: ../schemas/task-spec-frontmatter.schema.json.
  *
  * Usage:

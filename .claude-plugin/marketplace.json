@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "seamwise",
+  "owner": {
+    "name": "Luan Moreno M. Maciel",
+    "url": "https://github.com/luanmorenommaciel"
+  },
+  "description": "Architecture-aware delivery planning for Claude Code.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "seamwise",
+      "displayName": "Seamwise",
+      "source": "./",
+      "description": "Turn delivery intent into reviewed, validated, unsealed Task-Spec DAGs.",
+      "version": "0.1.0",
+      "category": "Developer Tools",
+      "tags": [
+        "architecture",
+        "delivery-planning",
+        "task-spec"
+      ],
+      "strict": true
+    }
+  ]
+}

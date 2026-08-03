@@ -6,6 +6,7 @@ import contextlib
 import hashlib
 import json
 import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -287,6 +288,35 @@ def private_state_path(root: Path, *parts: str) -> Path:
     return base.joinpath(*parts)
 
 
+def workspace_lock_path(root: Path) -> Path:
+    """Resolve the non-authoritative lock outside sandbox-protected Git metadata."""
+
+    resolved_root = root.resolve()
+    digest = hashlib.sha256(str(resolved_root).encode("utf-8")).hexdigest()[:20]
+    configured = os.environ.get("SEAMWISE_LOCK_HOME")
+    if configured:
+        lock_home = Path(os.path.abspath(os.path.expanduser(configured)))
+    else:
+        user_id = str(os.getuid()) if hasattr(os, "getuid") else "user"
+        lock_home = Path(tempfile.gettempdir()).resolve() / f"seamwise-locks-{user_id}"
+    return lock_home / digest / "workspace.lock"
+
+
+def _ensure_private_lock_directory(path: Path) -> None:
+    """Create and verify a user-private directory without accepting a symlink leaf."""
+
+    if path.is_symlink() or (path.exists() and not path.is_dir()):
+        raise UnsafeWriteTargetError(f"Unsafe workspace lock directory: {path}")
+    path.mkdir(parents=True, mode=0o700, exist_ok=True)
+    if path.is_symlink() or not path.is_dir():
+        raise UnsafeWriteTargetError(f"Unsafe workspace lock directory: {path}")
+    metadata = path.stat()
+    if hasattr(os, "getuid") and metadata.st_uid != os.getuid():
+        raise UnsafeWriteTargetError(f"Workspace lock directory is not user-owned: {path}")
+    if stat.S_IMODE(metadata.st_mode) & 0o077:
+        raise UnsafeWriteTargetError(f"Workspace lock directory is not private: {path}")
+
+
 @contextlib.contextmanager
 def workspace_lock(root: Path, *, dry_run: bool = False) -> Iterator[None]:
     """Serialize mutations with an advisory lock on supported POSIX hosts."""
@@ -296,9 +326,29 @@ def workspace_lock(root: Path, *, dry_run: bool = False) -> Iterator[None]:
         return
     import fcntl
 
-    lock_path = private_state_path(root, "workspace.lock")
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("a+", encoding="utf-8") as handle:
+    lock_path = workspace_lock_path(root)
+    lock_home = lock_path.parents[1]
+    _ensure_private_lock_directory(lock_home)
+    _ensure_private_lock_directory(lock_path.parent)
+    if lock_path.is_symlink() or (lock_path.exists() and not lock_path.is_file()):
+        raise UnsafeWriteTargetError(f"Unsafe workspace lock file: {lock_path}")
+    flags = os.O_CREAT | os.O_RDWR | os.O_APPEND | getattr(os, "O_CLOEXEC", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+    try:
+        descriptor = os.open(lock_path, flags, 0o600)
+    except OSError as error:
+        raise UnsafeWriteTargetError(
+            f"Unable to open workspace lock safely: {lock_path}"
+        ) from error
+    metadata = os.fstat(descriptor)
+    if (
+        not stat.S_ISREG(metadata.st_mode)
+        or (hasattr(os, "getuid") and metadata.st_uid != os.getuid())
+        or stat.S_IMODE(metadata.st_mode) & 0o077
+    ):
+        os.close(descriptor)
+        raise UnsafeWriteTargetError(f"Unsafe workspace lock file: {lock_path}")
+    with os.fdopen(descriptor, "a+", encoding="utf-8") as handle:
         fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
         try:
             yield

@@ -21,7 +21,6 @@ from seamwise.io import (
 )
 from seamwise.result import Diagnostic, Result
 from seamwise.safety import workspace_boundary_diagnostics
-from seamwise.taskpack import assets_root
 from seamwise.workspace import _stage_state_unlocked, next_steps_for_state
 
 CONTEXT_ARTIFACT_LIMIT = 64_000
@@ -87,6 +86,14 @@ Workspace label: `{workspace}` (absolute local path intentionally omitted)
 
 Delivery Intent → seam → one owning swimlane → observable capability leg → Task-Spec.
 
+## Guided conversation contract
+
+- Work one pass at a time and ask exactly one concise unanswered question.
+- Summarize the proposed artifact for that pass and wait for explicit confirmation.
+- Run no later transformation until the current pass is confirmed and its CLI token is reported.
+- Never fill evidence, ownership, architecture decisions, review, or proof gaps by inference.
+- Stop after validation with every Task-Spec unsealed unless the human separately authorizes sealing.
+
 ## Authority boundary
 
 - Treat current, proposed, derived, and external claims separately.
@@ -102,6 +109,55 @@ Delivery Intent → seam → one owning swimlane → observable capability leg �
 {next_command}
 ```
 """
+
+
+def _recipe_authoring_guide() -> dict[str, Any]:
+    return {
+        "mode": "guided-one-pass",
+        "instructions": [
+            "Ask exactly one concise unanswered question at a time.",
+            "Keep model-authored material proposed until the CLI validates it.",
+            "Show the completed pass and wait for explicit confirmation before advancing.",
+            "Do not infer evidence, owners, accepted decisions, review authority, or proof.",
+        ],
+        "passes": [
+            {
+                "pass": 1,
+                "name": "delivery-intent",
+                "question": "What observable delivery outcome should be true when this work is done?",
+                "captures": ["title", "summary", "success", "out_of_scope"],
+            },
+            {
+                "pass": 2,
+                "name": "evidence-and-system",
+                "question": "Which current source should ground that outcome, and where is its immutable local snapshot?",
+                "captures": ["source", "evidence", "system_map", "unknowns"],
+            },
+            {
+                "pass": 3,
+                "name": "seams-and-ownership",
+                "question": "Which independently provable system boundary owns the first observable capability state?",
+                "captures": ["seams", "rejected_alternatives", "swimlanes", "owners"],
+            },
+            {
+                "pass": 4,
+                "name": "capability-and-proof",
+                "question": "What capability states, dependencies, contention, and proof form the steel thread?",
+                "captures": ["legs", "steel_thread", "contentions", "objections"],
+            },
+            {
+                "pass": 5,
+                "name": "task-contracts",
+                "question": "What single done-condition and executable proof belongs to each runnable leaf?",
+                "captures": ["tasks", "behavior", "evals", "write_surfaces"],
+            },
+        ],
+        "output": {
+            "file": "seamwise-recipe.yaml",
+            "validate_with": "seamwise --workspace <path> --json map --source seamwise-recipe.yaml",
+        },
+        "schema": load_schema("recipe"),
+    }
 
 
 def _bounded_context_packet(
@@ -182,17 +238,7 @@ def _snapshot(root: Path) -> dict[str, Any]:
                 ],
             }
         if not state["seam_map"]:
-            example_path = assets_root() / "examples" / "rate-limiting" / "recipe.yaml"
-            snapshot["recipe_authoring"] = {
-                "instructions": (
-                    "Replace every fixture fact with sourced project evidence; preserve the "
-                    "schema, label model-authored claims proposed, then pass the file to "
-                    "seamwise map --source <recipe.yaml>."
-                ),
-                "schema": load_schema("recipe"),
-                "example_yaml": example_path.read_text(encoding="utf-8"),
-                "example_sha256": sha256_file(example_path),
-            }
+            snapshot["recipe_authoring"] = _recipe_authoring_guide()
         files: dict[str, Path] = {}
         if state["seam_map"]:
             files["seam_map"] = root / "seamwise" / "seam-map.yaml"

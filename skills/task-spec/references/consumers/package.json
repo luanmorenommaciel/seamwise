@@ -1,5 +1,5 @@
 {
-  "name": "task-spec-consumer-example",
+  "name": "task-spec-consumer-proof",
   "version": "2.1.1",
   "private": true,
   "description": "Reference TypeScript consumer for Task-Spec v2.1.1 — parse, validate, and enumerate evals.",

@@ -7,15 +7,24 @@ description: Orchestrate the complete Seamwise intent-to-task workflow through t
 
 Drive the shared CLI; do not recreate compiler behavior in the model.
 
-## Workflow
+## First run
 
-1. Confirm that `seamwise` is executable. If it is absent, stop and give the documented installation command; do not imitate its output.
-2. Run `seamwise --json doctor`. Treat any nonzero exit as a blocker and report its diagnostics.
-3. Resolve the intended workspace explicitly with the user when more than one candidate exists. Never silently initialize or switch workspaces.
-4. Run `seamwise --workspace "<path>" --json status`, then follow only the ordered actions in `next`.
-5. If mapping is next and no authored recipe exists, run `seamwise --workspace "<path>" --json recipe schema` and `seamwise --workspace "<path>" recipe example --output seamwise-recipe.yaml`. Replace every fixture fact with sourced project evidence; never present the bundled example as project truth.
-6. Use `seamwise --workspace "<path>" --json prepare --source "<recipe.yaml>"` for the normal resumable path before mapping, or omit `--source` when the seam map already exists. Use the stage skills when the user asks to focus on one transformation.
-7. Re-run `seamwise --workspace "<path>" --json status` and report the exact token, artifact paths, diagnostics, and next human decision.
+1. Check whether `seamwise` is executable.
+2. If it is absent and the user explicitly asked to install Seamwise, confirm `uv` is available and run `uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"`. If installation was not explicitly requested, offer that exact command and wait. Never imitate CLI output.
+3. Run `seamwise --json doctor`. Treat any nonzero exit as a blocker and report its diagnostics.
+4. Resolve the intended workspace explicitly when more than one candidate exists. Never silently initialize or switch workspaces.
+
+## Guided workflow
+
+Default to one pass per human confirmation. Ask exactly one concise unanswered question at a time.
+
+1. Run `seamwise --workspace "<path>" --json status` and report the current token and first `next` action.
+2. If the workspace is absent, ask permission to initialize it, then run only `seamwise --workspace "<path>" --json init`.
+3. Before mapping, run `seamwise --workspace "<path>" --json agent-context --host <codex|claude|chat>`. Follow its `guided-one-pass` authoring sequence and exact recipe schema. Build `seamwise-recipe.yaml` only from confirmed answers and immutable local evidence; do not use or invent an example.
+4. Present the proposed Delivery Intent, evidence/system map, seams/ownership, capability/proof chain, and task contracts one pass at a time. Wait for explicit confirmation after each pass.
+5. Run exactly one transformation after its input is confirmed: `map`, then `plan`, then explicit human `review`, then `compile`, then `tasks validate`. Report the exact JSON token and artifacts before asking whether to continue.
+6. Use `prepare` only when the user explicitly asks for automation across already-confirmed passes. It still stops at closed gates and never reviews, preflights, or seals.
+7. Re-run `status` at handoff and report the exact token, artifact paths, diagnostics, and next human decision.
 
 Inspect `seamwise <command> --help` before using an option that is not shown here.
 
