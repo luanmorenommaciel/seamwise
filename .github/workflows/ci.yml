@@ -63,6 +63,11 @@ jobs:
             sudo apt-get update -qq
             sudo apt-get install -y -qq shellcheck
           fi
+          npm install --global \
+            @openai/codex@0.146.0 \
+            @anthropic-ai/claude-code@2.1.220
+          codex --version
+          claude --version
 
       - name: Lint this workflow
         if: runner.os == 'Linux'

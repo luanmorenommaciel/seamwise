@@ -452,8 +452,8 @@ make check
 
 The checked-in CI workflow runs that same credential-free boundary on Linux
 with Python 3.11 and macOS with Python 3.13. It uses read-only repository
-permissions, does not persist checkout credentials, and keeps hosted-service or
-marketplace checks outside the green signal.
+permissions, does not persist checkout credentials, and installs pinned Codex
+and Claude Code CLIs solely inside each disposable runner.
 
 It verifies:
 
@@ -466,20 +466,20 @@ It verifies:
 - transactional install, reinstall, rollback, modified-file refusal, and
   receipt-owned uninstall;
 - wheel/sdist build plus a fresh-venv wheel install and complete clean-room E2E;
+- isolated Codex and Claude marketplace add, plugin install, enabled listing,
+  cached-content, uninstall, and marketplace-removal lifecycles;
 - plugin/skill manifests, local links, Mermaid fences, SVGs, and the unchanged
   canonical PDF hash.
 
-Real host marketplace lifecycle checks are intentionally separate because CI
-does not install third-party host CLIs:
+Run only the real-host marketplace lifecycle checks with:
 
 ```bash
 make check-hosts
 ```
 
-That command uses isolated Codex and Claude configuration directories and
-requires both CLIs. It proves marketplace add, plugin install, enabled listing,
-cached plugin contents, uninstall, and marketplace removal without touching the
-user's normal host configuration.
+That focused command uses isolated Codex and Claude configuration directories
+and requires both CLIs. It exercises the same lifecycle proof without touching
+the user's normal host configuration.
 
 Credentialed live-host probes are explicit: `seamwise doctor --host all --live`.
 They are reported separately from the credential-free release gate. Claude's

@@ -46,10 +46,11 @@
 ## Acceptance boundary
 
 Credential-free sign-off includes static manifest validation, clean project/user
-install simulation, reinstall, upgrade, doctor, uninstall, and rollback.
-When both host CLIs are installed, `make check-hosts` separately proves real
+install simulation, reinstall, upgrade, doctor, uninstall, rollback, and real
 Codex and Claude marketplace add, plugin install, enabled listing, cache
-contents, uninstall, and marketplace removal in isolated configurations.
+contents, uninstall, and marketplace removal in isolated configurations. CI
+installs pinned host CLIs in disposable runners. `make check-hosts` exposes the
+same host lifecycle as a focused local proof.
 Universal-directory publication, browser-hosted execution, and authenticated
 remote MCP behavior require external systems and remain separately labeled.
 

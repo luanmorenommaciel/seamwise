@@ -155,12 +155,14 @@ make check-hosts
 `make check` is the credential-free release boundary. It runs static checks,
 schemas, positive and adversarial tests, the full imported Task Pack suite in a
 disposable copy, package build, a fresh-environment wheel E2E, installer
-transactions, documentation checks, and the unchanged PDF hash check.
+transactions, isolated real-host plugin lifecycles, documentation checks, and
+the unchanged PDF hash check. CI installs pinned host CLIs in its disposable
+runners; it does not require host authentication.
 
-`make check-hosts` is the explicit installed-host boundary. With both host CLIs
-available, it uses isolated configuration directories to test marketplace add,
-plugin install, enabled listing, cached contents, uninstall, and marketplace
-removal for Codex and Claude Code.
+`make check-hosts` is the focused installed-host boundary. With both host CLIs
+available, it reruns the isolated marketplace add, plugin install, enabled
+listing, cached contents, uninstall, and marketplace removal proof for Codex
+and Claude Code.
 
 Credentialed host probes are separate and explicit:
 

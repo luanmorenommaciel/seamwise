@@ -20,6 +20,7 @@ uv build
 release_wheel="$release_root/dist/seamwise-0.1.0-py3-none-any.whl"
 test -f "$release_wheel"
 uv run python scripts/clean_room_e2e.py "$release_wheel"
+uv run python scripts/host_plugin_e2e.py
 uv run seamwise --json doctor --host core
 git diff --check
 git diff --cached --check
