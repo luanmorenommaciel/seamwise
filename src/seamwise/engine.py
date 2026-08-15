@@ -55,10 +55,16 @@ from seamwise.render import (
     render_steel_thread,
     render_swimlane,
     render_system_map,
-    render_task_spec,
 )
 from seamwise.result import Diagnostic, Result
 from seamwise.safety import workspace_boundary_diagnostics
+from seamwise.taskspec_adapter import (
+    TASK_PLAN_LINEAGE_PATH,
+    TASK_PLAN_PATH,
+    build_task_plan,
+    build_task_plan_lineage,
+    task_plan_digest,
+)
 
 
 def _diag(code: str, message: str, artifact: Path | None = None, **detail: Any) -> Diagnostic:
@@ -543,7 +549,7 @@ def _verify_local_recipe_sources(
 ) -> list[Diagnostic]:
     """Verify local bytes and reject remote claims without immutable snapshots."""
 
-    from seamwise.taskpack import assets_root
+    from seamwise.assets import assets_root
 
     source_records = [recipe["intent"]["source"]]
     source_records.extend(item["source"] for item in recipe["evidence"])
@@ -1808,139 +1814,37 @@ def render_graph_mermaid(graph: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _existing_spec_diagnostics(root: Path, generated: dict[str, str]) -> list[Diagnostic]:
-    existing = sorted((root / "tasks").glob("T-*.md"))
-    if not existing:
-        return []
-    lineage_path = root / "tasks" / "task-lineage.json"
-    if not lineage_path.is_file():
-        return [
-            _diag(
-                "unowned_task_specs",
-                "Existing Task-Specs have no Seamwise lineage receipt; refusing to replace them.",
-            )
-        ]
-    try:
-        lineage = load_json(lineage_path)
-    except (OSError, ValueError) as error:
-        return [_diag("task_lineage_invalid", str(error), lineage_path)]
-    errors = validate_contract("task-lineage", lineage)
-    if errors:
-        return [_diag("task_lineage_schema", item, lineage_path) for item in errors]
-    diagnostics: list[Diagnostic] = []
-    expected_existing = set(lineage["tasks"])
-    actual_existing = {path.stem for path in existing}
-    if actual_existing != expected_existing:
-        diagnostics.append(
-            _diag(
-                "stale_or_unowned_task_specs",
-                "Existing Task-Spec files do not exactly match the prior lineage receipt.",
-                missing=sorted(expected_existing - actual_existing),
-                extra=sorted(actual_existing - expected_existing),
-            )
-        )
-    for task_id, entry in lineage["tasks"].items():
-        expected_relative = f"tasks/{task_id}.md"
-        path = _owned_artifact_path(root, entry["spec"], "tasks")
-        if path is None or entry["spec"] != expected_relative:
-            diagnostics.append(
-                _diag("task_spec_path_invalid", f"Prior lineage path is invalid for {task_id}.")
-            )
-        elif not path.is_file() or sha256_file(path) != entry["spec_sha256"]:
-            diagnostics.append(
-                _diag(
-                    "task_spec_changed",
-                    f"Existing Task-Spec {task_id} changed after compilation.",
-                    path,
-                )
-            )
-    if diagnostics:
-        return diagnostics
-    if set(generated) != actual_existing or any(
-        (root / "tasks" / f"{task_id}.md").read_text(encoding="utf-8") != content
-        for task_id, content in generated.items()
-    ):
-        return [
-            _diag(
-                "task_spec_replacement_required",
-                "Compilation would replace or orphan prior drafts. Archive the receipt-owned "
-                "tasks/T-*.md files and task-lineage.json explicitly, then rerun compile.",
-            )
-        ]
-    return []
-
-
 def derive_task_bundle(
-    root: Path, plan: dict[str, Any], task_pack_root: Path
+    root: Path, plan: dict[str, Any]
 ) -> tuple[
     list[dict[str, Any]],
     dict[str, Any],
-    dict[str, Any] | None,
-    dict[str, str],
     list[Diagnostic],
 ]:
-    """Deterministically rebuild every compiler-owned task projection."""
+    """Deterministically rebuild Seamwise-owned topology before materialization."""
 
     plan_sha = sha256_file(root / "seamwise" / "delivery-plan.yaml")
     records = _task_records(root, plan)
     graph, diagnostics = _graph_projection(records, plan, plan_sha)
     if diagnostics or graph["status"] != GRAPH_READY:
-        return records, graph, None, {}, diagnostics
-    try:
-        intent, _ = load_frontmatter(root / "seamwise" / "intent.md")
-        lineage: dict[str, Any] = {
-            "schema_version": 1,
-            "intent": intent["id"],
-            "plan_sha256": plan_sha,
-            "fixture": bool(
-                load_json(root / "seamwise" / "reviews" / "delivery-plan-review.json").get(
-                    "fixture"
-                )
-            ),
-            "tasks": {},
-        }
-        generated_specs: dict[str, str] = {}
-        for record in records:
-            task = record["task"]
-            content = render_task_spec(
-                task=task,
-                intent_id=intent["id"],
-                seam_id=record["seam_id"],
-                lane_id=record["swimlane_id"],
-                leg_id=record["leg_id"],
-                source_sha256=record["source_sha256"],
-                task_pack_root=task_pack_root,
-            )
-            generated_specs[task["id"]] = content
-            lineage["tasks"][task["id"]] = {
-                "seam": record["seam_id"],
-                "swimlane": record["swimlane_id"],
-                "leg": record["leg_id"],
-                "spec": f"tasks/{task['id']}.md",
-                "spec_sha256": sha256_bytes(content.encode("utf-8")),
-                "source_sha256": record["source_sha256"],
-            }
-    except (OSError, ValueError, KeyError, yaml.YAMLError) as error:
-        return records, graph, None, {}, [_diag("task_spec_render_failed", str(error))]
-    projection_errors = [
-        *validate_contract("task-graph", graph),
-        *validate_contract("task-lineage", lineage),
-    ]
+        return records, graph, diagnostics
+    projection_errors = validate_contract("task-graph", graph)
     if projection_errors:
-        return (
-            records,
-            graph,
-            None,
-            {},
-            [_diag("projection_schema", item) for item in projection_errors],
-        )
-    return records, graph, lineage, generated_specs, []
+        return records, graph, [_diag("projection_schema", item) for item in projection_errors]
+    return records, graph, []
+
+
+def _task_lineage(
+    root: Path,
+    records: list[dict[str, Any]],
+    task_plan: dict[str, Any],
+) -> dict[str, Any]:
+    return build_task_plan_lineage(root, records, task_plan)
 
 
 def compile_graph(
     root: Path,
     *,
-    task_pack_root: Path,
     dry_run: bool = False,
     command: str = "compile",
 ) -> Result:
@@ -1965,32 +1869,48 @@ def compile_graph(
         )
     plan_path = root / "seamwise" / "delivery-plan.yaml"
     plan_sha = sha256_file(plan_path)
-    records, graph, lineage, generated_specs, graph_diagnostics = derive_task_bundle(
-        root, plan, task_pack_root
-    )
+    records, graph, graph_diagnostics = derive_task_bundle(root, plan)
     token = graph["status"]
     exit_code = EXIT_OK if token == GRAPH_READY else EXIT_CONFLICT
+    if token != GRAPH_READY:
+        return Result(
+            command,
+            token,
+            exit_code,
+            root,
+            diagnostics=graph_diagnostics,
+            next_steps=["Resolve graph diagnostics, then rerun compile."],
+            data={"tasks": len(records), "dry_run": dry_run, "graph": graph},
+        )
+    if graph_diagnostics:
+        return Result(
+            command,
+            GRAPH_UNPROVABLE,
+            EXIT_INVALID,
+            root,
+            diagnostics=graph_diagnostics,
+        )
+    try:
+        task_plan = build_task_plan(root, plan, records)
+        lineage = _task_lineage(root, records, task_plan)
+    except (OSError, ValueError, KeyError, yaml.YAMLError) as error:
+        return Result(
+            command,
+            GRAPH_UNPROVABLE,
+            EXIT_INVALID,
+            root,
+            diagnostics=[_diag("task_plan_projection_failed", str(error))],
+        )
+    lineage_errors = validate_contract("task-lineage", lineage)
+    if lineage_errors:
+        return Result(
+            command,
+            GRAPH_UNPROVABLE,
+            EXIT_INVALID,
+            root,
+            diagnostics=[_diag("projection_schema", item) for item in lineage_errors],
+        )
     writer = TransactionWriter(dry_run=dry_run)
-    graph_path = root / "tasks" / "task-graph.yaml"
-    if token == GRAPH_READY:
-        if graph_diagnostics or lineage is None:
-            return Result(
-                command,
-                GRAPH_UNPROVABLE,
-                EXIT_INVALID,
-                root,
-                diagnostics=graph_diagnostics,
-            )
-        existing_diagnostics = _existing_spec_diagnostics(root, generated_specs)
-        if existing_diagnostics:
-            return Result(
-                command,
-                GRAPH_BLOCKED,
-                EXIT_CONFLICT,
-                root,
-                diagnostics=existing_diagnostics,
-                next_steps=["Archive the named prior drafts explicitly, then rerun compile."],
-            )
     with workspace_lock(root, dry_run=dry_run):
         locked_plan, locked_diagnostics = verify_plan(root)
         if locked_plan is None or sha256_file(plan_path) != plan_sha:
@@ -2002,22 +1922,8 @@ def compile_graph(
                 diagnostics=locked_diagnostics
                 or [_diag("plan_changed", "Delivery plan changed during compilation.")],
             )
-        locked_spec_diagnostics = _existing_spec_diagnostics(root, generated_specs)
-        if locked_spec_diagnostics:
-            return Result(
-                command,
-                GRAPH_BLOCKED,
-                EXIT_CONFLICT,
-                root,
-                diagnostics=locked_spec_diagnostics,
-            )
-        writer.yaml(graph_path, graph)
-        writer.text(root / "tasks" / "critical-path.mmd", render_graph_mermaid(graph))
-        if token == GRAPH_READY and lineage is not None:
-            for task_id, content in generated_specs.items():
-                writer.text(root / "tasks" / f"{task_id}.md", content)
-            writer.json(root / "tasks" / "task-lineage.json", lineage)
-        _event(writer, root, "compile", token, tasks=len(records))
+        writer.json(root / TASK_PLAN_PATH, task_plan)
+        writer.json(root / TASK_PLAN_LINEAGE_PATH, lineage)
         try:
             writer.commit()
         except UnsafeWriteTargetError as error:
@@ -2035,16 +1941,24 @@ def compile_graph(
         root,
         artifacts=writer.touched,
         diagnostics=graph_diagnostics,
-        next_steps=["seamwise tasks validate"]
+        next_steps=[
+            "Pass seamwise/task-plan.json and seamwise/task-plan-lineage.json to the composition coordinator."
+        ]
         if token == GRAPH_READY
         else ["Resolve graph diagnostics, then rerun compile."],
-        data={"tasks": len(records), "dry_run": dry_run},
+        data={
+            "tasks": len(records),
+            "dry_run": dry_run,
+            "task_plan_contract": "TaskPlan/v1",
+            "task_plan_digest": task_plan_digest(task_plan),
+            "task_plan_lineage_contract": "SeamwiseTaskPlanLineage/v1",
+            "dispatch_authorized": False,
+            "graph": graph,
+        },
     )
 
 
 def inspect_lineage(root: Path, task_id: str | None = None) -> Result:
-    from seamwise.taskpack import _verify_task_bundle_unlocked
-
     boundary_diagnostics = workspace_boundary_diagnostics(root)
     if boundary_diagnostics:
         return Result(
@@ -2055,20 +1969,37 @@ def inspect_lineage(root: Path, task_id: str | None = None) -> Result:
             diagnostics=boundary_diagnostics,
         )
     with workspace_lock(root):
-        specs, lineage, diagnostics = _verify_task_bundle_unlocked(root)
-        path = root / "tasks" / "task-lineage.json"
-        if lineage is None:
+        path = root / TASK_PLAN_LINEAGE_PATH
+        if not path.is_file():
             return Result(
                 "inspect",
                 GRAPH_BLOCKED,
-                EXIT_CONFLICT if diagnostics else EXIT_NEEDS_INPUT,
+                EXIT_NEEDS_INPUT,
                 root,
-                diagnostics=diagnostics
-                or [_diag("lineage_missing", "Compile a task graph first.", path)],
+                diagnostics=[_diag("lineage_missing", "Compile a task graph first.", path)],
                 next_steps=["seamwise compile"],
             )
+        try:
+            lineage = load_json(path)
+        except (OSError, ValueError) as error:
+            return Result(
+                "inspect",
+                GRAPH_BLOCKED,
+                EXIT_CONFLICT,
+                root,
+                diagnostics=[_diag("task_lineage_invalid", str(error), path)],
+            )
+        errors = validate_contract("task-lineage", lineage)
+        if errors:
+            return Result(
+                "inspect",
+                GRAPH_BLOCKED,
+                EXIT_CONFLICT,
+                root,
+                diagnostics=[_diag("task_lineage_schema", item, path) for item in errors],
+            )
         if task_id is not None:
-            task = lineage["tasks"].get(task_id)
+            task = lineage["units"].get(task_id)
             if task is None:
                 return Result(
                     "inspect",
@@ -2080,6 +2011,4 @@ def inspect_lineage(root: Path, task_id: str | None = None) -> Result:
             data = {"task_id": task_id, **task}
         else:
             data = lineage
-        return Result(
-            "inspect", "LINEAGE=READY", EXIT_OK, root, artifacts=[path, *specs], data=data
-        )
+        return Result("inspect", "LINEAGE=READY", EXIT_OK, root, artifacts=[path], data=data)

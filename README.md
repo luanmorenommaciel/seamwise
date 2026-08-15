@@ -1,527 +1,270 @@
-<div align="center">
-
-[![Seamwise — an architecture-aware intent-to-task compiler that finds natural system joints and preserves them through proof-bearing work.](assets/seamwise-banner.png)](https://github.com/luanmorenommaciel/seamwise)
-
-<sub>Intent and evidence meet a natural system joint; owned capability legs continue to independent proof.</sub>
-
 # Seamwise
 
-**Find the joints. Preserve the system. Prove the work.**
+<p align="center">
+  <img src="assets/seamwise-hero.svg" alt="Seamwise lowers an approved initiative through evidence-backed seams, ownership, review, and TaskPlan projection." width="100%">
+</p>
 
-*The architecture-aware compiler between delivery intent and trustworthy implementation tasks.*
+<p align="center">
+  <a href="https://github.com/luanmorenommaciel/seamwise/releases"><img src="https://img.shields.io/badge/release-0.2.0--alpha.1-171717" alt="Release 0.2.0-alpha.1"></a>
+  <img src="https://img.shields.io/badge/python-3.11%2B-3776AB" alt="Python 3.11+">
+  <img src="https://img.shields.io/badge/TaskPlan-v1-C18DFF" alt="TaskPlan v1">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2F855A" alt="MIT License"></a>
+</p>
 
-[![Candidate: v0.1.0-alpha](https://img.shields.io/badge/candidate-v0.1.0--alpha-31D892)](#verified-candidate-surface)
-[![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-73D8FF)](pyproject.toml)
-[![Task-Spec: v3](https://img.shields.io/badge/Task--Spec-v3-C18DFF)](skills/task-spec/SKILL.md)
-[![License: MIT](https://img.shields.io/badge/license-MIT-F2AD45)](LICENSE)
+> One approved initiative in. One reviewed `TaskPlan/v1` and digest-bound
+> lineage out. No task materialization and no dispatch authority.
 
-[Start](#start-in-a-chat) · [Guided flow](#one-pass-at-a-time) · [Compiler](#the-compiler) · [Codex](#codex) · [Claude Code](#claude-code) · [CLI](#cli-map)
+Seamwise answers one question:
 
-</div>
+**How should this initiative be sliced along real system seams?**
 
----
+It maps evidence-backed responsibility boundaries, creates one owning swimlane
+per seam, lowers work into observable capability legs, proves dependency and
+contention ordering, stops for explicit human review, and projects the reviewed
+result into a portable TaskPlan.
 
-## What is Seamwise?
+Seamwise does not import, vendor, invoke, or reimplement Task-Spec. It does not
+write Task-Spec Markdown, authorize dispatch, execute work, or accept delivery.
 
-Your agents can split the work. **Seamwise makes sure they split the system.**
-
-Seamwise is a model-agnostic compiler that turns Delivery Intent plus evidence
-into a reviewed, dependency-safe, proof-bearing Task-Spec DAG without losing
-the architecture that makes each task legitimate.
-
-> One outcome in. A trustworthy, **unsealed** Task-Spec DAG out.
-
-Seamwise is not a backlog generator. It preserves the system model, ownership,
-causal order, contention, lineage, and proof boundaries that flat task splitting
-usually erases.
-
-## Start in a chat
-
-Requirements: macOS, Linux, or Linux under WSL; Python 3.11+; Git; and Bash.
-Native Windows Python is not supported in this alpha because workspace locking
-and the embedded Task Pack are POSIX/Bash based. The explicit Task-Spec
-preflight gate also requires `shellcheck` plus every tool named by the authored
-specs. Those tools are not required for installation, mapping, planning,
-compilation, or structural validation. Install [`uv`](https://docs.astral.sh/uv/)
-once, then choose a host.
-
-### Codex CLI or desktop
-
-```bash
-uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
-codex plugin marketplace add luanmorenommaciel/seamwise
-codex plugin add seamwise@seamwise
-seamwise doctor
-```
-
-Open a new Codex session, then say:
-
-```text
-Use $seamwise. Work one confirmed pass at a time, ask me exactly one question,
-and stop after each CLI token before continuing.
-```
-
-### Claude Code
-
-```bash
-uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
-claude plugin marketplace add luanmorenommaciel/seamwise --scope user
-claude plugin install seamwise@seamwise --scope user
-seamwise doctor
-```
-
-Run `/reload-plugins` in the current session, or open a new one, then say:
-
-```text
-Use /seamwise:seamwise. Work one confirmed pass at a time, ask me exactly one
-question, and stop after each CLI token before continuing.
-```
-
-The plugin and CLI are separate on purpose: the plugin teaches the host how to
-guide the conversation; the CLI owns schemas, lineage, stable tokens, and
-fail-closed validation. If the plugin is present but the CLI is not, the main
-skill offers the same `uv tool install` command and waits for installation
-authority.
-
-For repository development, install from the checkout instead:
-
-```bash
-git clone https://github.com/luanmorenommaciel/seamwise.git
-cd seamwise
-uv sync --extra dev
-uv run seamwise --help
-```
-
-The package installs two executables: `seamwise` for the complete compiler and
-`task-spec` for the atomic Task Pack surface.
-
-## One pass at a time
-
-The default agent experience is deliberately conversational. No public example
-recipe is shipped or copied into a project. The host reads the exact schema,
-collects real project evidence, and builds only the artifact you confirm.
-
-| Pass | The agent asks for | Command after confirmation | Stop token |
-| ---: | --- | --- | --- |
-| 0 | workspace and installation scope | `seamwise init` | `WORKSPACE=READY` |
-| 1 | observable Delivery Intent | none; proposal only | human confirmation |
-| 2 | immutable evidence and current system boundaries | none; proposal only | human confirmation |
-| 3 | seams, rejected alternatives, and one owner per seam | `seamwise map --source seamwise-recipe.yaml` | `SEAM_MAP=READY` |
-| 4 | capability legs, dependencies, contention, and objections | `seamwise plan` | `DELIVERY_PLAN=NEEDS_REVIEW` |
-| 5 | explicit review, atomic proof, and write surfaces | `seamwise review`, then `seamwise compile` | `TASK_GRAPH=READY` |
-| 6 | every generated behavior and eval | `seamwise tasks validate` | `TASK_SPECS=VALID` |
-
-The agent begins with:
-
-```bash
-seamwise --workspace "/path/to/project" --json status
-seamwise --workspace "/path/to/project" --json agent-context --host codex
-```
-
-Before mapping, the context packet contains the exact recipe schema and a
-five-pass question sequence, never fictional project data. v0.1 accepts only
-local paths or local `file:` URIs whose bytes match their declared SHA-256.
-Capture web or provider discoveries as immutable local snapshots before citing
-them; retrieved text never becomes verified compilation evidence directly.
-
-The normal end state is:
-
-```text
-WORKSPACE=READY
-SEAM_MAP=READY
-DELIVERY_PLAN=NEEDS_REVIEW   # exit 2, by design
-DELIVERY_PLAN=READY
-TASK_GRAPH=READY
-TASK_SPECS=VALID
-```
-
-Every emitted draft still contains:
-
-```yaml
-signed_off: false
-accepted: false
-```
-
-Validation does not create dispatch authority. Optional preflight executes the
-eval Bash written into every draft and therefore requires an explicit
-acknowledgement. Only the separate seal path may create dispatch authority.
-
-For a non-fixture plan, provision the repo-local HMAC key outside Git and seal
-only under explicit authority:
-
-```bash
-seamwise --workspace "/path/to/non-fixture-workspace" tasks setup-signing-key
-seamwise --workspace "/path/to/non-fixture-workspace" tasks seal \
-  --reviewer "human-reviewer" \
-  --acknowledge-eval-execution \
-  --acknowledge-dispatch-authority
-```
-
-The command runs one pinned Task Pack stamping gate, which executes authored
-evals according to Task Pack semantics. Fixture reviews can never be sealed.
-`--force` key rotation invalidates prior signatures and is never implicit.
-
-## The compiler
-
-![Seamwise lowers delivery intent through evidence-backed system joints, explicit ownership and review, dependency-aware ordering, and independently provable unsealed Task-Specs.](assets/seamwise-hero.svg)
-
-Read left to right: evidence reaches a natural joint; one owning swimlane orders
-observable capability legs; each leg retains lineage to independently runnable
-proof. The colored rails illustrate capability flow, not generic compiler
-stages. Validation observes the result; it does not seal it.
-
-<details>
-<summary><strong>Portable Mermaid view</strong></summary>
-
+## Authority boundary
 
 ```mermaid
 flowchart LR
-    I["Delivery Intent<br/>+ evidence"] --> M["1 · Seam map<br/>find + refute joints"]
-    M --> P["2 · Delivery plan<br/>one owner + capability states"]
-    P --> R{"Explicit<br/>review"}
-    R -- accepted --> G["3 · Task graph<br/>dependencies + contention"]
-    R -- missing/open --> X["Stop<br/>gate remains closed"]
-    G --> T["4 · Task-Specs<br/>scope + behavior + evals"]
-    T --> V["Validate / preflight<br/>still unsealed"]
-
-    classDef input fill:#0d2334,stroke:#31d892,color:#fff,stroke-width:2px;
-    classDef stage fill:#10253a,stroke:#4ba4ff,color:#fff,stroke-width:2px;
-    classDef gate fill:#302618,stroke:#f2ad45,color:#fff,stroke-width:2px;
-    classDef stop fill:#371d29,stroke:#ff6f91,color:#fff,stroke-width:2px;
-    class I input;
-    class M,P,G,T,V stage;
-    class R gate;
-    class X stop;
+    I["Approved initiative"] --> S["Seamwise decomposition"]
+    S --> R{"Explicit human review"}
+    R --> TP["TaskPlan/v1"]
+    R --> L["SeamwiseTaskPlanLineage/v1"]
+    TP --> C["Converge coordinator"]
+    L --> C
+    C --> T["Task-Spec engine"]
+    T --> M["Materialized tasks"]
+    M --> A["Per-leaf authorization and acceptance"]
 ```
 
-</details>
+| Product | Owns | Does not own |
+|---|---|---|
+| Seamwise | evidence-backed decomposition, seams, swimlanes, capability legs, topology, human plan review, TaskPlan projection | Task-Spec validation, materialization, dispatch, execution, acceptance |
+| Task-Spec | TaskPlan validation, task materialization, per-leaf authorization, handoff, evaluation, acceptance | initiative discovery or decomposition |
+| Converge | engine negotiation, sequencing, runtime binding, settlement, composition receipts | either engine's internal authority |
 
-The governing chain is strict:
+The invariant is:
+
+> **Seamwise decomposes. Task-Spec contracts. Converge coordinates.**
+
+## Install
+
+```bash
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git@v0.2.0-alpha.1"
+seamwise --version
+seamwise --json doctor --host core
+```
+
+Core Seamwise requires Python 3.11 or newer and Git. Task-Spec is deliberately
+not a Seamwise runtime dependency. A composed caller installs and negotiates
+the two engines independently.
+
+Inspect the exact machine boundary:
+
+```bash
+seamwise --json capabilities
+```
+
+The returned `SeamwiseCapabilities/v1` advertises the engine version,
+`TaskPlan/v1`, `SeamwiseTaskPlanLineage/v1`, and the supported coordinator
+commands. It also declares `materializes_tasks: false` and
+`dispatch_authority: false`.
+
+## First successful journey
+
+Initialize a repository workspace and inspect the recipe schema:
+
+```bash
+seamwise --workspace "/path/to/project" init
+seamwise --workspace "/path/to/project" recipe schema
+```
+
+Author `seamwise-recipe.yaml`, then run each authority boundary explicitly:
+
+```bash
+seamwise --workspace "/path/to/project" map --source seamwise-recipe.yaml
+seamwise --workspace "/path/to/project" plan
+seamwise --workspace "/path/to/project" review \
+  --accept \
+  --reviewer "human-name" \
+  --reason "The seams, ownership, ordering, and proof boundaries are acceptable."
+seamwise --workspace "/path/to/project" compile
+seamwise --workspace "/path/to/project" status
+```
+
+`plan` stops at `DELIVERY_PLAN=NEEDS_REVIEW`. `compile` refuses to cross that
+boundary without a current review receipt bound to the exact delivery-plan
+digest.
+
+Successful compilation writes exactly two boundary artifacts:
 
 ```text
-Delivery Intent
-  → 1..N accepted seams
-  → exactly 1 owning swimlane per seam
-  → 1..N observable capability legs per lane
-  → dependency- and contention-aware task nodes
-  → independently provable Task-Spec leaves
+seamwise/
+├── task-plan.json
+└── task-plan-lineage.json
 ```
 
-Every Task-Spec inherits its purpose from the leg, coordination from the lane,
-boundary from the seam, and proof contract from the embedded Task Pack.
+- `task-plan.json` is the reviewed `TaskPlan/v1` input for Task-Spec.
+- `task-plan-lineage.json` binds the intent, review digest, TaskPlan digest, and
+  every unit ID to its seam, swimlane, capability leg, and source digest.
 
-![A flat activity list compared with architecture-aware Seamwise decomposition.](assets/seamwise-before-after.svg)
+Compilation is atomic and deterministic. A rerun produces identical bytes.
+Coordinated tampering with both files still fails because status rebuilds the
+expected projections from the reviewed canonical inputs.
 
-Both sides make work smaller. Only the Seamwise side preserves the system joint,
-owner, capability state, causal order, and proof boundary needed to execute that
-work without reconstructing the architecture from a flat list.
-
-## Four gates, four failure routes
-
-| Stage | Writes | Ready token | Fails closed when |
-| --- | --- | --- | --- |
-| `map` | intent, evidence register, decisions, seams, seam index | `SEAM_MAP=READY` | evidence, owner, accepted decision, or a unique boundary is missing |
-| `plan` | one lane per seam, capability legs, steel thread, objections | `DELIVERY_PLAN=READY` | objections remain open or the hash-bound review is absent |
-| `compile` | task graph, lineage, Mermaid critical path, Task-Spec drafts | `TASK_GRAPH=READY` | a cycle, collision, stale hash, missing capability producer/dependency, forbidden write, or unprovable leaf exists |
-| `tasks validate` | no canonical authority | `TASK_SPECS=VALID` | Task-Spec v3 structure, behavior/eval traceability, or lineage is invalid |
-
-Sibling tasks are not assumed parallel. They become concurrent only when the
-dependency graph and shared write surface justify it.
-
-Authoring is deliberately strict in this alpha:
-
-- cited evidence must have nonzero declared confidence and a nonblank summary;
-- a seam and its exactly one owning swimlane name the same nonblank owner;
-- capability states, independent proof, decisions, and fixed/accepted objection
-  rationale cannot be whitespace placeholders;
-- `touches_paths` must already exist or be created by a transitive predecessor,
-  while `creates_paths` must not exist at compilation time;
-- write paths may not cross symlinks or differ only by case; and
-- behavior/eval IDs use the Task Pack's exact `B-1`/`B-2` and
-  `eval_1`/`eval_2`/`eval_3` shape, while their authored `verifies` mappings are
-  preserved exactly.
-
-Every status/validate read re-derives the graph, lineage, Mermaid, and normalized
-Task-Spec drafts from the hash-verified reviewed plan. Mutually consistent edits
-to derived hashes therefore remain tamper, not a new source of truth. The full
-review identity, rationale, timestamp, draft hash, and fixture class are also
-bound into the accepted plan.
-
-## Resume without archaeology
+To check interoperability manually without materializing tasks:
 
 ```bash
-seamwise --workspace "/path/to/workspace" status
-seamwise --workspace "/path/to/workspace" next
-seamwise --workspace "/path/to/workspace" prepare --source "/path/to/recipe.yaml"
+taskspec --json plan --manifest seamwise/task-plan.json
 ```
 
-`prepare` runs only missing transformations and stops at the first closed gate.
-It never reviews, preflights, seals, dispatches, or accepts work implicitly.
-After compilation, `seamwise tasks validate` checks every emitted leaf when the
-workspace resolves from the current directory.
+Task-Spec validation remains Task-Spec's authority. A caller invokes
+`taskspec batch` later and must retain `dispatch_authorized: false` until every
+leaf passes `taskspec gate --stamp`.
 
-Supplying `--source` after mapping is a consistency check, never a silent no-op:
-the recipe must match the hash recorded in the seam map. This alpha does not
-replace compiled projections in place. For a revised recipe, preserve the old
-proof chain and use a clean checkout or worktree of the target repository, then
-run `seamwise prepare --source "/path/to/revised-recipe.yaml"` there. An owned,
-transactional in-place revision/archive command is explicitly deferred.
+## Chat interface
 
-Workspace resolution is deterministic: `--workspace`, then
-`SEAMWISE_WORKSPACE`, the nearest ancestor with `seamwise/intent.md`, the Git
-root, and finally the current directory.
+Install the five focused Seamwise skills for Codex, Claude Code, or both:
+
+```bash
+seamwise install codex --scope project
+seamwise install claude --scope project
+seamwise install all --scope project
+```
+
+Start a new host session after installation. A safe first prompt is:
 
 ```text
-<workspace>/
-├── seamwise/
-│   ├── intent.md
-│   ├── system-map.md
-│   ├── evidence.jsonl
-│   ├── decisions/
-│   ├── seams/
-│   ├── seam-map.yaml
-│   ├── swimlanes/
-│   ├── legs/
-│   ├── steel-thread.md
-│   └── reviews/
-├── tasks/
-│   ├── T-*.md
-│   ├── task-graph.yaml
-│   ├── task-lineage.json
-│   └── critical-path.mmd
-├── telemetry/
-├── reports/
-└── lessons/
+Use $seamwise to decompose this approved initiative one confirmed pass at a
+time. Ask one concise unanswered question, show each proposed artifact, and
+wait for my confirmation before running the next Seamwise command.
 ```
 
-The recipe and its cited evidence are authored inputs. Accepted review receipts
-and explicit Task-Spec seals are authority records. Seam, lane, leg, graph, and
-draft Task-Spec files are compiler-owned, hash-bound projections: change the
-input and rebuild instead of hand-editing them. Reports, chat packets, and
-telemetry are also derived; telemetry observes and never authorizes.
-
-## Codex
-
-Codex CLI and desktop use the repository marketplace shown in
-[`marketplace.json`](.agents/plugins/marketplace.json). A new session is
-required after installation. Codex IDE does not currently load plugins, so use
-the receipt-owned native project skills there:
+Export a bounded, verified packet for a chat interface with:
 
 ```bash
-uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
-seamwise --workspace /path/to/consumer --dry-run install codex --scope project
-seamwise --workspace /path/to/consumer install codex --scope project
-seamwise --workspace /path/to/consumer doctor --host codex --scope project
+seamwise --workspace "/path/to/project" --json agent-context --host chat
 ```
 
-Restart the session, then invoke `$seamwise`. The marketplace install and native
-fallback load the same shared skills and call the same CLI. This repository is
-a working repo marketplace; a listing in OpenAI's universal public directory
-is not claimed.
+Chat output remains a proposal. It cannot review a plan, materialize a task,
+or create Task-Spec authority.
 
-The direct, much larger Task Pack skill is intentionally opt-in to protect the
-host's skill-context budget: add `--with-task-spec` only when you also want
-`$task-spec`. The `seamwise tasks ...` CLI always uses the bundled Task Pack.
-For plugin development, the root manifest intentionally exposes all six skills,
-including the Task Pack; the native installer defaults to the five thin skills.
-
-## Claude Code
-
-Claude Code uses the repository marketplace shown in
-[`marketplace.json`](.claude-plugin/marketplace.json). The commands in
-[Start in a chat](#start-in-a-chat) install the namespaced plugin; use
-`/reload-plugins` before invoking `/seamwise:seamwise` in the same session.
-
-The receipt-owned native fallback is:
-
-```bash
-uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git"
-seamwise --workspace /path/to/consumer --dry-run install claude --scope project
-seamwise --workspace /path/to/consumer install claude --scope project
-seamwise --workspace /path/to/consumer doctor --host claude --scope project
-```
-
-Restart the session, then invoke `/seamwise`. For local plugin development:
-
-```bash
-claude plugin validate . --strict
-claude --plugin-dir /absolute/path/to/seamwise
-```
-
-Plugin-loaded skills may be namespaced, for example `/seamwise:seamwise`.
-Native and plugin adapters both call the same CLI; they do not reimplement its
-semantics.
-
-## Chat
-
-Plain chat cannot truthfully claim local repository execution. Generate a
-self-contained packet instead:
-
-```bash
-seamwise --workspace "/path/to/workspace" agent-context --host chat
-```
-
-Paste the packet into the conversation. It carries current stage state, the
-canonical chain, trust boundaries, and the exact next command. Before mapping it
-includes the exact recipe schema and one-question-at-a-time authoring passes;
-after compilation it includes bounded, hash-matched seam/lane/leg and Task-Spec
-text so evals can be reviewed. Oversized artifacts are named by hash for
-separate attachment. Chat may propose artifacts; only a local CLI result can
-validate them. Local Codex and Claude Code can complete this loop entirely in
-their chat because they can execute the CLI. A browser-only chat needs the
-packet and cannot claim execution; an authenticated remote MCP service remains
-outside this alpha candidate.
-
-## Safe install and uninstall
-
-Project installs target `.agents/skills` and `.claude/skills`; user installs
-target their documented home equivalents. Every install:
-
-- previews cleanly with global `--dry-run`;
-- refuses unowned destinations;
-- stages and hash-verifies every skill;
-- rolls the whole transaction back on failure;
-- records versioned ownership receipts;
-- supports idempotent reinstall and upgrade.
-
-Compiler mutations use a user-private advisory lock in the operating system's
-runtime directory, not under `.git`. Codex and Claude may therefore keep Git
-metadata sandbox-protected without preventing normal `init`, `status`, mapping,
-planning, compilation, or validation.
-
-Uninstall removes only unchanged, receipt-owned directories:
-
-```bash
-seamwise uninstall codex --scope project
-seamwise uninstall claude --scope project
-```
-
-Locally modified installed skills are preserved and reported as a conflict.
-
-## Machine contract
-
-Every command supports global `--json` and emits exactly one versioned envelope:
-
-```json
-{
-  "schema_version": 1,
-  "command": "map",
-  "ok": true,
-  "token": "SEAM_MAP=READY",
-  "exit_code": 0,
-  "workspace": "/absolute/workspace",
-  "artifacts": [],
-  "diagnostics": [],
-  "next": ["seamwise plan"]
-}
-```
-
-Stable exits are `0` ready, `2` human/evidence input required, `3` invalid
-input, `4` lineage/tamper/graph conflict, `5` unavailable external requirement,
-and `10` internal mechanism failure. Schemas live in [`schemas/`](schemas/).
-
-## CLI map
+## CLI
 
 ```text
 seamwise init
 seamwise recipe schema
-seamwise map --source "/path/to/recipe.yaml"
+seamwise capabilities
+seamwise map --source <recipe.yaml>
 seamwise plan
-seamwise review --accept --reviewer "reviewer-name" --reason "review rationale"
+seamwise review --accept --reviewer <name> --reason <reason>
 seamwise compile
-seamwise prepare [--source "/path/to/recipe.yaml"]
-seamwise status | next | inspect [TASK_ID] | graph | report
+seamwise prepare --source <recipe.yaml>
+seamwise status
+seamwise next
+seamwise inspect [TASK_ID]
+seamwise graph
+seamwise report --format html|json
 seamwise agent-context --host codex|claude|chat
-seamwise tasks emit|validate|preflight|setup-signing-key|seal
-seamwise install|uninstall codex|claude|all
-seamwise doctor [--host core|codex|claude|all] [--live]
-
-task-spec new|validate|gate [--stamp]
+seamwise install codex|claude|all --scope project|user
+seamwise uninstall codex|claude|all --scope project|user
+seamwise doctor --host core|codex|claude|all
 ```
 
-Use `--dry-run` and `--json` before the subcommand because they are global
-options.
+`prepare` automates only already-authorized transformations and always stops at
+the review boundary. It never reviews or compiles implicitly.
 
-## Verified candidate surface
+Every command in JSON mode returns exactly one `SeamwiseCLIResult/v1` object:
 
-The single release gate is:
+```json
+{
+  "contract": "SeamwiseCLIResult/v1",
+  "engine_version": "0.2.0-alpha.1",
+  "schema_version": 1,
+  "command": "status",
+  "ok": true,
+  "token": "STATUS=READY",
+  "exit_code": 0,
+  "workspace": "/path/to/project",
+  "artifacts": [],
+  "diagnostics": [],
+  "next": [
+    "Pass seamwise/task-plan.json and seamwise/task-plan-lineage.json to the composition coordinator."
+  ],
+  "data": {
+    "reviewed": true,
+    "task_graph": true,
+    "task_plan": true,
+    "task_plan_lineage": true,
+    "units": 4,
+    "task_specs": 0,
+    "materialization_receipt": false,
+    "dispatch_authorized": false
+  }
+}
+```
+
+| Exit | Meaning |
+|---:|---|
+| 0 | operation succeeded or reached its intended boundary |
+| 2 | evidence, ownership, decision, or review input is required |
+| 3 | command or authored contract is invalid |
+| 4 | integrity, concurrency, or topology conflict |
+| 5 | required host runtime is unavailable |
+| 10 | internal mechanism failure |
+
+## Security and recovery
+
+- Review receipts become stale whenever the delivery plan changes.
+- Compile writes the TaskPlan and lineage in one lock-protected transaction.
+- Status regenerates both expected projections; altered, partial, additional,
+  or stale boundary artifacts fail closed.
+- Repository paths are canonical and checked against traversal, case, glob,
+  collision, and symlink escape.
+- Reports and chat packets explain verified state but create no authority.
+- Seamwise never receives Task-Spec credentials or signing keys.
+
+## Development and release proof
 
 ```bash
+uv sync --extra dev --locked
 make check
 ```
 
-The checked-in CI workflow runs that same credential-free boundary on Linux
-with Python 3.11 and macOS with Python 3.13. It uses read-only repository
-permissions, does not persist checkout credentials, and installs pinned Codex
-and Claude Code CLIs solely inside each disposable runner.
+The release gate runs formatting, linting, strict mypy, deterministic and
+adversarial tests, documentation checks, wheel inspection, a clean-room wheel
+lifecycle, independent Task-Spec `TaskPlan/v1` validation, host-plugin tests,
+doctor, and Git whitespace checks.
 
-It verifies:
+## Documentation
 
-- Ruff formatting/lint, strict mypy, JSON Schemas, and Python tests;
-- positive, adversarial, missing-evidence, missing-owner, open-objection,
-  stale-hash, tamper, cycle, collision, unprovable-node, and dry-run routes;
-- the pinned Task Pack's core, Bash portability, effort, fuzz, HMAC, portable
-  E2E, closed-loop, and conformance suites in a disposable copy;
-- deterministic compilation and valid, unsealed Task-Specs from internal test data;
-- transactional install, reinstall, rollback, modified-file refusal, and
-  receipt-owned uninstall;
-- wheel/sdist build plus a fresh-venv wheel install and complete clean-room E2E;
-- isolated Codex and Claude marketplace add, plugin install, enabled listing,
-  cached-content, uninstall, and marketplace-removal lifecycles;
-- plugin/skill manifests, local links, Mermaid fences, SVGs, and the unchanged
-  canonical PDF hash.
+- [Architecture and authority](docs/project.md)
+- [Implementation baseline](docs/decisions/0001-implementation-baseline.md)
+- [Machine contracts](docs/decisions/0002-machine-contracts.md)
+- [Host experience](docs/decisions/0003-host-experience.md)
+- [External Task-Spec boundary](docs/decisions/0004-external-taskspec-boundary.md)
+- [Changelog](CHANGELOG.md)
+- [Historical target blueprint](docs/seamwise.pdf)
+- [Contributing instructions](AGENTS.md)
 
-Run only the real-host marketplace lifecycle checks with:
+The PDF is preserved as historical v0.1 target evidence. Executable code,
+schemas, tests, built packages, and release evidence define current behavior.
 
-```bash
-make check-hosts
-```
+## Migration from 0.1
 
-That focused command uses isolated Codex and Claude configuration directories
-and requires both CLIs. It exercises the same lifecycle proof without touching
-the user's normal host configuration.
+Version `0.2.0-alpha.1` removes the bundled Task Pack, the `task-spec` console
+script, `seamwise tasks ...`, direct Task-Spec skill installation, and
+Task-Spec materialization from `seamwise compile`.
 
-Credentialed live-host probes are explicit: `seamwise doctor --host all --live`.
-They are reported separately from the credential-free release gate. Claude's
-`--bare` probe requires `ANTHROPIC_API_KEY` or a configured `apiKeyHelper`; it
-does not consume ordinary OAuth/keychain subscription state.
+Install Task-Spec separately. Existing Seamwise plans can be reviewed and
+recompiled into the two new boundary artifacts. Let Converge or another caller
+invoke Task-Spec; do not copy the removed engine or restore local gate logic.
 
-## Evidence and authority boundaries
+## License
 
-| Claim | `v0.1.0-alpha` candidate truth |
-| --- | --- |
-| Compiler, CLI, schemas, lineage, reports, installers | Implemented and tested in this repository |
-| Canonical target blueprint | [`docs/seamwise.pdf`](docs/seamwise.pdf), SHA-256 `cad353a…e5ee` |
-| Embedded Task Pack | Runtime scripts, contracts, fixtures, and conformance evidence pinned from Converge `v0.1.0`; provenance in [`vendor/task-pack-source.json`](vendor/task-pack-source.json) |
-| Generated test work | Validated from internal, unshipped test data; no target application is presented as implemented |
-| Task-Spec sealing or acceptance | Never performed by ordinary Seamwise compilation |
-| GitHub release, package index, tag, or Codex/Claude marketplace publication | Not claimed |
-| Plain-chat local execution | Not possible; packet is proposal context only |
-| Remote MCP and hosted service | Not part of v0.1.0 |
-| Converge execution loop | External; Seamwise does not collapse or replace it |
-
-The blueprint remains the canonical target architecture. Current behavior is
-determined by executable code, schemas, tests, and runtime evidence in this
-checkout. Decisions that fill previously unspecified machine/host details are
-recorded in [`docs/decisions/`](docs/decisions/).
-
-## Repository guide
-
-- [`docs/project.md`](docs/project.md) — agent-oriented project orientation
-- [`docs/seamwise.pdf`](docs/seamwise.pdf) — canonical target blueprint
-- [`assets/seamwise-mark.svg`](assets/seamwise-mark.svg) — reusable plate-and-seam symbol
-- [`assets/seamwise-logo.svg`](assets/seamwise-logo.svg) — horizontal wordmark lockup
-- [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) — Codex repo marketplace
-- [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) — Claude Code marketplace
-- [`skills/`](skills/) — shared Agent Skills plus the embedded Task Pack
-- [`src/seamwise/`](src/seamwise/) — compiler, CLI, installers, and reports
-- [`tests/`](tests/) — contract, failure-route, installer, and E2E proof
-
-## License and provenance
-
-Seamwise is licensed under the [MIT License](LICENSE). The Phase-0 Task Pack was
-copied from the pinned private Converge source commit
-`b585ca792418924182e1c6a87f660a5f8afa07bd`. Its 119-file inventory, modes, and
-hashes are independently checked on every release; the provenance manifest also
-records the documentation/reference cleanup and the retained consumer move. The
-upstream Task-Spec PDF is recorded by hash but is not duplicated in this repository.
+[MIT](LICENSE). Task-Spec and Converge are separate products with independent
+repositories, releases, and conformance evidence.

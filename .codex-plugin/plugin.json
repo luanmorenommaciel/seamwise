@@ -1,7 +1,7 @@
 {
   "name": "seamwise",
-  "version": "0.1.0",
-  "description": "Compile delivery intent through evidence-backed seams into validated, unsealed Task-Spec DAGs.",
+  "version": "0.2.0-alpha.1",
+  "description": "Decompose approved initiatives into a reviewed TaskPlan and digest-bound lineage.",
   "author": {
     "name": "Luan Moreno M. Maciel",
     "url": "https://github.com/luanmorenommaciel"
@@ -18,8 +18,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Seamwise",
-    "shortDescription": "Turn intent into evidence-backed Task-Spec DAGs.",
-    "longDescription": "Seamwise guides Codex through a fail-closed intent-to-task workflow while the shared CLI owns validation, lineage, and stable gate tokens.",
+    "shortDescription": "Decompose initiatives along real system seams.",
+    "longDescription": "Seamwise guides Codex through a fail-closed decomposition workflow and emits reviewed TaskPlan and lineage contracts for an external coordinator.",
     "developerName": "Luan Moreno M. Maciel",
     "category": "Developer Tools",
     "capabilities": [
@@ -29,7 +29,7 @@
     "websiteURL": "https://github.com/luanmorenommaciel/seamwise",
     "brandColor": "#31D892",
     "defaultPrompt": [
-      "Use $seamwise to guide me one confirmed pass at a time from delivery intent to validated, unsealed tasks.",
+      "Use $seamwise to guide me one confirmed pass at a time from approved initiative to reviewed execution topology.",
       "Use $to-seam-map to identify the real system seams.",
       "Use $to-delivery-plan to build an ownership-safe delivery plan."
     ]

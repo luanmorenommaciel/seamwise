@@ -1,6 +1,6 @@
 # Seamwise agent contract
 
-Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. The repository now contains the implemented v0.1.0-alpha compiler candidate; executable code, schemas, tests, and current runtime evidence govern shipped-behavior claims.
+Seamwise is an architecture-aware, model-agnostic decomposition compiler. The repository contains the v0.2 external Task-Spec boundary; executable code, schemas, tests, built artifacts, and current runtime evidence govern shipped-behavior claims.
 
 ## Read order
 
@@ -31,7 +31,11 @@ Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. The r
 - Sibling tasks are not automatically parallel; dependencies and contention must justify concurrency.
 - Models may research, propose, attack, or author, but they are never canonical sources of truth.
 - Fail closed when evidence, ownership, architecture decisions, lineage, or proof boundaries are insufficient.
-- Never auto-seal a Task-Spec during ordinary compilation.
+- Never import, vendor, invoke, or reimplement Task-Spec. Emit reviewed TaskPlan and lineage contracts for an external coordinator.
+- Never parse Task-Spec Markdown or human terminal output as an integration contract.
+- Publish `SeamwiseCapabilities/v1`, `TaskPlan/v1`, and `SeamwiseTaskPlanLineage/v1`; fail closed on projection drift.
+- Seamwise materializes no tasks and grants no dispatch authority.
+- Task-Spec owns authorization, handoff, evaluation, and acceptance; Seamwise exposes no substitute commands.
 - Never auto-approve a decomposition, contract, lesson, or implementation transition.
 - Do not collapse the responsibilities of Task-Spec, Seamwise, and Converge.
 - Keep credentials, tokens, private evidence, and local runtime state out of Git.
@@ -55,8 +59,7 @@ After changing the repository:
 
 ## Implementation discipline
 
-- Phase 0 is extraction without behavioral change.
-- Move first and refactor second.
+- The Phase-0 embedded Task Pack is historical and was removed in v0.2 after parity extraction.
 - Add or update tests before changing behavior-bearing contracts.
 - Use stable schemas, tokens, exit codes, and JSON envelopes for automation.
 - Keep canonical authored artifacts separate from rebuildable projections.

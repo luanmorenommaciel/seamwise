@@ -1,3 +1,0 @@
-# Materialized by `npm ci` when the cross-engine portability test
-# (tests/test-portability-e2e.sh, Step 7) runs the TypeScript consumer.
-node_modules/

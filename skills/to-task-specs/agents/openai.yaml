@@ -1,4 +1,4 @@
 interface:
-  display_name: "Materialize Task Specs"
-  short_description: "Create proof-bearing Task-Spec contracts"
-  default_prompt: "Use $to-task-specs to materialize this ready task graph as validated, unsealed Task-Specs."
+  display_name: "Project TaskPlan"
+  short_description: "Emit reviewed TaskPlan and lineage"
+  default_prompt: "Use $to-task-specs to project this reviewed Seamwise graph into TaskPlan/v1 and lineage, then stop before Task-Spec materialization."

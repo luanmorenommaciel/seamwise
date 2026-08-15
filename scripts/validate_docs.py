@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -65,11 +64,13 @@ def main() -> int:
         "seamwise plan",
         "seamwise review",
         "seamwise compile",
-        "seamwise tasks validate",
+        "seamwise --json capabilities",
+        "TaskPlan/v1",
+        "SeamwiseTaskPlanLineage/v1",
         "install codex --scope project",
         "install claude --scope project",
         "DELIVERY_PLAN=NEEDS_REVIEW",
-        "signed_off: false",
+        "materializes_tasks: false",
     ):
         if required not in readme:
             errors.append(f"README missing required command/boundary: {required}")
@@ -77,6 +78,8 @@ def main() -> int:
         "Implementation: not yet",
         "compiler and CLI | Not implemented",
         "pre-implementation foundation",
+        "SEAMWISE_TASKSPEC_BIN",
+        "invokes the independently installed Task-Spec",
     ):
         if stale in readme:
             errors.append(f"README retains stale foundation claim: {stale}")
@@ -85,9 +88,6 @@ def main() -> int:
     expected = "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
     if digest != expected:
         errors.append(f"canonical blueprint changed: {digest}")
-    provenance = json.loads((root / "vendor/task-pack-source.json").read_text(encoding="utf-8"))
-    if provenance["source_document"].get("included") is not False:
-        errors.append("Task Pack source PDF must remain provenance-only, not checked in")
     for asset in sorted((root / "assets").glob("*.svg")):
         ET.parse(asset)
     if errors:

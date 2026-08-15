@@ -9,10 +9,8 @@ import pytest
 import yaml
 
 from seamwise.engine import accept_plan, build_plan, compile_graph, map_recipe
-from seamwise.taskpack import task_pack_root
 from seamwise.workspace import init_workspace
 
-REPOSITORY = Path(__file__).resolve().parents[1]
 RECIPE = Path(__file__).resolve().parent / "fixtures" / "rate-limiting-recipe.yaml"
 
 
@@ -48,4 +46,4 @@ def compile_fixture(root: Path, value: dict[str, Any]):  # type: ignore[no-untyp
     plan = build_plan(root)
     assert plan.token == "DELIVERY_PLAN=NEEDS_REVIEW"
     assert accept_plan(root, reviewer="pytest", reason="fixture review", fixture=True).ok
-    return compile_graph(root, task_pack_root=task_pack_root())
+    return compile_graph(root)

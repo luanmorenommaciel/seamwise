@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from seamwise.constants import ENVELOPE_VERSION
+from seamwise.constants import ENVELOPE_VERSION, VERSION
 
 
 @dataclass(slots=True)
@@ -44,6 +44,8 @@ class Result:
     def as_dict(self) -> dict[str, Any]:
         artifacts = list(dict.fromkeys(str(path.resolve()) for path in self.artifacts))
         payload: dict[str, Any] = {
+            "contract": "SeamwiseCLIResult/v1",
+            "engine_version": VERSION,
             "schema_version": ENVELOPE_VERSION,
             "command": self.command,
             "ok": self.ok,

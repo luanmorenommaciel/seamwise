@@ -1,19 +1,15 @@
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 from typing import Any
 
-import pytest
-import yaml
 from click.testing import CliRunner
 from conftest import compile_fixture, git_init, write_recipe
 
 from seamwise.cli import cli
 from seamwise.engine import accept_plan, build_plan, compile_graph, inspect_lineage, map_recipe
 from seamwise.reporting import build_report
-from seamwise.taskpack import task_pack_root, validate_task_specs
 from seamwise.workspace import init_workspace, stage_state, status_result
 
 
@@ -43,11 +39,11 @@ def test_rate_limiting_compiles_to_valid_unsealed_task_dag(
     )
     assert reviewed.token == "DELIVERY_PLAN=READY"
 
-    compiled = compile_graph(tmp_path, task_pack_root=task_pack_root())
+    compiled = compile_graph(tmp_path)
     assert compiled.token == "TASK_GRAPH=READY"
     assert compiled.data["tasks"] == 4
 
-    graph = yaml.safe_load((tmp_path / "tasks/task-graph.yaml").read_text(encoding="utf-8"))
+    graph = compiled.data["graph"]
     assert graph["critical_path"] == [
         "T-20260802-policy-schema",
         "T-20260802-effective-policy",
@@ -60,51 +56,37 @@ def test_rate_limiting_compiles_to_valid_unsealed_task_dag(
         "depends_on",
     ]
 
-    validated = validate_task_specs(tmp_path)
-    assert validated.token == "TASK_SPECS=VALID"
-    assert validated.data["count"] == 4
-
-    specs = sorted((tmp_path / "tasks").glob("T-*.md"))
-    assert len(specs) == 4
-    for spec in specs:
-        text = spec.read_text(encoding="utf-8")
-        assert "signed_off: false" in text
-        assert "accepted: false" in text
-        assert "delivery_intent: DI-RATE-LIMIT" in text
-
-    first_card = (
-        (tmp_path / "tasks/T-20260802-policy-schema.md")
-        .read_text(encoding="utf-8")
-        .split("## Validation Card", 1)[1]
+    task_plan = json.loads((tmp_path / "seamwise/task-plan.json").read_text(encoding="utf-8"))
+    assert task_plan["api_version"] == "taskspec.dev/v1"
+    assert task_plan["metadata"]["name"] == "DI-RATE-LIMIT"
+    assert task_plan["approved"] is True
+    assert len(task_plan["units"]) == 4
+    assert not (tmp_path / "tasks").exists()
+    first_unit = next(
+        unit for unit in task_plan["units"] if unit["id"] == "T-20260802-policy-schema"
     )
     expected_traceability = {
-        "eval_1": "[B-1]",
-        "eval_2": "[B-1]",
-        "eval_3": "[B-2]",
+        "eval_1": ["B-1"],
+        "eval_2": ["B-1"],
+        "eval_3": ["B-2"],
     }
-    for eval_id, verifies in expected_traceability.items():
-        entry = first_card.split(f"- id: {eval_id}", 1)[1].split("terminal: true", 1)[0]
-        assert f"verifies: {verifies}" in entry
-    first_text = (tmp_path / "tasks/T-20260802-policy-schema.md").read_text(encoding="utf-8")
-    assert "# Define the versioned rate-limit policy schema" in first_text
-    assert '# "Define the versioned rate-limit policy schema"' not in first_text
-    first_frontmatter = yaml.safe_load(first_text[4:].split("\n---\n", 1)[0])
-    assert first_frontmatter["touches_paths"] == []
-    assert first_frontmatter["creates_paths"] == [
+    assert {item["id"]: item["verifies"] for item in first_unit["evals"]} == (expected_traceability)
+    assert first_unit["touches_paths"] == []
+    assert first_unit["creates_paths"] == [
         "src/rate_limit/policy.schema.json",
         "tests/test_policy_schema.py",
     ]
 
-    lineage = json.loads((tmp_path / "tasks/task-lineage.json").read_text(encoding="utf-8"))
-    assert set(lineage["tasks"]) == {path.stem for path in specs}
-    assert all(item["seam"].startswith("SEAM-") for item in lineage["tasks"].values())
-    assert all(item["swimlane"].startswith("LANE-") for item in lineage["tasks"].values())
-    assert all(item["leg"].startswith("LEG-") for item in lineage["tasks"].values())
+    lineage = json.loads((tmp_path / "seamwise/task-plan-lineage.json").read_text(encoding="utf-8"))
+    assert set(lineage["units"]) == {unit["id"] for unit in task_plan["units"]}
+    assert all(item["seam"].startswith("SEAM-") for item in lineage["units"].values())
+    assert all(item["swimlane"].startswith("LANE-") for item in lineage["units"].values())
+    assert all(item["leg"].startswith("LEG-") for item in lineage["units"].values())
 
     traced = inspect_lineage(tmp_path, "T-20260802-decision-visibility")
     assert traced.data["leg"] == "LEG-DENIAL-REASON-VISIBLE"
     assert status_result(tmp_path).next_steps == [
-        "seamwise tasks preflight --acknowledge-eval-execution"
+        "Pass seamwise/task-plan.json and seamwise/task-plan-lineage.json to the composition coordinator."
     ]
     assert stage_state(tmp_path) == {
         "initialized": True,
@@ -112,12 +94,12 @@ def test_rate_limiting_compiles_to_valid_unsealed_task_dag(
         "delivery_plan": True,
         "reviewed": True,
         "task_graph": True,
-        "task_specs": 4,
-        "validated": True,
-        "preflight_ready": False,
-        "sealed_task_specs": 0,
-        "claimed_sealed_task_specs": 0,
-        "authority_gaps": [],
+        "task_plan": True,
+        "task_plan_lineage": True,
+        "task_specs": 0,
+        "materialization_receipt": False,
+        "units": 4,
+        "dispatch_authorized": False,
         "issues": [],
     }
 
@@ -178,11 +160,11 @@ def test_task_rendering_does_not_recursively_expand_authored_placeholder_text(
     second_bash = task["evals"][1]["bash"]
 
     assert compile_fixture(tmp_path, recipe).ok
-    spec = tmp_path / "tasks/T-20260802-policy-schema.md"
-    text = spec.read_text(encoding="utf-8")
-    assert "preserve-left {{GOAL_ONE_PARAGRAPH}} preserve-right" in text
-    assert "printf '%s' '{{EVAL_2_BASH}}' >/dev/null" in text
-    assert text.count(second_bash) == 1
+    plan = json.loads((tmp_path / "seamwise/task-plan.json").read_text(encoding="utf-8"))
+    unit = next(item for item in plan["units"] if item["id"] == task["id"])
+    assert unit["goal"] == "preserve-left {{GOAL_ONE_PARAGRAPH}} preserve-right"
+    assert unit["evals"][0]["command"] == "printf '%s' '{{EVAL_2_BASH}}' >/dev/null"
+    assert [item["command"] for item in unit["evals"]].count(second_bash) == 1
 
 
 def test_yaml_ambiguous_backend_or_tool_names_are_rejected(
@@ -196,36 +178,13 @@ def test_yaml_ambiguous_backend_or_tool_names_are_rejected(
     assert any(item.code == "yaml_scalar_ambiguous" for item in result.diagnostics)
 
 
-def test_l_effort_glm_backend_survives_task_pack_validation(
+def test_l_effort_glm_backend_survives_task_plan_projection(
     tmp_path: Path, recipe: dict[str, Any]
 ) -> None:
     task = recipe["seams"][0]["swimlane"]["legs"][0]["tasks"][0]
     task["effort"] = "L"
     task["execution_backend"] = "glm"
     assert compile_fixture(tmp_path, recipe).ok
-    result = validate_task_specs(tmp_path)
-    assert result.ok
-    frontmatter = yaml.safe_load(
-        (tmp_path / "tasks/T-20260802-policy-schema.md")
-        .read_text(encoding="utf-8")[4:]
-        .split("\n---\n", 1)[0]
-    )
-    assert frontmatter["execution_backend"] == "glm"
-
-
-@pytest.mark.skipif(shutil.which("shellcheck") is None, reason="Task Pack PRE requires shellcheck")
-def test_rate_limiting_preflight_is_ready_but_does_not_seal(
-    tmp_path: Path, recipe: dict[str, Any]
-) -> None:
-    git_init(tmp_path)
-    source = write_recipe(tmp_path, recipe)
-    assert init_workspace(tmp_path).ok
-    assert map_recipe(tmp_path, source).ok
-    assert build_plan(tmp_path).exit_code == 2
-    assert accept_plan(tmp_path, reviewer="pytest", reason="fixture", fixture=True).ok
-    assert compile_graph(tmp_path, task_pack_root=task_pack_root()).ok
-
-    preflight = validate_task_specs(tmp_path, preflight=True, execute_evals=True)
-    assert preflight.token == "TASK_SPECS=PREFLIGHT_READY"
-    for path in (tmp_path / "tasks").glob("T-*.md"):
-        assert "signed_off: false" in path.read_text(encoding="utf-8")
+    plan = json.loads((tmp_path / "seamwise/task-plan.json").read_text(encoding="utf-8"))
+    unit = next(item for item in plan["units"] if item["id"] == task["id"])
+    assert unit["execution_backend"] == "glm"

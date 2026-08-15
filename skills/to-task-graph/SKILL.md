@@ -15,4 +15,4 @@ Let the shared compiler own decomposition, lineage, and gate tokens.
 4. Run `seamwise --workspace "<path>" --json graph` to inspect the derived DAG and critical path without changing canonical inputs.
 5. Otherwise report the exact cycle, collision, unprovable node, blocked dependency, stale lineage, or diagnostic returned by the CLI. Do not repair it by relabeling or deleting evidence.
 
-Require each runnable leaf to own one coherent, independently provable done-condition. Justify concurrency with dependencies and contention rather than sibling position. Preserve lineage from Delivery Intent through seam, swimlane, and capability leg to Task-Spec. Any Task-Spec drafts emitted by compilation remain unsealed; graph readiness is not task execution or implementation proof.
+Require each runnable leaf to own one coherent, independently provable done-condition. Justify concurrency with dependencies and contention rather than sibling position. Preserve lineage from Delivery Intent through seam, swimlane, and capability leg to each TaskPlan unit. Compilation emits no Task-Spec drafts; graph readiness is not materialization, execution, or implementation proof.

@@ -2,70 +2,60 @@
 
 - Status: accepted
 - Date: 2026-08-02
+- Updated: 2026-08-15
 - Contract version: 1
 
-## Result envelope
+## Seamwise result envelope
 
-Every command supports `--json`. JSON mode writes exactly one envelope to
-standard output:
+Every command in JSON mode emits exactly one object with:
 
-```json
-{
-  "schema_version": 1,
-  "command": "map",
-  "ok": true,
-  "token": "SEAM_MAP=READY",
-  "exit_code": 0,
-  "workspace": "/absolute/path",
-  "artifacts": [],
-  "diagnostics": [],
-  "next": []
-}
-```
+- `contract: SeamwiseCLIResult/v1`
+- `engine_version`
+- `schema_version`
+- `command`
+- `ok`
+- `token`
+- `exit_code`
+- `workspace`
+- `artifacts`
+- `diagnostics`
+- `next`
+- optional `data`
 
-Human mode ends with the same token. Diagnostics go to standard error when they
-would invalidate JSON output.
+Human rendering is derived from this object. Automation never parses Rich
+terminal prose.
 
-## Exit codes
+## Stable phase tokens
 
-| Code | Meaning |
-| ---: | --- |
-| 0 | Requested gate is ready or read-only query succeeded |
-| 2 | Named evidence, owner input, architecture decision, or review resolution is required |
-| 3 | Input or canonical artifact is invalid |
-| 4 | Hash, lineage, tamper, cycle, or contention conflict prevents progress |
-| 5 | Required provider, host, or external executable is unavailable |
-| 10 | Internal mechanism error |
-
-## Gate tokens
-
-The Seam Map and Task Graph tokens are copied exactly from the blueprint. The
-following version-1 Delivery Plan tokens fill the blueprint's unspecified
-machine surface:
-
-- `DELIVERY_PLAN=READY`
+- `WORKSPACE=READY`
+- `SEAM_MAP=READY`
+- `SEAM_MAP=NEEDS_DISCOVERY`
+- `SEAM_MAP=NEEDS_OWNER_INPUT`
+- `SEAM_MAP=NEEDS_ARCHITECTURE_DECISION`
 - `DELIVERY_PLAN=NEEDS_REVIEW`
-- `DELIVERY_PLAN=OPEN_OBJECTIONS`
-- `DELIVERY_PLAN=NEEDS_OWNER_INPUT`
-- `DELIVERY_PLAN=NEEDS_ARCHITECTURE_DECISION`
-- `DELIVERY_PLAN=ERROR`
+- `DELIVERY_PLAN=READY`
+- `TASK_GRAPH=READY`
+- `TASK_GRAPH=CYCLE`
+- `TASK_GRAPH=COLLISION`
+- `TASK_GRAPH=UNPROVABLE_NODE`
+- `STATUS=READY`
+- `STATUS=BLOCKED`
 
-The version-1 Task-Spec wrapper tokens are:
+## Composition contract
 
-- `TASK_SPECS=EMITTED`
-- `TASK_SPECS=VALID`
-- `TASK_SPECS=PREFLIGHT_READY`
-- `TASK_SPECS=SEALED`
-- `TASK_SPECS=INVALID`
-- `TASK_SPECS=ERROR`
+Task-Spec wrapper tokens formerly owned by Seamwise are removed. Seamwise
+advertises `SeamwiseCapabilities/v1` and emits:
 
-Underlying Task Pack tokens remain byte-preserved and are included in envelope
-diagnostics rather than replaced.
+- `TaskPlan/v1`
+- `SeamwiseTaskPlanLineage/v1`
 
-## Workspace resolution
+It does not call or consume Task-Spec at runtime. The composition coordinator
+negotiates both engines and owns the subprocess boundary.
 
-Resolution order is explicit `--workspace`, `SEAMWISE_WORKSPACE`, nearest
-ancestor containing `seamwise/intent.md`, Git root, then current directory.
-Mutations are atomic, receipt-owned, and protected by a workspace lock. Dry-run
-performs all reads and validations but writes no canonical, derived, receipt, or
-telemetry file.
+See [Decision 0004](0004-external-taskspec-boundary.md).
+
+## Failure behavior
+
+Invalid author input, stale review receipts, unsafe paths, conflicting task
+topology, partial output transactions, and projection drift all fail closed
+with named diagnostics.

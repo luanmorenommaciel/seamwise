@@ -1,4 +1,4 @@
 interface:
   display_name: "Seamwise"
   short_description: "Compile intent into trustworthy tasks"
-  default_prompt: "Use $seamwise to prepare this delivery intent into a reviewed, unsealed Task-Spec DAG."
+  default_prompt: "Use $seamwise to prepare this delivery intent into a reviewed TaskPlan/v1 and digest-bound lineage."
