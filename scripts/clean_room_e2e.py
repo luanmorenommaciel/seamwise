@@ -75,6 +75,12 @@ def main() -> int:
         os.environ["SEAMWISE_LOCK_HOME"] = str(clean / "runtime-locks")
         assert taskspec_source is not None
         taskspec = str(Path(taskspec_source).resolve())
+        taskspec_version = run([taskspec, "version"]).strip()
+        if taskspec_version != "3.8.0":
+            raise RuntimeError(
+                "clean-room proving fixture requires Task-Spec 3.8.0, got "
+                f"{taskspec_version or '<empty>'}"
+            )
         venv = clean / "venv"
         run(["uv", "venv", str(venv)])
         python = venv / "bin/python"
