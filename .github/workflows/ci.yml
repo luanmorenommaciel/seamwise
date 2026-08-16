@@ -52,7 +52,7 @@ jobs:
           test -n "$GH_TOKEN" || { echo "::error::RELEASE_STACK_READ_TOKEN is required for the private Task-Spec repository"; exit 5; }
           engine_dir="$(mktemp -d -t task-spec-engine.XXXXXX)"
           gh repo clone luanmorenommaciel/task-spec "$engine_dir" -- --quiet
-          git -C "$engine_dir" checkout --quiet --detach 44c23e974b6448cdaf21e7514f297a757154beac
+          git -C "$engine_dir" checkout --quiet --detach 50531a36feff52a081488c2286ed3547b717cc38
           test "$("$engine_dir/bin/taskspec" version)" = "3.8.0"
           printf 'TASKSPEC_BIN=%s/bin/taskspec\n' "$engine_dir" >> "$GITHUB_ENV"
 
