@@ -45,7 +45,7 @@ jobs:
       - name: Install the pinned build runner
         run: python -m pip install --disable-pip-version-check uv==0.9.25
 
-      - name: Install the exact Task-Spec 3.8 candidate
+      - name: Install the exact released Task-Spec 3.8 engine
         env:
           GH_TOKEN: ${{ secrets.RELEASE_STACK_READ_TOKEN }}
         run: |
