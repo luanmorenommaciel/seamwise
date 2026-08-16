@@ -1,6 +1,6 @@
 {
   "name": "seamwise",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0",
   "description": "Decompose approved initiatives into a reviewed TaskPlan and digest-bound lineage.",
   "author": {
     "name": "Luan Moreno M. Maciel",

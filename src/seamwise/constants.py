@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-VERSION = "0.2.0-alpha.1"
+VERSION = "0.2.0"
 ENVELOPE_VERSION = 1
 SEAM_MAP_VERSION = 1
 DELIVERY_PLAN_VERSION = 1

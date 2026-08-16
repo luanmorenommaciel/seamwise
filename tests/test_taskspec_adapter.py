@@ -44,7 +44,7 @@ def test_capabilities_are_machine_negotiable(tmp_path: Path) -> None:
     assert result.exit_code == 0
     envelope = json.loads(result.stdout)
     assert envelope["contract"] == "SeamwiseCLIResult/v1"
-    assert envelope["engine_version"] == "0.2.0-alpha.1"
+    assert envelope["engine_version"] == "0.2.0"
     capability = envelope["data"]
     assert capability["contract"] == "SeamwiseCapabilities/v1"
     assert capability["contracts"]["task_plan"] == "TaskPlan/v1"

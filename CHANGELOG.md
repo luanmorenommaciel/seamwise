@@ -2,7 +2,7 @@
 
 All notable changes to Seamwise are documented here.
 
-## 0.2.0-alpha.1 — 2026-08-15
+## 0.2.0 — 2026-08-16
 
 ### Changed
 

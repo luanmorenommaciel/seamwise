@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/luanmorenommaciel/seamwise/releases"><img src="https://img.shields.io/badge/release-0.2.0--alpha.1-171717" alt="Release 0.2.0-alpha.1"></a>
+  <a href="https://github.com/luanmorenommaciel/seamwise/releases"><img src="https://img.shields.io/badge/release-0.2.0-171717" alt="Release 0.2.0"></a>
   <img src="https://img.shields.io/badge/python-3.11%2B-3776AB" alt="Python 3.11+">
   <img src="https://img.shields.io/badge/TaskPlan-v1-C18DFF" alt="TaskPlan v1">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2F855A" alt="MIT License"></a>
@@ -54,7 +54,7 @@ The invariant is:
 ## Install
 
 ```bash
-uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git@v0.2.0-alpha.1"
+uv tool install "git+https://github.com/luanmorenommaciel/seamwise.git@v0.2.0"
 seamwise --version
 seamwise --json doctor --host core
 ```
@@ -183,7 +183,7 @@ Every command in JSON mode returns exactly one `SeamwiseCLIResult/v1` object:
 ```json
 {
   "contract": "SeamwiseCLIResult/v1",
-  "engine_version": "0.2.0-alpha.1",
+  "engine_version": "0.2.0",
   "schema_version": 1,
   "command": "status",
   "ok": true,
@@ -256,7 +256,7 @@ schemas, tests, built packages, and release evidence define current behavior.
 
 ## Migration from 0.1
 
-Version `0.2.0-alpha.1` removes the bundled Task Pack, the `task-spec` console
+Version `0.2.0` removes the bundled Task Pack, the `task-spec` console
 script, `seamwise tasks ...`, direct Task-Spec skill installation, and
 Task-Spec materialization from `seamwise compile`.
 
