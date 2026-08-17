@@ -8,6 +8,10 @@ All notable changes to Seamwise are documented here.
 
 - Ship a PEP 561 `py.typed` marker so installed Seamwise exposes its types.
 - Enforce branch coverage in the release gate with a minimum of 78 percent.
+- Add `CLAUDE.md`, a Claude Code project guide covering the repository map,
+  commands, engine stage order, conventions, and fail-closed rules.
+- Add `make lint`, `make typecheck`, and `make cov` for the individual gate
+  steps, and ship `AGENTS.md` and `CLAUDE.md` in the source distribution.
 
 ### Changed
 
@@ -24,6 +28,8 @@ All notable changes to Seamwise are documented here.
 
 - `mypy` with no arguments resolved the installed package instead of the source
   tree and silently type-checked nothing. It now checks `src/seamwise`.
+- `.gitattributes` pinned whitespace handling for `skills/task-spec/**`, a path
+  removed in 0.2. Replaced with rules for the lockfile and raster assets.
 - The proving fixture cited `docs/seamwise.pdf` as its evidence source, so the
   test suite depended on a 3.7 MB document and 59 tests failed without it.
   Evidence is now `tests/fixtures/blueprint.md`, a small purpose-built file.

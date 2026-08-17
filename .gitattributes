@@ -1,3 +1,5 @@
-# The Task Pack is a byte- and mode-pinned Phase-0 import. Preserve its donor
-# bytes exactly; Seamwise's manifest and parity suites validate that subtree.
-skills/task-spec/** -whitespace
+# uv.lock is generated. Keep it out of diffs and language statistics.
+uv.lock -diff linguist-generated=true
+
+# Raster assets are binary and must never be line-ending normalized.
+*.png binary

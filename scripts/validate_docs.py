@@ -18,6 +18,8 @@ def main() -> int:
     root = args.root.resolve()
     documents = [
         root / "README.md",
+        root / "AGENTS.md",
+        root / "CLAUDE.md",
         *sorted((root / "skills").glob("*/SKILL.md")),
     ]
     errors: list[str] = []

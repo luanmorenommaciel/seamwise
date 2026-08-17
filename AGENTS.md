@@ -5,8 +5,9 @@ Seamwise is an architecture-aware, model-agnostic decomposition compiler. The re
 ## Read order
 
 1. `README.md`
-2. Schemas and source contracts
-3. Implementation and tests
+2. `CLAUDE.md` for the repository map, commands, and conventions
+3. Schemas and source contracts
+4. Implementation and tests
 
 ## Source boundary
 
@@ -55,6 +56,8 @@ After changing the repository:
 ## Implementation discipline
 
 - The Phase-0 embedded Task Pack is historical and was removed in v0.2 after parity extraction.
+- `make check` is the authoritative release boundary; run it before claiming a change is done.
+- Keep `seamwise.engine` stage modules acyclic and import the public surface from `seamwise.engine`.
 - Add or update tests before changing behavior-bearing contracts.
 - Use stable schemas, tokens, exit codes, and JSON envelopes for automation.
 - Keep canonical authored artifacts separate from rebuildable projections.
