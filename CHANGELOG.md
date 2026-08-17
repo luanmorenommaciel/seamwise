@@ -14,10 +14,18 @@ All notable changes to Seamwise are documented here.
 - Split `seamwise.engine` into a package of focused stage modules. The public
   `seamwise.engine` import surface is unchanged.
 
+### Removed
+
+- `docs/project.md` and `docs/seamwise.pdf`. Documentation will be rebuilt
+  later; accepted decisions in `docs/decisions/` remain.
+
 ### Fixed
 
 - `mypy` with no arguments resolved the installed package instead of the source
   tree and silently type-checked nothing. It now checks `src/seamwise`.
+- The proving fixture cited `docs/seamwise.pdf` as its evidence source, so the
+  test suite depended on a 3.7 MB document and 59 tests failed without it.
+  Evidence is now `tests/fixtures/blueprint.md`, a small purpose-built file.
 
 ## 0.2.0 — 2026-08-16
 

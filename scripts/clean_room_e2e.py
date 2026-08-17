@@ -108,18 +108,18 @@ def main() -> int:
             encoding="utf-8"
         )
         recipe_text = recipe_text.replace(
-            "uri: docs/seamwise.pdf", "uri: seamwise-evidence/seamwise.pdf"
+            "uri: tests/fixtures/blueprint.md", "uri: seamwise-evidence/blueprint.md"
         )
         recipe.write_text(recipe_text, encoding="utf-8")
-        blueprint = workspace / "seamwise-evidence/seamwise.pdf"
+        blueprint = workspace / "seamwise-evidence/blueprint.md"
         blueprint.parent.mkdir(parents=True)
-        shutil.copyfile(root / "docs/seamwise.pdf", blueprint)
-        assert "uri: seamwise-evidence/seamwise.pdf" in recipe_text
+        shutil.copyfile(root / "tests/fixtures/blueprint.md", blueprint)
+        assert "uri: seamwise-evidence/blueprint.md" in recipe_text
         remote_recipe = workspace / "remote-recipe.yaml"
         remote_recipe.write_text(
             recipe_text.replace(
-                "uri: seamwise-evidence/seamwise.pdf",
-                "uri: https://example.invalid/unverified-blueprint.pdf",
+                "uri: seamwise-evidence/blueprint.md",
+                "uri: https://example.invalid/unverified-blueprint.md",
                 1,
             ),
             encoding="utf-8",
@@ -132,7 +132,7 @@ def main() -> int:
         )
         assert remote["diagnostics"][0]["code"] == "remote_source_unverified"
         assert hashlib.sha256(blueprint.read_bytes()).hexdigest() == (
-            "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
+            "f40ed16c2898b8363dfce1c19e7c3fd539d52810d52b21faeaf59323117af445"
         )
         pre_map_packet = envelope(seamwise, workspace, ["agent-context", "--host", "chat"])
         assert "recipe_authoring" in str(pre_map_packet["data"]["packet"])

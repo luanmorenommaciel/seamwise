@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Check local links, Mermaid fences, status language, assets, and blueprint hash."""
+"""Check local links, Mermaid fences, status language, and assets."""
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -19,7 +18,6 @@ def main() -> int:
     root = args.root.resolve()
     documents = [
         root / "README.md",
-        root / "docs/project.md",
         *sorted((root / "docs/decisions").glob("*.md")),
         *sorted((root / "skills").glob("*/SKILL.md")),
     ]
@@ -83,16 +81,11 @@ def main() -> int:
     ):
         if stale in readme:
             errors.append(f"README retains stale foundation claim: {stale}")
-    pdf = root / "docs/seamwise.pdf"
-    digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
-    expected = "cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee"
-    if digest != expected:
-        errors.append(f"canonical blueprint changed: {digest}")
     for asset in sorted((root / "assets").glob("*.svg")):
         ET.parse(asset)
     if errors:
         raise SystemExit("\n".join(errors))
-    print(f"Documentation valid: {len(documents)} Markdown files, canonical PDF {digest[:12]}")
+    print(f"Documentation valid: {len(documents)} Markdown files")
     return 0
 
 

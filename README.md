@@ -242,17 +242,15 @@ doctor, and Git whitespace checks.
 
 ## Documentation
 
-- [Architecture and authority](docs/project.md)
 - [Implementation baseline](docs/decisions/0001-implementation-baseline.md)
 - [Machine contracts](docs/decisions/0002-machine-contracts.md)
 - [Host experience](docs/decisions/0003-host-experience.md)
 - [External Task-Spec boundary](docs/decisions/0004-external-taskspec-boundary.md)
 - [Changelog](CHANGELOG.md)
-- [Historical target blueprint](docs/seamwise.pdf)
 - [Contributing instructions](AGENTS.md)
 
-The PDF is preserved as historical v0.1 target evidence. Executable code,
-schemas, tests, built packages, and release evidence define current behavior.
+Executable code, schemas, tests, built packages, and release evidence define
+current behavior.
 
 ## Migration from 0.1
 

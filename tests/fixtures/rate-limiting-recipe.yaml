@@ -8,9 +8,9 @@ intent:
     plus decision telemetry without changing provider-owned metering.
   claim: proposed
   source:
-    uri: docs/seamwise.pdf
+    uri: tests/fixtures/blueprint.md
     captured_at: "2026-08-02T00:00:00Z"
-    sha256: cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee
+    sha256: f40ed16c2898b8363dfce1c19e7c3fd539d52810d52b21faeaf59323117af445
   success:
     - A versioned policy schema rejects invalid limits and windows.
     - Resolution produces exactly one effective policy for an organization.
@@ -34,11 +34,11 @@ evidence:
   - id: E-BLUEPRINT
     claim: external
     source:
-      uri: docs/seamwise.pdf
+      uri: tests/fixtures/blueprint.md
       captured_at: "2026-08-02T00:00:00Z"
-      sha256: cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee
+      sha256: f40ed16c2898b8363dfce1c19e7c3fd539d52810d52b21faeaf59323117af445
     confidence: 1.0
-    summary: Canonical Seamwise target blueprint and rate-limiting steel thread.
+    summary: Synthetic blueprint fixture describing the rate-limiting steel thread.
 decisions:
   - id: ADR-RATE-LIMIT-ORDER
     status: accepted
@@ -116,7 +116,7 @@ seams:
                 - action: couple the schema to one storage provider
                   reason: policy shape and persistence are separate decisions
                   instead: keep the schema provider-neutral
-              do_not_touch: [docs/seamwise.pdf]
+              do_not_touch: [tests/fixtures/blueprint.md]
               rollback: Remove the additive schema and its focused tests.
               observability: policy schema test pass count
   - id: SEAM-POLICY-RESOLUTION
@@ -188,7 +188,7 @@ seams:
                 - action: silently invent a default
                   reason: missing policy is an ownership decision
                   instead: require a validated explicit default
-              do_not_touch: [docs/seamwise.pdf]
+              do_not_touch: [tests/fixtures/blueprint.md]
               rollback: Remove the additive resolver and focused tests.
               observability: effective policy resolution test pass count
   - id: SEAM-REQUEST-ENFORCEMENT
@@ -260,7 +260,7 @@ seams:
                 - action: share counters across organizations
                   reason: one tenant could consume another tenant's budget
                   instead: key state by organization and window
-              do_not_touch: [docs/seamwise.pdf]
+              do_not_touch: [tests/fixtures/blueprint.md]
               rollback: Remove the additive enforcement boundary and focused tests.
               observability: boundary test pass count
   - id: SEAM-DECISION-VISIBILITY
@@ -332,7 +332,7 @@ seams:
                 - action: omit decision lineage
                   reason: response and telemetry could not be correlated
                   instead: carry one decision identifier across both outputs
-              do_not_touch: [docs/seamwise.pdf]
+              do_not_touch: [tests/fixtures/blueprint.md]
               rollback: Remove the additive response adapter, telemetry event, and focused tests.
               observability: response-to-telemetry correlation test pass count
 steel_thread:
