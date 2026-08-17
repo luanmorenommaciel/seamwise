@@ -16,8 +16,9 @@ All notable changes to Seamwise are documented here.
 
 ### Removed
 
-- `docs/project.md` and `docs/seamwise.pdf`. Documentation will be rebuilt
-  later; accepted decisions in `docs/decisions/` remain.
+- The whole `docs/` tree: `project.md`, `seamwise.pdf`, and the four accepted
+  decision records. Documentation is being rebuilt in a later pass. The records
+  remain recoverable from Git history.
 
 ### Fixed
 

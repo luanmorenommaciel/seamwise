@@ -242,10 +242,6 @@ doctor, and Git whitespace checks.
 
 ## Documentation
 
-- [Implementation baseline](docs/decisions/0001-implementation-baseline.md)
-- [Machine contracts](docs/decisions/0002-machine-contracts.md)
-- [Host experience](docs/decisions/0003-host-experience.md)
-- [External Task-Spec boundary](docs/decisions/0004-external-taskspec-boundary.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing instructions](AGENTS.md)
 

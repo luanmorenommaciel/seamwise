@@ -63,7 +63,6 @@ include = [
   "/.agents",
   "/.claude-plugin",
   "/.codex-plugin",
-  "/docs",
   "/schemas",
   "/scripts",
   "/skills",
