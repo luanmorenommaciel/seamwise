@@ -9,8 +9,8 @@ command -v uv >/dev/null 2>&1 || { echo "RELEASE=BLOCKED — uv is required" >&2
 uv sync --extra dev --locked
 uv run ruff format --check src tests scripts
 uv run ruff check src tests scripts
-uv run mypy src/seamwise
-uv run pytest -q
+uv run mypy
+uv run pytest -q --cov --cov-report=term-missing
 uv run python scripts/validate_host_adapters.py
 uv run python scripts/validate_docs.py
 uv build

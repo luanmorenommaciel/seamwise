@@ -79,6 +79,14 @@ include = [
 addopts = "-ra --strict-config --strict-markers"
 testpaths = ["tests"]
 
+[tool.coverage.run]
+branch = true
+source = ["seamwise"]
+
+[tool.coverage.report]
+fail_under = 78
+show_missing = true
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100
@@ -90,4 +98,4 @@ ignore = ["E501"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-packages = ["seamwise"]
+files = ["src/seamwise"]

@@ -2,6 +2,23 @@
 
 All notable changes to Seamwise are documented here.
 
+## Unreleased
+
+### Added
+
+- Ship a PEP 561 `py.typed` marker so installed Seamwise exposes its types.
+- Enforce branch coverage in the release gate with a minimum of 78 percent.
+
+### Changed
+
+- Split `seamwise.engine` into a package of focused stage modules. The public
+  `seamwise.engine` import surface is unchanged.
+
+### Fixed
+
+- `mypy` with no arguments resolved the installed package instead of the source
+  tree and silently type-checked nothing. It now checks `src/seamwise`.
+
 ## 0.2.0 — 2026-08-16
 
 ### Changed
