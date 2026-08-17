@@ -23,6 +23,10 @@ All notable changes to Seamwise are documented here.
 - The whole `docs/` tree: `project.md`, `seamwise.pdf`, and the four accepted
   decision records. Documentation is being rebuilt in a later pass. The records
   remain recoverable from Git history.
+- `brand/`, nine logo exploration files that no tracked file referenced and
+  that shipped in no artifact.
+- Four unreferenced files from `assets/`. Only `seamwise-hero.svg` is used,
+  by the README header.
 
 ### Fixed
 
