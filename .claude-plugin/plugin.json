@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "seamwise",
   "displayName": "Seamwise",
-  "version": "0.1.0",
-  "description": "Compile delivery intent through evidence-backed seams into validated, unsealed Task-Spec DAGs.",
+  "version": "0.2.0",
+  "description": "Decompose approved initiatives into a reviewed TaskPlan and digest-bound lineage.",
   "author": {
     "name": "Luan Moreno M. Maciel",
     "url": "https://github.com/luanmorenommaciel"

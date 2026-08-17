@@ -1,19 +1,33 @@
 ---
 name: to-task-specs
-description: Materialize and validate runnable Task-Spec leaves from a ready Seamwise task graph through the shared CLI and bundled Task Pack. Use when asked to emit Task-Spec files, validate proof contracts, run preflight, inspect Task Pack diagnostics, or prepare explicitly authorized specs for sealing.
+description: Project a reviewed Seamwise delivery plan into TaskPlan/v1 and digest-bound lineage without materializing tasks. Use when asked to compile a ready Seamwise graph or inspect its external Task-Spec boundary.
 ---
 
 # To Task Specs
 
-Use the `seamwise tasks` wrapper so every host reaches the same Task Pack behavior.
+Use Seamwise only for reviewed projection. Never recreate Seamwise, Task-Spec,
+or coordinator behavior in the model.
 
 ## Workflow
 
-1. Run `seamwise --workspace "<path>" --json status`. Stop unless the task graph is ready and lineage is current.
-2. Run `seamwise --workspace "<path>" --json tasks emit` to materialize drafts.
-3. Run `seamwise --workspace "<path>" --json tasks validate`.
-4. Review every authored eval body, then run `seamwise --workspace "<path>" --json tasks preflight --acknowledge-eval-execution` only when the user asks to prove execution readiness and explicitly authorizes those evals to execute in the workspace. Use global `--dry-run` first for structural and shellcheck-only preview without eval execution.
-5. Report both the `TASK_SPECS=*` wrapper token and underlying Task Pack diagnostics. Treat `TASK_SPECS=VALID` or `TASK_SPECS=PREFLIGHT_READY` as validation only, never as execution or acceptance.
-6. Run `seamwise --workspace "<path>" --json tasks seal --reviewer "<human>" --acknowledge-eval-execution --acknowledge-dispatch-authority` only after an explicit human request names the validated specs, authorizes one pinned Task Pack stamping gate to execute their evals according to Task Pack semantics, and all required preflight evidence is current. Never seal as part of ordinary compilation, and never seal a fixture review.
+1. Run `seamwise --workspace "<path>" --json doctor --host core` and
+   `seamwise --workspace "<path>" --json capabilities`.
+2. Run `seamwise --workspace "<path>" --json status`. Stop unless the delivery
+   plan has a current digest-bound review.
+3. Run `seamwise --workspace "<path>" --json compile` once. It writes exactly
+   `seamwise/task-plan.json` and `seamwise/task-plan-lineage.json`.
+4. Confirm `TASK_GRAPH=READY`, `TaskPlan/v1`,
+   `SeamwiseTaskPlanLineage/v1`, and `dispatch_authorized: false`.
+5. Run Seamwise status again and report the exact artifact paths, unit count,
+   TaskPlan digest, and integrity diagnostics.
+6. Stop. TaskPlan validation, materialization, authorization, handoff,
+   evaluation, and acceptance require Task-Spec plus an explicit composition
+   caller. They are not Seamwise operations.
 
-Keep XL and XXL items as composition nodes without write surfaces. Require each runnable leaf to have one coherent independently provable done-condition, explicit scope, verification, failure route, and lineage. Stop on stale hashes, tamper evidence, collisions, ambiguous proof, or unavailable providers; do not weaken a gate to obtain a green token.
+## Trust boundary
+
+- Consume only `SeamwiseCLIResult/v1` and the two digest-bound artifacts.
+- Do not invoke or parse Task-Spec from this skill.
+- Do not modify either projection to make Seamwise status green.
+- Treat partial, changed, stale, or unowned projection outputs as a closed gate.
+- Successful Seamwise compilation still reports `dispatch_authorized: false`.

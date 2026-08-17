@@ -4,8 +4,10 @@
   "title": "Seamwise result envelope v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "command", "ok", "token", "exit_code", "workspace", "artifacts", "diagnostics", "next"],
+  "required": ["contract", "engine_version", "schema_version", "command", "ok", "token", "exit_code", "workspace", "artifacts", "diagnostics", "next"],
   "properties": {
+    "contract": {"const": "SeamwiseCLIResult/v1"},
+    "engine_version": {"type": "string", "minLength": 1},
     "schema_version": {"const": 1},
     "command": {"type": "string", "minLength": 1},
     "ok": {"type": "boolean"},

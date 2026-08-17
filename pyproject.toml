@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "seamwise"
-version = "0.1.0"
-description = "Architecture-aware, model-agnostic intent-to-task compiler"
+version = "0.2.0"
+description = "Architecture-aware decomposition compiler with an external Task-Spec boundary"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "Luan Moreno M. Maciel" }]
 keywords = ["agentic-engineering", "architecture", "cli", "task-spec"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Environment :: Console",
   "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS",
@@ -42,7 +42,6 @@ dev = [
 
 [project.scripts]
 seamwise = "seamwise.cli:main"
-task-spec = "seamwise.task_spec_cli:main"
 
 [project.urls]
 Homepage = "https://github.com/luanmorenommaciel/seamwise"
@@ -56,7 +55,6 @@ packages = ["src/seamwise"]
 "skills" = "seamwise/assets/skills"
 ".codex-plugin" = "seamwise/assets/.codex-plugin"
 ".claude-plugin" = "seamwise/assets/.claude-plugin"
-"vendor" = "seamwise/assets/vendor"
 "VERSION" = "seamwise/assets/VERSION"
 "LICENSE" = "seamwise/assets/LICENSE"
 
@@ -71,7 +69,7 @@ include = [
   "/skills",
   "/src",
   "/tests",
-  "/vendor",
+  "/CHANGELOG.md",
   "/LICENSE",
   "/README.md",
   "/VERSION",

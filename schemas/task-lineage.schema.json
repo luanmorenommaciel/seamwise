@@ -1,26 +1,66 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://seamwise.dev/schemas/task-lineage-v1.json",
+  "$id": "https://seamwise.dev/schemas/task-plan-lineage-v1.json",
+  "title": "Seamwise TaskPlan lineage v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "intent", "plan_sha256", "fixture", "tasks"],
+  "required": [
+    "contract",
+    "engine_version",
+    "intent",
+    "delivery_plan_sha256",
+    "review",
+    "task_plan",
+    "units"
+  ],
   "properties": {
-    "schema_version": {"const": 1},
-    "intent": {"type": "string"},
-    "plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "fixture": {"type": "boolean"},
-    "tasks": {
+    "contract": {"const": "SeamwiseTaskPlanLineage/v1"},
+    "engine_version": {"type": "string", "minLength": 1},
+    "intent": {
       "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "delivery_plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "plan_sha256", "reviewer", "reviewed_at", "fixture"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "fixture": {"type": "boolean"}
+      }
+    },
+    "task_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "path", "digest"],
+      "properties": {
+        "contract": {"const": "TaskPlan/v1"},
+        "path": {"const": "seamwise/task-plan.json"},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "units": {
+      "type": "object",
+      "minProperties": 1,
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["seam", "swimlane", "leg", "spec", "spec_sha256", "source_sha256"],
+        "required": ["unit_id", "intent", "seam", "swimlane", "leg", "source_sha256"],
         "properties": {
-          "seam": {"type": "string"},
-          "swimlane": {"type": "string"},
-          "leg": {"type": "string"},
-          "spec": {"type": "string"},
-          "spec_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "unit_id": {"type": "string", "pattern": "^T-"},
+          "intent": {"type": "string", "minLength": 1},
+          "seam": {"type": "string", "minLength": 1},
+          "swimlane": {"type": "string", "minLength": 1},
+          "leg": {"type": "string", "minLength": 1},
           "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
         }
       }

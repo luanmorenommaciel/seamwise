@@ -18,7 +18,6 @@ from seamwise.constants import (
     GRAPH_BLOCKED,
     GRAPH_READY,
     PLAN_NEEDS_REVIEW,
-    SPECS_EMITTED,
     VERSION,
 )
 from seamwise.contracts import schema_path, validate_contract
@@ -27,9 +26,11 @@ from seamwise.engine import (
     accept_plan,
     build_plan,
     compile_graph,
+    derive_task_bundle,
     inspect_lineage,
     map_recipe,
     render_graph_mermaid,
+    verify_plan,
 )
 from seamwise.installer import install as run_install
 from seamwise.installer import uninstall as run_uninstall
@@ -41,12 +42,6 @@ from seamwise.io import (
 from seamwise.reporting import agent_context as build_agent_context
 from seamwise.reporting import build_report
 from seamwise.result import Diagnostic, Result
-from seamwise.taskpack import (
-    _verify_task_bundle_unlocked,
-    setup_signing_key,
-    task_pack_root,
-    validate_task_specs,
-)
 from seamwise.workspace import init_workspace, resolve_workspace, stage_state, status_result
 
 
@@ -273,6 +268,36 @@ def recipe_schema_command(state: State) -> NoReturn:
     )
 
 
+@cli.command("capabilities")
+@pass_state
+def capabilities_command(state: State) -> NoReturn:
+    """Advertise the versioned contracts supported by this engine."""
+
+    emit_result(
+        state,
+        Result(
+            "capabilities",
+            "CAPABILITIES=READY",
+            EXIT_OK,
+            state.workspace,
+            data={
+                "contract": "SeamwiseCapabilities/v1",
+                "engine_version": VERSION,
+                "engine_major": 0,
+                "contracts": {
+                    "cli_result": "SeamwiseCLIResult/v1",
+                    "task_plan": "TaskPlan/v1",
+                    "task_plan_lineage": "SeamwiseTaskPlanLineage/v1",
+                    "delivery_plan_review": "DeliveryPlanReview/v1",
+                },
+                "commands": ["prepare", "review", "compile", "status"],
+                "materializes_tasks": False,
+                "dispatch_authority": False,
+            },
+        ),
+    )
+
+
 @cli.command("map")
 @click.option(
     "--source", type=click.Path(path_type=Path, exists=True, dir_okay=False), required=True
@@ -333,11 +358,11 @@ def review_command(
 @cli.command("compile")
 @pass_state
 def compile_command(state: State) -> NoReturn:
-    """Build the semantic graph and emit unsealed Task-Spec drafts."""
+    """Emit a reviewed TaskPlan and digest-bound lineage; create no Task-Specs."""
 
     emit_result(
         state,
-        compile_graph(state.workspace, task_pack_root=task_pack_root(), dry_run=state.dry_run),
+        compile_graph(state.workspace, dry_run=state.dry_run),
     )
 
 
@@ -393,7 +418,7 @@ def prepare_command(state: State, source: Path | None) -> NoReturn:
                         )
                     ],
                     next_steps=[
-                        "Start this revised recipe in a clean workspace; v0.1 never replaces compiled projections in place."
+                        "Start this revised recipe in a clean workspace; Seamwise never silently replaces reviewed projections in place."
                     ],
                 ),
             )
@@ -446,7 +471,6 @@ def prepare_command(state: State, source: Path | None) -> NoReturn:
     if not current["task_graph"]:
         result = compile_graph(
             state.workspace,
-            task_pack_root=task_pack_root(),
             dry_run=state.dry_run,
             command="prepare",
         )
@@ -498,7 +522,7 @@ def next_command(state: State) -> NoReturn:
 @click.argument("task_id", required=False)
 @pass_state
 def inspect_command(state: State, task_id: str | None) -> NoReturn:
-    """Trace a Task-Spec back to intent, seam, lane, and leg."""
+    """Trace a TaskPlan unit back to intent, seam, lane, and leg."""
 
     emit_result(state, inspect_lineage(state.workspace, task_id))
 
@@ -508,23 +532,24 @@ def inspect_command(state: State, task_id: str | None) -> NoReturn:
 def graph_command(state: State) -> NoReturn:
     """Render the current task graph as Mermaid."""
 
-    graph_path = state.workspace / "tasks" / "task-graph.yaml"
-    mermaid_path = state.workspace / "tasks" / "critical-path.mmd"
     with workspace_lock(state.workspace):
-        _, _, diagnostics = _verify_task_bundle_unlocked(state.workspace)
-        if diagnostics:
+        plan, diagnostics = verify_plan(state.workspace)
+        if plan is None:
             emit_result(
                 state,
                 Result(
                     "graph",
                     GRAPH_BLOCKED,
-                    4,
+                    EXIT_INVALID,
                     state.workspace,
                     diagnostics=diagnostics,
-                    next_steps=["seamwise compile"],
+                    next_steps=[
+                        "seamwise plan",
+                        "seamwise review --accept --reviewer <name> --reason <reason>",
+                    ],
                 ),
             )
-        graph = load_yaml(graph_path)
+        _, graph, graph_diagnostics = derive_task_bundle(state.workspace, plan)
         mermaid = render_graph_mermaid(graph)
     emit_result(
         state,
@@ -533,8 +558,8 @@ def graph_command(state: State) -> NoReturn:
             graph.get("status", GRAPH_BLOCKED),
             EXIT_OK if graph.get("status") == GRAPH_READY else EXIT_INVALID,
             state.workspace,
-            artifacts=[graph_path, mermaid_path],
-            data={"mermaid": mermaid},
+            diagnostics=graph_diagnostics,
+            data={"graph": graph, "mermaid": mermaid},
         ),
     )
 
@@ -560,131 +585,11 @@ def agent_context_command(state: State, host: str) -> NoReturn:
     emit_result(state, build_agent_context(state.workspace, host=host))
 
 
-@cli.group("tasks")
-def tasks_group() -> None:
-    """Emit, validate, preflight, or explicitly seal Task-Spec leaves."""
-
-
-@tasks_group.command("setup-signing-key")
-@click.option(
-    "--force",
-    is_flag=True,
-    help="Rotate an existing key; every prior signature will require re-sealing.",
-)
-@pass_state
-def tasks_setup_signing_key_command(state: State, force: bool) -> NoReturn:
-    """Create a chmod-0600 HMAC key in the workspace Git metadata."""
-
-    emit_result(
-        state,
-        setup_signing_key(state.workspace, force=force, dry_run=state.dry_run),
-    )
-
-
-@tasks_group.command("emit")
-@pass_state
-def tasks_emit_command(state: State) -> NoReturn:
-    result = compile_graph(
-        state.workspace,
-        task_pack_root=task_pack_root(),
-        dry_run=state.dry_run,
-        command="tasks emit",
-    )
-    if result.ok:
-        result.token = SPECS_EMITTED
-    emit_result(state, result)
-
-
-@tasks_group.command("validate")
-@click.argument("paths", nargs=-1, type=click.Path(path_type=Path, exists=True, dir_okay=False))
-@pass_state
-def tasks_validate_command(state: State, paths: tuple[Path, ...]) -> NoReturn:
-    emit_result(state, validate_task_specs(state.workspace, paths=paths, dry_run=state.dry_run))
-
-
-@tasks_group.command("preflight")
-@click.option(
-    "--acknowledge-eval-execution",
-    is_flag=True,
-    help="Confirm that preflight may execute authored eval Bash in the workspace.",
-)
-@click.argument("paths", nargs=-1, type=click.Path(path_type=Path, exists=True, dir_okay=False))
-@pass_state
-def tasks_preflight_command(
-    state: State, acknowledge_eval_execution: bool, paths: tuple[Path, ...]
-) -> NoReturn:
-    emit_result(
-        state,
-        validate_task_specs(
-            state.workspace,
-            paths=paths,
-            preflight=True,
-            dry_run=state.dry_run,
-            execute_evals=acknowledge_eval_execution,
-        ),
-    )
-
-
-@tasks_group.command("seal")
-@click.option("--reviewer", required=True)
-@click.option(
-    "--acknowledge-eval-execution",
-    is_flag=True,
-    help="Confirm that the Task Pack stamping gate may execute authored eval Bash.",
-)
-@click.option(
-    "--acknowledge-dispatch-authority",
-    is_flag=True,
-    help="Confirm that sealing creates dispatch authority.",
-)
-@click.argument("paths", nargs=-1, type=click.Path(path_type=Path, exists=True, dir_okay=False))
-@pass_state
-def tasks_seal_command(
-    state: State,
-    reviewer: str,
-    acknowledge_eval_execution: bool,
-    acknowledge_dispatch_authority: bool,
-    paths: tuple[Path, ...],
-) -> NoReturn:
-    if not acknowledge_dispatch_authority:
-        emit_result(
-            state,
-            Result(
-                "tasks seal",
-                "TASK_SPECS=INVALID",
-                EXIT_NEEDS_INPUT,
-                state.workspace,
-                diagnostics=[
-                    Diagnostic(
-                        "authority_acknowledgement_required",
-                        "Pass --acknowledge-dispatch-authority to seal explicitly.",
-                    )
-                ],
-            ),
-        )
-    emit_result(
-        state,
-        validate_task_specs(
-            state.workspace,
-            paths=paths,
-            seal=True,
-            reviewer=reviewer,
-            dry_run=state.dry_run,
-            execute_evals=acknowledge_eval_execution,
-        ),
-    )
-
-
 @cli.command("install")
 @click.argument("host", type=click.Choice(["codex", "claude", "all"]))
 @click.option("--scope", type=click.Choice(["project", "user"]), default="project")
 @click.option(
     "--target", type=click.Path(path_type=Path), help="Project root or test home override."
-)
-@click.option(
-    "--with-task-spec",
-    is_flag=True,
-    help="Also expose the large direct Task Pack skill to the host.",
 )
 @pass_state
 def install_command(
@@ -692,7 +597,6 @@ def install_command(
     host: str,
     scope: str,
     target: Path | None,
-    with_task_spec: bool,
 ) -> NoReturn:
     """Install receipt-owned native skills for a supported host."""
 
@@ -704,7 +608,6 @@ def install_command(
             scope=scope,
             target=target,
             dry_run=state.dry_run,
-            include_task_spec=with_task_spec,
         ),
     )
 

@@ -12,6 +12,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from seamwise.assets import SEAMWISE_SKILLS, skills_root
 from seamwise.constants import (
     EXIT_CONFLICT,
     EXIT_INVALID,
@@ -24,7 +25,8 @@ from seamwise.contracts import validate_contract
 from seamwise.io import Writer, load_json, private_state_path, sha256_object, workspace_lock
 from seamwise.result import Diagnostic, Result
 from seamwise.safety import path_boundary_diagnostics
-from seamwise.taskpack import CANONICAL_SKILLS, SEAMWISE_SKILLS, skills_root
+
+CANONICAL_SKILLS = SEAMWISE_SKILLS
 
 HOSTS = ("codex", "claude")
 
@@ -220,10 +222,9 @@ def install(
     scope: str,
     target: Path | None,
     dry_run: bool,
-    include_task_spec: bool = False,
 ) -> Result:
     base = _base(root, scope, target)
-    selected_skills = CANONICAL_SKILLS if include_task_spec else SEAMWISE_SKILLS
+    selected_skills = SEAMWISE_SKILLS
     boundary_diagnostics = _install_boundary_diagnostics(
         base, host, scope, selected_skills=selected_skills
     )
@@ -242,7 +243,6 @@ def install(
             scope=scope,
             target=target,
             dry_run=dry_run,
-            include_task_spec=include_task_spec,
         )
 
 
@@ -253,7 +253,6 @@ def _install_unlocked(
     scope: str,
     target: Path | None,
     dry_run: bool,
-    include_task_spec: bool = False,
 ) -> Result:
     if host not in (*HOSTS, "all") or scope not in ("project", "user"):
         return Result(
@@ -264,7 +263,7 @@ def _install_unlocked(
             diagnostics=[Diagnostic("invalid_install_target", "Host or scope is invalid.")],
         )
     base = _base(root, scope, target)
-    selected_skills = CANONICAL_SKILLS if include_task_spec else SEAMWISE_SKILLS
+    selected_skills = SEAMWISE_SKILLS
     boundary_diagnostics = _install_boundary_diagnostics(
         base, host, scope, selected_skills=selected_skills
     )

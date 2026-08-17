@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from seamwise.assets import assets_root
 from seamwise.constants import (
     DOCTOR_BLOCKED,
     DOCTOR_OK,
@@ -19,7 +20,6 @@ from seamwise.constants import (
 from seamwise.contracts import validate_contract
 from seamwise.installer import verify_installation
 from seamwise.result import Diagnostic, Result
-from seamwise.taskpack import assets_root, verify_task_pack
 
 
 def _supported_platform() -> bool:
@@ -133,7 +133,7 @@ def doctor(
     target: Path | None = None,
 ) -> Result:
     checks: list[dict[str, Any]] = []
-    diagnostics = verify_task_pack()
+    diagnostics: list[Diagnostic] = []
     supported_platform = _supported_platform()
     checks.append(
         {
@@ -147,7 +147,7 @@ def doctor(
         diagnostics.append(
             Diagnostic(
                 "unsupported_platform",
-                "Seamwise v0.1 requires macOS, Linux, or Linux under WSL because its locks and embedded Task Pack are POSIX/Bash based.",
+                "Seamwise requires macOS, Linux, or Linux under WSL for its file-locking model.",
             )
         )
     checks.append(
@@ -167,6 +167,8 @@ def doctor(
         }
     )
     sample_envelope = {
+        "contract": "SeamwiseCLIResult/v1",
+        "engine_version": VERSION,
         "schema_version": 1,
         "command": "doctor",
         "ok": True,
@@ -186,7 +188,7 @@ def doctor(
             "required": True,
         }
     )
-    for executable in ("git", "bash"):
+    for executable in ("git",):
         probe = _probe_version(executable)
         checks.append({**probe, "ok": probe["available"], "required": True})
     required_hosts = () if host == "core" else (("codex", "claude") if host == "all" else (host,))
@@ -232,7 +234,7 @@ def doctor(
                 )
     failures = [item for item in checks if item["required"] and not item["ok"]]
     if diagnostics:
-        failures.append({"name": "task_pack", "ok": False, "required": True})
+        failures.append({"name": "contract_boundary", "ok": False, "required": True})
     for failure in failures:
         if failure["name"] == "supported_platform":
             continue

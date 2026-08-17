@@ -15,12 +15,11 @@ MANAGED_WORKSPACE_DIRECTORIES = (
     "seamwise/swimlanes",
     "seamwise/legs",
     "seamwise/reviews",
-    "tasks",
     "telemetry",
     "reports",
     "lessons",
 )
-MANAGED_WORKSPACE_ROOTS = ("seamwise", "tasks", "telemetry", "reports", "lessons")
+MANAGED_WORKSPACE_ROOTS = ("seamwise", "telemetry", "reports", "lessons")
 
 
 def path_boundary_diagnostics(

@@ -14,7 +14,6 @@ from seamwise.cli import cli
 from seamwise.contracts import load_schema, validate_contract
 from seamwise.engine import accept_plan, build_plan, compile_graph, map_recipe
 from seamwise.io import sha256_file
-from seamwise.taskpack import task_pack_root
 from seamwise.workspace import init_workspace
 
 SCHEMAS = (
@@ -25,7 +24,6 @@ SCHEMAS = (
     "delivery-plan-review",
     "task-graph",
     "task-lineage",
-    "task-check-receipt",
     "install-receipt",
 )
 
@@ -92,14 +90,13 @@ def test_compile_is_deterministic_for_authority_artifacts(
     assert map_recipe(tmp_path, source).ok
     assert build_plan(tmp_path).exit_code == 2
     assert accept_plan(tmp_path, reviewer="pytest", reason="fixture", fixture=True).ok
-    assert compile_graph(tmp_path, task_pack_root=task_pack_root()).ok
+    assert compile_graph(tmp_path).ok
     paths = [
-        tmp_path / "tasks/task-graph.yaml",
-        tmp_path / "tasks/task-lineage.json",
-        *sorted((tmp_path / "tasks").glob("T-*.md")),
+        tmp_path / "seamwise/task-plan.json",
+        tmp_path / "seamwise/task-plan-lineage.json",
     ]
     first = {str(path): sha256_file(path) for path in paths}
-    assert compile_graph(tmp_path, task_pack_root=task_pack_root()).ok
+    assert compile_graph(tmp_path).ok
     assert {str(path): sha256_file(path) for path in paths} == first
 
 

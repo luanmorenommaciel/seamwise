@@ -6,7 +6,7 @@
   "required": ["schema_version", "seamwise_version", "host", "scope", "base", "installed_at", "entries"],
   "properties": {
     "schema_version": {"const": 1},
-    "seamwise_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "seamwise_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
     "host": {"enum": ["codex", "claude"]},
     "scope": {"enum": ["project", "user"]},
     "base": {"type": "string", "minLength": 1},

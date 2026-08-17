@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 
 import seamwise.installer as installer_module
+from seamwise.assets import SEAMWISE_SKILLS
 from seamwise.installer import install, uninstall
 from seamwise.io import private_state_path
-from seamwise.taskpack import CANONICAL_SKILLS, SEAMWISE_SKILLS
 
 
 def receipt_path(target: Path, host: str) -> Path:
@@ -58,34 +58,6 @@ def test_install_dry_run_has_no_side_effects(tmp_path: Path) -> None:
     assert result.token == "INSTALL=OK"
     assert result.data["dry_run"] is True
     assert not target.exists()
-
-
-def test_direct_task_spec_skill_is_explicit_opt_in(tmp_path: Path) -> None:
-    target = tmp_path / "consumer"
-    result = install(
-        tmp_path,
-        host="codex",
-        scope="project",
-        target=target,
-        dry_run=False,
-        include_task_spec=True,
-    )
-    assert result.ok
-    installed = {item.name for item in (target / ".agents/skills").iterdir()}
-    assert installed == set(CANONICAL_SKILLS)
-
-    reinstalled = install(
-        tmp_path,
-        host="codex",
-        scope="project",
-        target=target,
-        dry_run=False,
-    )
-    assert reinstalled.ok
-    receipt = json.loads(receipt_path(target, "codex").read_text())
-    assert {item["skill"] for item in receipt["entries"]} == set(CANONICAL_SKILLS)
-    assert uninstall(tmp_path, host="codex", scope="project", target=target, dry_run=False).ok
-    assert not (target / ".agents/skills/task-spec").exists()
 
 
 def test_unrelated_optional_task_spec_symlink_does_not_block_default_install(

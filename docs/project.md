@@ -1,174 +1,188 @@
-# Seamwise project orientation
+# Seamwise project architecture
 
-## Identity
+## Purpose
 
-- Repository: `luanmorenomaciel/seamwise`
-- Package and CLI version: `0.1.0` (`v0.1.0-alpha` candidate; not tagged or published)
-- Current phase: implemented alpha with executable release gates
-- Canonical target blueprint: [`seamwise.pdf`](seamwise.pdf)
-- Canonical PDF SHA-256: `cad353a000ee1cffe5c41e56307c4d1ac164641853d21f78cbc90d8c8271e5ee`
+Seamwise is an architecture-aware decomposition compiler. It turns one
+approved initiative into reviewed execution topology and two portable boundary
+artifacts:
 
-Seamwise is an architecture-aware, model-agnostic intent-to-task compiler. It
-lowers Delivery Intent plus evidence through defensible seams, one owning
-swimlane per seam, observable capability legs, a semantic task graph, and
-validated Task-Spec drafts.
+```text
+Delivery Intent
+  → evidence-backed seam
+  → one owning swimlane
+  → observable capability leg
+  → dependency and contention proof
+  → reviewed TaskPlan/v1
+  → SeamwiseTaskPlanLineage/v1
+```
 
-## Read order
+It does not materialize Task-Spec Markdown. That is an explicit coordination
+step performed through the independent Task-Spec engine.
 
-1. [`../README.md`](../README.md) for installation and the user journey.
-2. This orientation for source and authority boundaries.
-3. [`seamwise.pdf`](seamwise.pdf) for the canonical target architecture.
-4. Accepted records in [`decisions/`](decisions/) for choices the PDF leaves open.
-5. `src/`, `schemas/`, and `tests/` for current executable behavior.
+## Responsibilities
 
-## Current versus proposed
+Seamwise owns:
 
-| Class | Meaning in this repository |
-| --- | --- |
-| `current` | Verified source, schema, test, command result, or runtime behavior |
-| `proposed` | Authored intent, blueprint target, agent suggestion, or unaccepted design |
-| `derived` | Rebuildable projection from canonical authored artifacts |
-| `external` | State owned by another repository, provider, host, or service |
+- delivery intent and local evidence projection;
+- seam identification and responsibility assignment;
+- one owning swimlane per seam;
+- observable capability legs and their independent proof;
+- dependency, contention, path, and critical-path analysis;
+- digest-bound human review of the delivery plan;
+- deterministic projection into `TaskPlan/v1`;
+- lineage from every TaskPlan unit to intent, review, seam, lane, and leg.
 
-The PDF is canonical for the target system; it is not evidence that a feature
-ships. For current behavior, executable contracts win. Accepted decisions may
-fill an unspecified implementation detail but may not silently amend the PDF.
+Seamwise does not own:
 
-## Implemented surface
+- continuous portfolio discovery;
+- TaskPlan validation or task materialization;
+- Task-Spec Markdown, sealing, authorization, handoff, or acceptance;
+- execution-loop scheduling or settlement;
+- human-facing multi-format release rendering.
 
-The current package contains:
+Those responsibilities belong to upstream intent systems, Task-Spec,
+Converge, executors, and Brief-Spec respectively.
 
-- four deterministic, fail-closed transformations;
-- authored recipe/evidence inputs and compiler-owned Markdown/frontmatter projections with SHA-256 lineage;
-- stable tokens, exit codes, and a versioned JSON result envelope;
-- explicit delivery-plan review with hash-bound receipts;
-- cycle, collision, write-budget, dependency, and tamper detection;
-- Task-Spec v3 draft materialization and Task Pack wrappers;
-- status, next, prepare, inspect, graph, report, and guided one-pass chat context;
-- receipt-owned Codex and Claude Code native-skill installers;
-- Codex and Claude plugin manifests plus repository marketplaces that call the same CLI;
-- clean-room packaging, installer, internal E2E, and release checks.
-
-Ordinary compilation never preflights, seals, dispatches, executes, accepts, or
-settles a task. Those authority transitions remain explicit.
-
-## Canonical semantic chain
+## Runtime sequence
 
 ```mermaid
-flowchart LR
-    I["Delivery Intent"] --> S["Evidence-backed seam"]
-    S --> W["Exactly one owning swimlane"]
-    W --> L["Observable capability leg"]
-    L --> G["Dependency + contention graph"]
-    G --> T["Validated, unsealed Task-Spec"]
+sequenceDiagram
+    participant C as Caller
+    participant S as Seamwise
+    participant H as Human reviewer
+    participant T as Task-Spec
+
+    C->>S: map approved recipe
+    S-->>C: SEAM_MAP=READY
+    C->>S: plan
+    S-->>H: DELIVERY_PLAN=NEEDS_REVIEW
+    H->>S: accept exact plan digest
+    S-->>C: DELIVERY_PLAN=READY
+    C->>S: compile
+    S-->>C: TaskPlan/v1 and lineage
+    C->>T: plan then batch
+    T-->>C: TaskMaterializationReceipt/v1
 ```
 
-Non-negotiable invariants:
+The `S-->>C` compile response is the repository boundary. Seamwise does not
+call the final two Task-Spec messages itself.
 
-- one accepted seam has exactly one owning swimlane;
-- a capability leg names a capability state, not an activity;
-- one runnable leaf owns one coherent, independently provable done-condition;
-- sibling position does not imply concurrency;
-- evidence, owner, architecture, review, lineage, and proof gaps close the gate;
-- telemetry observes but does not authorize;
-- model output and retrieved text are proposals, never canonical truth;
-- Task-Spec, Seamwise, and Converge retain separate responsibilities.
+## Compile transaction
 
-## Artifact authority
+After verifying the current human review, Seamwise rebuilds the topology and
+both output objects from canonical inputs. It writes exactly:
 
-Authority is split deliberately:
+- `seamwise/task-plan.json`;
+- `seamwise/task-plan-lineage.json`.
 
-```text
-authored input       recipe.yaml + cited evidence
-human authority      seamwise/reviews/delivery-plan-review.json
-compiler projections seamwise/{intent,system-map,seams,swimlanes,legs}/**
-task projections     tasks/T-*.md + graph + lineage
-dispatch authority   verified Tier-1 seal on a non-fixture Task-Spec
-```
+Both files are staged and replaced in one lock-protected transaction. Dry-run
+returns the intended paths without writing. Failed topology or review checks
+write neither artifact.
 
-Indexes, Mermaid, reports, telemetry, and host packets are derived. A receipt
-binds review to an exact plan hash. Changing a source artifact after its gate
-invalidates downstream readiness; compiler-owned projections must be rebuilt,
-not hand-edited.
+The TaskPlan contains tools, done condition, behavior-to-eval traceability,
+write surfaces, dependencies, rollback, and observability for every unit. Its
+`approved: true` means only that the decomposition passed Seamwise's explicit
+human review. It is not Task-Spec dispatch authorization.
 
-## Task Pack boundary
+The lineage contract binds:
 
-Phase 0 copied the complete tracked `skills/task-spec/` tree from Converge
-`v0.1.0`, commit `b585ca792418924182e1c6a87f660a5f8afa07bd`, Git tree
-`95dae33bf9c8da852ae50a7b6cfc44176cdaa5c8`.
+- Seamwise engine version;
+- intent ID and digest;
+- delivery-plan digest;
+- review digest, reviewed plan digest, reviewer, timestamp, and fixture class;
+- canonical TaskPlan digest and path;
+- every unit ID to intent, seam, swimlane, leg, and source digest.
 
-The retained subsystem contains 119 files, including the template, parser helpers,
-validator, PRE/POST gates, HMAC envelope, lifecycle scripts, schemas, fixtures,
-and conformance harness. [`../vendor/task-pack-source.json`](../vendor/task-pack-source.json)
-records every file hash and executable mode. Seamwise wraps that subsystem; it
-does not rewrite its tokens or gate semantics. The manifest records the local
-documentation/reference cleanup and the move of the still-tested cross-engine
-consumers; the upstream Task-Spec PDF is retained by provenance hash rather than
-duplicated in this repository.
+## Machine contracts
 
-Converge's CLI, task loop, runtime binding, trackers, settlement, and learning
-passes were not imported. They remain external responsibilities.
-
-## Host boundary
-
-One shared Agent Skills tree serves all hosts:
-
-- Codex project/user installs use `.agents/skills`.
-- Claude Code project/user installs use `.claude/skills`.
-- Codex CLI/desktop and Claude Code use the checked-in repository marketplaces.
-- Codex IDE uses the native `.agents/skills` fallback because that surface does not load plugins.
-- Plain chat uses `seamwise agent-context --host chat` and cannot claim local execution.
-- Advisory workspace locks live in private runtime state outside `.git`, so a
-  host may protect Git metadata while the compiler serializes mutations.
-
-The repository marketplace is implemented and locally lifecycle-tested. A
-universal public-directory listing, hosted browser-chat execution,
-authenticated remote MCP, and external-service authorization are not claimed.
-Hooks, when added, may diagnose but may not approve or seal.
-
-## Verification data
-
-No public recipe example is shipped. Tests keep a private fixture under
-`tests/fixtures/` to exercise the blueprint's canonical steel thread:
-
-```text
-policy schema valid
-  → effective policy resolved
-  → request 101 denied
-  → stable reason and matching decision telemetry visible
-```
-
-The internal run creates four seams, four owners, four capability legs, a
-four-node critical path, complete lineage, and four Task-Spec v3 drafts. The
-drafts validate and preflight while remaining `signed_off: false` and
-`accepted: false`. The fictional target application is deliberately not
-presented as implemented, and the fixture is excluded from the wheel.
-
-## Development and sign-off
+All JSON commands return `SeamwiseCLIResult/v1`. A coordinator discovers the
+engine with:
 
 ```bash
-uv sync --extra dev
-make check
-make check-hosts
+seamwise --json capabilities
 ```
 
-`make check` is the credential-free release boundary. It runs static checks,
-schemas, positive and adversarial tests, the full imported Task Pack suite in a
-disposable copy, package build, a fresh-environment wheel E2E, installer
-transactions, isolated real-host plugin lifecycles, documentation checks, and
-the unchanged PDF hash check. CI installs pinned host CLIs in its disposable
-runners; it does not require host authentication.
+The nested `SeamwiseCapabilities/v1` declares supported contracts, the engine
+version, relevant commands, and the negative authority facts:
 
-`make check-hosts` is the focused installed-host boundary. With both host CLIs
-available, it reruns the isolated marketplace add, plugin install, enabled
-listing, cached contents, uninstall, and marketplace removal proof for Codex
-and Claude Code.
-
-Credentialed host probes are separate and explicit:
-
-```bash
-seamwise doctor --host all --live
+```json
+{
+  "materializes_tasks": false,
+  "dispatch_authority": false
+}
 ```
 
-Never convert a skipped, unavailable, or externally blocked check into a green
-claim. Record the access gap and preserve the smallest reversible next step.
+Converge may negotiate this surface and pass the emitted TaskPlan to Task-Spec.
+It must not infer compatibility from terminal prose or file names alone.
+
+## Human authority
+
+Delivery-plan review is Seamwise-owned because decomposition is Seamwise's
+responsibility. The review receipt binds reviewer, reason, timestamp, fixture
+class, draft digest, and plan digest.
+
+```text
+Seamwise plan review      ≠ Task-Spec validation
+TaskPlan emission         ≠ task materialization
+task materialization      ≠ dispatch authorization
+dispatch authorization    ≠ implementation success
+evaluation result         ≠ independent acceptance
+```
+
+Any edit to the plan, review receipt, intent, or source lineage makes the
+projection fail closed.
+
+## Durable artifacts
+
+Seamwise-owned canonical and reviewed inputs:
+
+- `seamwise/intent.md`
+- `seamwise/system-map.md`
+- `seamwise/evidence.jsonl`
+- `seamwise/seam-map.yaml`
+- `seamwise/delivery-plan.yaml`
+- `seamwise/reviews/delivery-plan-review.json`
+- `seamwise/seams/*.md`
+- `seamwise/swimlanes/*.md`
+- `seamwise/legs/*.md`
+
+Portable boundary outputs:
+
+- `seamwise/task-plan.json`
+- `seamwise/task-plan-lineage.json`
+
+Task-Spec-owned outputs such as `tasks/T-*.md` and materialization receipts are
+outside Seamwise's managed workspace roots.
+
+## Status, graph, and recovery
+
+`seamwise status` regenerates the expected graph, TaskPlan, and lineage from
+the reviewed inputs. If only one output exists, either projection differs, or
+review/source evidence is stale, status returns `STATUS=BLOCKED` with a named
+diagnostic.
+
+`seamwise graph` derives graph JSON and Mermaid in memory. It is read-only and
+does not create another canonical topology file. Repeating `compile` with
+unchanged inputs produces identical bytes.
+
+## Security model
+
+- Managed writes are atomic and lock-protected.
+- Project paths reject traversal, globs, ambiguous case, collision, and
+  symlink escape.
+- Coordinated graph and lineage tampering cannot erase reviewed tasks because
+  status independently rebuilds the expected projections.
+- No Task-Spec executable, credential, signing key, or provider environment is
+  consumed by Seamwise runtime code.
+- Chat packets and reports explain verified state but cannot transition it.
+
+## Release proof
+
+`make check` is the complete local release boundary. It proves source quality,
+schemas, deterministic transformations, tamper rejection, documentation,
+package contents, clean installation, host lifecycle, and the emitted
+TaskPlan's compatibility with an independently resolved Task-Spec v3 engine.
+
+The canonical PDF is preserved as historical v0.1 target evidence. Current
+behavior is established by source, schemas, tests, built packages, and release
+evidence.

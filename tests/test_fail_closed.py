@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
 
 import pytest
-import yaml
 from click.testing import CliRunner
 from conftest import RECIPE, compile_fixture, write_recipe
 
@@ -19,7 +17,6 @@ from seamwise.engine import (
     render_graph_mermaid,
 )
 from seamwise.reporting import build_report
-from seamwise.taskpack import task_pack_root
 from seamwise.workspace import init_workspace, status_result
 
 
@@ -201,7 +198,7 @@ def test_review_hash_tamper_blocks_compilation(tmp_path: Path, recipe: dict[str,
     assert accept_plan(tmp_path, reviewer="pytest", reason="fixture", fixture=True).ok
     plan = tmp_path / "seamwise/delivery-plan.yaml"
     plan.write_text(plan.read_text(encoding="utf-8") + "\n# tamper\n", encoding="utf-8")
-    result = compile_graph(tmp_path, task_pack_root=task_pack_root())
+    result = compile_graph(tmp_path)
     assert result.token == "TASK_GRAPH=BLOCKED"
     assert result.exit_code == 4
     assert any(item.code == "review_hash_mismatch" for item in result.diagnostics)
@@ -380,7 +377,6 @@ def test_init_refuses_symlinked_managed_root(tmp_path: Path) -> None:
         "seamwise/swimlanes",
         "seamwise/legs",
         "seamwise/reviews",
-        "tasks",
         "telemetry",
         "reports",
         "lessons",
@@ -446,21 +442,19 @@ def test_map_never_replaces_directory_at_managed_file_output(
     assert not list((root / "seamwise").glob(".seam-map.yaml.seamwise-backup-*"))
 
 
-def test_compile_refuses_symlinked_output_root(tmp_path: Path, recipe: dict[str, Any]) -> None:
+def test_compile_refuses_symlinked_output_target(tmp_path: Path, recipe: dict[str, Any]) -> None:
     root = tmp_path / "workspace"
-    outside_tasks = tmp_path / "outside-tasks"
-    outside_tasks.mkdir()
+    outside_plan = tmp_path / "outside-task-plan.json"
+    outside_plan.write_text("preserve", encoding="utf-8")
     assert init_workspace(root).ok
     source = write_recipe(root, recipe)
     assert map_recipe(root, source).ok
     assert build_plan(root).exit_code == 2
     assert accept_plan(root, reviewer="pytest", reason="boundary test", fixture=True).ok
-    (root / "tasks/task-graph.yaml").unlink()
-    (root / "tasks").rmdir()
-    (root / "tasks").symlink_to(outside_tasks, target_is_directory=True)
-    compile_result = compile_graph(root, task_pack_root=task_pack_root())
+    (root / "seamwise/task-plan.json").symlink_to(outside_plan)
+    compile_result = compile_graph(root)
     assert compile_result.exit_code == 4
-    assert list(outside_tasks.iterdir()) == []
+    assert outside_plan.read_text(encoding="utf-8") == "preserve"
 
 
 def test_report_refuses_symlinked_output_root(tmp_path: Path, recipe: dict[str, Any]) -> None:
@@ -499,26 +493,19 @@ def test_coordinated_projection_rebinding_cannot_erase_reviewed_tasks(
     tmp_path: Path, recipe: dict[str, Any]
 ) -> None:
     assert compile_fixture(tmp_path, recipe).ok
-    graph_path = tmp_path / "tasks/task-graph.yaml"
-    graph = yaml.safe_load(graph_path.read_text(encoding="utf-8"))
-    graph["nodes"] = []
-    graph["edges"] = []
-    graph["critical_path"] = []
-    mermaid = "flowchart LR\n"
-    graph["critical_path_mermaid_sha256"] = hashlib.sha256(mermaid.encode("utf-8")).hexdigest()
-    graph_path.write_text(yaml.safe_dump(graph, sort_keys=False), encoding="utf-8")
-    (tmp_path / "tasks/critical-path.mmd").write_text(mermaid, encoding="utf-8")
-    lineage_path = tmp_path / "tasks/task-lineage.json"
+    plan_path = tmp_path / "seamwise/task-plan.json"
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    plan["units"] = []
+    plan_path.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
+    lineage_path = tmp_path / "seamwise/task-plan-lineage.json"
     lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
-    lineage["tasks"] = {}
+    lineage["units"] = {}
     lineage_path.write_text(json.dumps(lineage, indent=2) + "\n", encoding="utf-8")
-    for spec in (tmp_path / "tasks").glob("T-*.md"):
-        spec.unlink()
 
     status = status_result(tmp_path)
     assert status.token == "STATUS=BLOCKED"
     assert status.exit_code == 4
     assert any(
-        item.code in {"task_graph_projection_mismatch", "task_lineage_projection_mismatch"}
+        item.code in {"task_plan_projection_mismatch", "task_lineage_projection_mismatch"}
         for item in status.diagnostics
     )

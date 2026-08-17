@@ -72,7 +72,6 @@ def init_workspace(root: Path, *, force: bool = False, dry_run: bool = False) ->
         root / "seamwise" / "evidence.jsonl",
         root / "seamwise" / "seam-map.yaml",
         root / "seamwise" / "steel-thread.md",
-        root / "tasks" / "task-graph.yaml",
     ]
     collisions = [path for path in [*starter_documents, *derived_starters] if path.exists()]
     if not force and collisions:
@@ -128,7 +127,6 @@ Record current boundaries and cite the source for every material claim.
         derived_starters[0]: "",
         derived_starters[1]: "schema_version: 1\nstatus: empty\nseams: []\n",
         derived_starters[2]: "# Steel Thread\n\nNot compiled.\n",
-        derived_starters[3]: "schema_version: 1\nstatus: empty\nnodes: []\nedges: []\n",
     }
     for path, content in initial_content.items():
         if not path.exists():
@@ -178,11 +176,11 @@ Record current boundaries and cite the source for every material claim.
 
 
 def _stage_state_unlocked(root: Path) -> dict[str, Any]:
-    from seamwise.engine import verify_plan, verify_seam_map
-    from seamwise.taskpack import (
-        _verify_task_bundle_unlocked,
-        verify_check_receipt,
-        verify_tier1_seals,
+    from seamwise.engine import derive_task_bundle, verify_plan, verify_seam_map
+    from seamwise.taskspec_adapter import (
+        TASK_PLAN_LINEAGE_PATH,
+        TASK_PLAN_PATH,
+        verify_task_plan_bundle,
     )
 
     boundary_diagnostics = workspace_boundary_diagnostics(root)
@@ -193,18 +191,16 @@ def _stage_state_unlocked(root: Path) -> dict[str, Any]:
             "delivery_plan": False,
             "reviewed": False,
             "task_graph": False,
+            "task_plan": False,
+            "task_plan_lineage": False,
             "task_specs": 0,
-            "validated": False,
-            "preflight_ready": False,
-            "sealed_task_specs": 0,
-            "claimed_sealed_task_specs": 0,
-            "authority_gaps": [],
+            "materialization_receipt": False,
+            "dispatch_authorized": False,
             "issues": [item.as_dict() for item in boundary_diagnostics],
         }
     seam_map = root / "seamwise" / "seam-map.yaml"
     plan = root / "seamwise" / "delivery-plan.yaml"
     review = root / "seamwise" / "reviews" / "delivery-plan-review.json"
-    graph = root / "tasks" / "task-graph.yaml"
     issues: list[dict[str, Any]] = []
     starter_paths = [
         root / "seamwise" / "intent.md",
@@ -255,47 +251,46 @@ def _stage_state_unlocked(root: Path) -> dict[str, Any]:
             issues.extend(item.as_dict() for item in diagnostics)
 
     graph_ready = False
-    specs: list[Path] = []
-    graph_started = False
-    if graph.is_file():
-        try:
-            graph_started = load_yaml(graph).get("status") != "empty"
-        except (AttributeError, OSError, ValueError, yaml.YAMLError):
-            graph_started = True
-    if reviewed and graph_started:
-        specs, _, diagnostics = _verify_task_bundle_unlocked(root)
-        graph_ready = not diagnostics
+    task_plan_ready = False
+    task_plan_lineage_ready = False
+    task_count = 0
+    if reviewed:
+        assert plan_ready
+        verified_plan, diagnostics = verify_plan(root)
+        if verified_plan is not None and not diagnostics:
+            records, expected_graph, graph_diagnostics = derive_task_bundle(root, verified_plan)
+            diagnostics.extend(graph_diagnostics)
+            plan_path = root / TASK_PLAN_PATH
+            lineage_path = root / TASK_PLAN_LINEAGE_PATH
+            bundle_started = plan_path.exists() or lineage_path.exists()
+            if not diagnostics and bundle_started:
+                task_plan, lineage, bundle_diagnostics = verify_task_plan_bundle(
+                    root, verified_plan, records
+                )
+                diagnostics.extend(bundle_diagnostics)
+                task_plan_ready = task_plan is not None and not bundle_diagnostics
+                task_plan_lineage_ready = lineage is not None and not bundle_diagnostics
+                task_count = len(records) if task_plan_ready else 0
+            graph_ready = (
+                expected_graph.get("status") == "TASK_GRAPH=READY"
+                and task_plan_ready
+                and task_plan_lineage_ready
+                and not diagnostics
+            )
         if diagnostics:
             issues.extend(item.as_dict() for item in diagnostics)
-
-    validated = False
-    preflight_ready = False
-    sealed_task_specs = 0
-    claimed_sealed_task_specs = 0
-    authority_gaps: list[dict[str, Any]] = []
-    if graph_ready:
-        validated = not verify_check_receipt(root, "validate", specs)
-        preflight_ready = not verify_check_receipt(root, "preflight", specs)
-        sealed_task_specs, claimed_sealed_task_specs, seal_diagnostics = verify_tier1_seals(
-            root, specs
-        )
-        for diagnostic in seal_diagnostics:
-            target = (
-                authority_gaps if diagnostic.code == "tier1_verification_unavailable" else issues
-            )
-            target.append(diagnostic.as_dict())
     return {
         "initialized": initialized,
         "seam_map": seam_ready,
         "delivery_plan": plan_ready,
         "reviewed": reviewed,
         "task_graph": graph_ready,
-        "task_specs": len(specs) if graph_ready else 0,
-        "validated": validated,
-        "preflight_ready": preflight_ready,
-        "sealed_task_specs": sealed_task_specs,
-        "claimed_sealed_task_specs": claimed_sealed_task_specs,
-        "authority_gaps": authority_gaps,
+        "task_plan": task_plan_ready,
+        "task_plan_lineage": task_plan_lineage_ready,
+        "task_specs": 0,
+        "materialization_receipt": False,
+        "units": task_count if graph_ready else 0,
+        "dispatch_authorized": False,
         "issues": issues,
     }
 
@@ -322,18 +317,9 @@ def next_steps_for_state(state: dict[str, Any]) -> list[str]:
         return ["seamwise review --accept --reviewer <name> --reason <reason>"]
     elif not state["task_graph"]:
         return ["seamwise compile"]
-    elif not state["validated"]:
-        return ["seamwise tasks validate"]
-    elif not state["preflight_ready"]:
-        return ["seamwise tasks preflight --acknowledge-eval-execution"]
-    elif state["claimed_sealed_task_specs"] > state["sealed_task_specs"]:
-        return [
-            "Restore or configure the Task-Spec signing key, then rerun seamwise status; "
-            "until Tier 1 verifies, dispatch only under human supervision."
-        ]
-    elif state["sealed_task_specs"] == state["task_specs"] and state["task_specs"] > 0:
-        return ["Tier-1-sealed Task-Specs are ready for authority-bounded dispatch."]
-    return ["Review drafts; seal only with explicit dispatch authority."]
+    return [
+        "Pass seamwise/task-plan.json and seamwise/task-plan-lineage.json to the composition coordinator."
+    ]
 
 
 def status_result(root: Path) -> Result:

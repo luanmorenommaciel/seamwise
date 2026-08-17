@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Prove the built wheel in an isolated venv and disposable workspaces.
-
-The internal test fixture deliberately retains its host-tool contract:
-``shellcheck`` and ``pytest`` must already be available on ``PATH``. It is test
-data, not a user-facing example and is not included in the wheel.
-"""
+"""Prove the wheel and its emitted TaskPlan against an independent Task-Spec CLI."""
 
 from __future__ import annotations
 
@@ -57,13 +52,18 @@ def main() -> int:
         "/TASK_PACK_VERSION",
         "/TASK_PACK_CHANGELOG.md",
         "/task-spec-v0.1.pdf",
+        "/skills/task-spec/",
+        "/vendor/",
+        "/taskpack.py",
+        "/task_spec_cli.py",
     )
     for forbidden in forbidden_package_paths:
         if any(forbidden in f"/{name}" for name in packaged):
             raise RuntimeError(f"wheel retains obsolete package content: {forbidden}")
-    missing_host_tools = [
-        tool for tool in ("git", "bash", "shellcheck", "pytest") if shutil.which(tool) is None
-    ]
+    taskspec_source = os.environ.get("TASKSPEC_BIN") or shutil.which("taskspec")
+    missing_host_tools = [tool for tool in ("git",) if shutil.which(tool) is None]
+    if taskspec_source is None:
+        missing_host_tools.append("taskspec")
     if missing_host_tools:
         raise RuntimeError(
             "clean-room proving fixture requires host tools on PATH: "
@@ -73,12 +73,20 @@ def main() -> int:
         clean = Path(directory)
         os.environ["SEAMWISE_STATE_HOME"] = str(clean / "runtime-state")
         os.environ["SEAMWISE_LOCK_HOME"] = str(clean / "runtime-locks")
+        assert taskspec_source is not None
+        taskspec = str(Path(taskspec_source).resolve())
+        taskspec_version = run([taskspec, "version"]).strip()
+        if taskspec_version != "3.8.0":
+            raise RuntimeError(
+                "clean-room proving fixture requires Task-Spec 3.8.0, got "
+                f"{taskspec_version or '<empty>'}"
+            )
         venv = clean / "venv"
         run(["uv", "venv", str(venv)])
         python = venv / "bin/python"
         run(["uv", "pip", "install", "--python", str(python), str(wheel)])
         seamwise = venv / "bin/seamwise"
-        task_spec = venv / "bin/task-spec"
+        assert not (venv / "bin/task-spec").exists()
         workspace = clean / "workspace"
         consumer = clean / "consumer"
         run(["git", "init", "-q", str(workspace)])
@@ -173,20 +181,33 @@ def main() -> int:
             )["token"]
             == "DELIVERY_PLAN=READY"
         )
-        assert envelope(seamwise, workspace, ["compile"])["token"] == "TASK_GRAPH=READY"
-        assert envelope(seamwise, workspace, ["tasks", "validate"])["token"] == "TASK_SPECS=VALID"
-        assert (
-            envelope(
-                seamwise,
-                workspace,
-                ["tasks", "preflight", "--acknowledge-eval-execution"],
-            )["token"]
-            == "TASK_SPECS=PREFLIGHT_READY"
+        compiled = envelope(seamwise, workspace, ["compile"])
+        assert compiled["token"] == "TASK_GRAPH=READY"
+        compiled_artifacts = {
+            Path(path).resolve().relative_to(workspace.resolve()).as_posix()
+            for path in compiled["artifacts"]
+        }
+        assert compiled_artifacts == {
+            "seamwise/task-plan.json",
+            "seamwise/task-plan-lineage.json",
+        }
+        task_plan_path = workspace / "seamwise/task-plan.json"
+        task_plan_result = json.loads(
+            run(
+                [taskspec, "--json", "plan", "--manifest", str(task_plan_path)],
+                cwd=workspace,
+            )
         )
-        for spec in (workspace / "tasks").glob("T-*.md"):
-            text = spec.read_text(encoding="utf-8")
-            assert "signed_off: false" in text
-            assert "accepted: false" in text
+        assert task_plan_result["contract"] == "TaskSpecCLIResult/v1"
+        assert task_plan_result["data"]["contract"] == "TaskPlan/v1"
+        status = envelope(seamwise, workspace, ["status"])
+        assert status["data"]["task_plan"] is True
+        assert status["data"]["task_plan_lineage"] is True
+        assert status["data"]["materialization_receipt"] is False
+        assert status["data"]["task_specs"] == 0
+        assert status["data"]["dispatch_authorized"] is False
+        assert "composition coordinator" in status["next"][0]
+        assert not (workspace / "tasks").exists()
         assert (
             envelope(seamwise, workspace, ["agent-context", "--host", "chat"])["token"]
             == "AGENT_CONTEXT=READY"
@@ -235,10 +256,9 @@ def main() -> int:
             )["token"]
             == "UNINSTALL=OK"
         )
-        assert "task-spec, version 0.1.0" in run([str(task_spec), "--version"])
     print(
-        "Clean-room wheel E2E passed with declared host tools: "
-        "compile, validate, preflight, install, reinstall, uninstall"
+        "Clean-room wheel E2E passed: two-artifact compile, independent Task-Spec "
+        "TaskPlan validation, install, reinstall, uninstall"
     )
     return 0
 

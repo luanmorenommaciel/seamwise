@@ -1,0 +1,96 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v0.2.0
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: packaged release gate (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check uv==0.9.25
+      - name: Install exact Task-Spec release
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_STACK_READ_TOKEN }}
+        run: |
+          test -n "$GH_TOKEN" || { echo "::error::RELEASE_STACK_READ_TOKEN is required"; exit 5; }
+          engine_dir="$(mktemp -d -t task-spec-engine.XXXXXX)"
+          gh repo clone luanmorenommaciel/task-spec "$engine_dir" -- --quiet
+          git -C "$engine_dir" checkout --quiet --detach 0e6180cfc3009bd4ef9cf7ab050b463e10d4af91
+          test "$("$engine_dir/bin/taskspec" version)" = "3.8.0"
+          printf 'TASKSPEC_BIN=%s/bin/taskspec\n' "$engine_dir" >> "$GITHUB_ENV"
+      - name: Install host prerequisites
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            if [ "$RUNNER_OS" = macOS ]; then brew install shellcheck; else sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck; fi
+          fi
+          npm install --global @openai/codex@0.146.0 @anthropic-ai/claude-code@2.1.220
+      - run: make check
+
+  build:
+    name: build release assets
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check uv==0.9.25
+      - name: Build stable package
+        run: |
+          test "$(cat VERSION)" = "0.2.0"
+          if [[ "$GITHUB_REF_TYPE" = tag ]]; then test "$GITHUB_REF_NAME" = "v$(cat VERSION)"; fi
+          uv build
+          python scripts/release-assets.py \
+            --dist dist \
+            --out release-assets \
+            --source-commit "$GITHUB_SHA" \
+            --source-ref "$GITHUB_REF_NAME" \
+            --ci-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seamwise-v0.2.0-release-assets
+          path: release-assets/
+          if-no-files-found: error
+
+  publish:
+    name: publish GitHub release
+    if: github.ref == 'refs/tags/v0.2.0'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: seamwise-v0.2.0-release-assets
+          path: release-assets
+      - name: Publish immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.2.0 release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Seamwise 0.2.0" \
+            --generate-notes \
+            --verify-tag
