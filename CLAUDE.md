@@ -1,3 +1,4 @@
+@OPERATING.md
 # Seamwise — Claude Code project guide
 
 Seamwise is an architecture-aware decomposition compiler. It takes one approved

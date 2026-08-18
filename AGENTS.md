@@ -1,3 +1,10 @@
+# Agent entry
+
+Before any task, read [OPERATING.md](OPERATING.md).
+Do not invent a second loop.
+Do not skip the HMAC seal.
+Do not put family hops in docs/.
+
 # Seamwise agent contract
 
 Seamwise is an architecture-aware, model-agnostic decomposition compiler. The repository contains the v0.2 external Task-Spec boundary; executable code, schemas, tests, built artifacts, and current runtime evidence govern shipped-behavior claims.
