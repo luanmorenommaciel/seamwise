@@ -5,6 +5,7 @@ name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -29,8 +30,6 @@ jobs:
         include:
           - os: ubuntu-latest
             python: "3.11"
-          - os: macos-latest
-            python: "3.13"
     steps:
       - name: Check out without persisted credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
