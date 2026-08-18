@@ -237,8 +237,9 @@ make check
 
 The release gate runs formatting, linting, strict mypy, deterministic and
 adversarial tests under a branch-coverage floor, documentation checks, wheel
-inspection, a clean-room wheel lifecycle, independent Task-Spec `TaskPlan/v1`
-validation, host-plugin tests, doctor, and Git whitespace checks.
+inspection, release-asset assembly, doctor, host-plugin tests, a clean-room
+wheel lifecycle with independent Task-Spec `TaskPlan/v1` validation, and Git
+whitespace checks.
 
 Individual steps are available as `make lint`, `make typecheck`, `make test`,
 `make cov`, and `make check-hosts`.

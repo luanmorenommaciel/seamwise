@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import tomllib
 from pathlib import Path
 
 import yaml
@@ -35,6 +36,11 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.resolve()
     version = (root / "VERSION").read_text(encoding="utf-8").strip()
+    assert version, "VERSION file is empty"
+    pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+    assert "version" in pyproject.get("project", {}).get("dynamic", [])
+    hatch_version = pyproject.get("tool", {}).get("hatch", {}).get("version", {})
+    assert hatch_version.get("path") == "VERSION"
     manifests = [
         json.loads((root / ".codex-plugin/plugin.json").read_text(encoding="utf-8")),
         json.loads((root / ".claude-plugin/plugin.json").read_text(encoding="utf-8")),

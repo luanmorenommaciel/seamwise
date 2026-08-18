@@ -28,9 +28,9 @@ make build                     # wheel and sdist
 ```
 
 `make check` is authoritative. It runs lint, strict mypy, tests with a coverage
-floor, host-adapter and documentation validation, a wheel build, a clean-room
-wheel lifecycle, host-plugin install/uninstall, doctor, and Git whitespace
-checks.
+floor, host-adapter and documentation validation, a wheel build, release-asset
+assembly, doctor, host-plugin install/uninstall, a clean-room wheel lifecycle
+with independent Task-Spec `TaskPlan/v1` validation, and Git whitespace checks.
 
 The CLI pipeline, in order:
 
@@ -114,8 +114,8 @@ support  →  recipe  →  seams  →  planning  →  graph  →  compilation
   editing that file breaks most of the suite. Update the digest in
   `tests/fixtures/rate-limiting-recipe.yaml` and `scripts/clean_room_e2e.py`
   together if you ever change it.
-- **The clean-room step needs Task-Spec exactly 3.8.0.** With any other version
-  installed, `make check` stops at `clean_room_e2e.py` before running the
-  Seamwise checks that follow it. CI pins the correct version.
+- **The clean-room step needs Task-Spec exactly 3.8.0.** It runs last and exits
+  `CLEAN_ROOM=BLOCKED` (exit 5) when `PATH` or `TASKSPEC_BIN` is any other
+  version. Doctor and host-plugin have already run. CI pins 3.8.0.
 - **`docs/` does not exist.** Documentation is being rebuilt. Historical
   decision records are recoverable from Git history.

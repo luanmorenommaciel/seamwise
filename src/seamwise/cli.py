@@ -225,7 +225,7 @@ def cli(
     json_mode: bool,
     dry_run: bool,
 ) -> None:
-    """Compile Delivery Intent into reviewed, provable Task-Spec leaves."""
+    """Compile Delivery Intent into a reviewed TaskPlan and digest-bound lineage."""
 
     context.obj = State(
         workspace=resolve_workspace(workspace_option), json_mode=json_mode, dry_run=dry_run

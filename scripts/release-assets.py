@@ -18,6 +18,14 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def read_project_version(root: Path) -> str:
+    path = root / "VERSION"
+    version = path.read_text(encoding="utf-8").strip()
+    if not version:
+        raise SystemExit(f"empty VERSION file: {path}")
+    return version
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dist", type=Path, required=True)
@@ -31,10 +39,11 @@ def main() -> int:
         default="0e6180cfc3009bd4ef9cf7ab050b463e10d4af91",
     )
     args = parser.parse_args()
+    version = read_project_version(Path.cwd())
 
     artifacts = [
-        args.dist / "seamwise-0.2.0-py3-none-any.whl",
-        args.dist / "seamwise-0.2.0.tar.gz",
+        args.dist / f"seamwise-{version}-py3-none-any.whl",
+        args.dist / f"seamwise-{version}.tar.gz",
     ]
     missing = [path for path in artifacts if not path.is_file()]
     if missing:
@@ -55,7 +64,7 @@ def main() -> int:
     manifest = {
         "contract": "SeamwiseReleaseManifest/v1",
         "product": "seamwise",
-        "version": "0.2.0",
+        "version": version,
         "source": {"commit": args.source_commit, "ref": args.source_ref},
         "dependencies": [
             {

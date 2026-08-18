@@ -19,3 +19,18 @@ def test_doctor_reports_native_windows_as_unsupported(
         item for item in result.data["checks"] if item["name"] == "supported_platform"
     )
     assert platform_check["ok"] is False
+
+
+def test_doctor_reports_missing_version_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    empty = tmp_path / "no-assets"
+    empty.mkdir()
+    monkeypatch.setattr(doctor_module, "assets_root", lambda: empty)
+    result = doctor(tmp_path)
+    assert result.token == "DOCTOR=BLOCKED"
+    version_check = next(
+        item for item in result.data["checks"] if item["name"] == "seamwise_version"
+    )
+    assert version_check["ok"] is False
+    assert any(item.code == "doctor_check_failed" for item in result.diagnostics)

@@ -1,6 +1,6 @@
 ---
 name: to-task-graph
-description: Compile a reviewed Seamwise delivery plan into a dependency-safe, lineage-complete Task-Spec graph through the shared CLI. Use when asked to decompose capability legs, inspect critical path or concurrency, detect cycles or write-surface collisions, or validate an atomic task graph.
+description: Compile a reviewed Seamwise delivery plan into a dependency-safe, lineage-complete task graph through the shared CLI. Use when asked to decompose capability legs, inspect critical path or concurrency, detect cycles or write-surface collisions, or validate an atomic task graph.
 ---
 
 # To Task Graph

@@ -1,6 +1,6 @@
 ---
 name: seamwise
-description: Orchestrate the complete Seamwise intent-to-task workflow through the installed `seamwise` CLI. Use when asked to initialize or resume a Seamwise workspace, turn delivery intent into a seam map, delivery plan, task graph, or Task-Specs, inspect gate status, or determine the next safe action.
+description: Orchestrate the complete Seamwise intent-to-task workflow through the installed `seamwise` CLI. Use when asked to initialize or resume a Seamwise workspace, turn delivery intent into a seam map, delivery plan, task graph, or reviewed TaskPlan, inspect gate status, or determine the next safe action.
 ---
 
 # Seamwise

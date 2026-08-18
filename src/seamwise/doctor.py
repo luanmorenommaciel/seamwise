@@ -158,11 +158,16 @@ def doctor(
             "required": True,
         }
     )
+    version_path = assets_root() / "VERSION"
+    try:
+        file_version = version_path.read_text(encoding="utf-8").strip()
+    except OSError:
+        file_version = ""
     checks.append(
         {
             "name": "seamwise_version",
-            "ok": (assets_root() / "VERSION").read_text(encoding="utf-8").strip() == VERSION,
-            "value": VERSION,
+            "ok": bool(file_version) and file_version == VERSION,
+            "value": VERSION or None,
             "required": True,
         }
     )

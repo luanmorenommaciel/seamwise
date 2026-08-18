@@ -56,8 +56,14 @@ def main() -> int:
             resolved = (document.parent / target).resolve()
             if not resolved.exists():
                 errors.append(f"broken local link in {document}: {raw_target}")
+    version = (root / "VERSION").read_text(encoding="utf-8").strip()
+    if not version:
+        errors.append("VERSION file is empty")
     readme = (root / "README.md").read_text(encoding="utf-8")
     for required in (
+        f"release-{version}",
+        f"@v{version}",
+        f'"engine_version": "{version}"',
         "seamwise init",
         "seamwise map",
         "seamwise plan",

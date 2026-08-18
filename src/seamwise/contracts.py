@@ -11,7 +11,6 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
-from jsonschema.exceptions import ValidationError
 
 FORMAT_CHECKER = FormatChecker()
 RFC3339 = re.compile(
@@ -87,9 +86,3 @@ def validate_contract(name: str, value: Any) -> list[str]:
         location = "/" + "/".join(str(part) for part in error.absolute_path)
         errors.append(f"{location}: {error.message}")
     return errors
-
-
-def assert_contract(name: str, value: Any) -> None:
-    errors = validate_contract(name, value)
-    if errors:
-        raise ValidationError("; ".join(errors))

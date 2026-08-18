@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "seamwise"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Architecture-aware decomposition compiler with an external Task-Spec boundary"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,7 +31,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "build>=1.2,<2",
   "mypy>=1.15,<2",
   "pytest>=8.3,<9",
   "pytest-cov>=6,<7",
@@ -46,6 +45,10 @@ seamwise = "seamwise.cli:main"
 [project.urls]
 Homepage = "https://github.com/luanmorenommaciel/seamwise"
 Repository = "https://github.com/luanmorenommaciel/seamwise"
+
+[tool.hatch.version]
+path = "VERSION"
+pattern = "(?P<version>\\S+)"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/seamwise"]
@@ -63,6 +66,7 @@ include = [
   "/.agents",
   "/.claude-plugin",
   "/.codex-plugin",
+  "/assets",
   "/schemas",
   "/scripts",
   "/skills",
@@ -72,8 +76,10 @@ include = [
   "/CHANGELOG.md",
   "/CLAUDE.md",
   "/LICENSE",
+  "/Makefile",
   "/README.md",
   "/VERSION",
+  "/uv.lock",
 ]
 
 [tool.pytest.ini_options]

@@ -1,5 +1,2 @@
 # uv.lock is generated. Keep it out of diffs and language statistics.
 uv.lock -diff linguist-generated=true
-
-# Raster assets are binary and must never be line-ending normalized.
-*.png binary

@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 from pathlib import Path
@@ -77,10 +78,12 @@ def main() -> int:
         taskspec = str(Path(taskspec_source).resolve())
         taskspec_version = run([taskspec, "version"]).strip()
         if taskspec_version != "3.8.0":
-            raise RuntimeError(
-                "clean-room proving fixture requires Task-Spec 3.8.0, got "
-                f"{taskspec_version or '<empty>'}"
+            print(
+                "CLEAN_ROOM=BLOCKED — need Task-Spec 3.8.0 on PATH or TASKSPEC_BIN, got "
+                f"{taskspec_version or '<empty>'}",
+                file=sys.stderr,
             )
+            return 5
         venv = clean / "venv"
         run(["uv", "venv", str(venv)])
         python = venv / "bin/python"
@@ -198,8 +201,18 @@ def main() -> int:
                 cwd=workspace,
             )
         )
-        assert task_plan_result["contract"] == "TaskSpecCLIResult/v1"
-        assert task_plan_result["data"]["contract"] == "TaskPlan/v1"
+        data = task_plan_result.get("data")
+        if (
+            task_plan_result.get("contract") != "TaskSpecCLIResult/v1"
+            or not isinstance(data, dict)
+            or data.get("contract") != "TaskPlan/v1"
+        ):
+            print(
+                "CLEAN_ROOM=BLOCKED — Task-Spec plan envelope is not a TaskPlan/v1 result",
+                file=sys.stderr,
+            )
+            print(json.dumps(task_plan_result, indent=2, sort_keys=True)[:2000], file=sys.stderr)
+            return 5
         status = envelope(seamwise, workspace, ["status"])
         assert status["data"]["task_plan"] is True
         assert status["data"]["task_plan_lineage"] is True

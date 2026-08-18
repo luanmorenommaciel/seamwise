@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - v0.2.0
+      - "v*"
 
 permissions:
   contents: read
@@ -48,6 +48,8 @@ jobs:
     name: build release assets
     runs-on: ubuntu-latest
     needs: verify
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -57,9 +59,12 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --disable-pip-version-check uv==0.9.25
       - name: Build stable package
+        id: version
         run: |
-          test "$(cat VERSION)" = "0.2.0"
-          if [[ "$GITHUB_REF_TYPE" = tag ]]; then test "$GITHUB_REF_NAME" = "v$(cat VERSION)"; fi
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          test -n "$VERSION"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF_TYPE" = tag ]]; then test "$GITHUB_REF_NAME" = "v${VERSION}"; fi
           uv build
           python scripts/release-assets.py \
             --dist dist \
@@ -69,13 +74,13 @@ jobs:
             --ci-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - uses: actions/upload-artifact@v4
         with:
-          name: seamwise-v0.2.0-release-assets
+          name: seamwise-v${{ steps.version.outputs.version }}-release-assets
           path: release-assets/
           if-no-files-found: error
 
   publish:
     name: publish GitHub release
-    if: github.ref == 'refs/tags/v0.2.0'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -83,14 +88,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: seamwise-v0.2.0-release-assets
+          name: seamwise-v${{ needs.build.outputs.version }}-release-assets
           path: release-assets
       - name: Publish immutable release
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.build.outputs.version }}
         run: |
-          gh release create v0.2.0 release-assets/* \
+          gh release create "v${VERSION}" release-assets/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Seamwise 0.2.0" \
+            --title "Seamwise ${VERSION}" \
             --generate-notes \
             --verify-tag

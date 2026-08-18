@@ -8,6 +8,7 @@ from click.testing import CliRunner
 from conftest import git_init, write_recipe
 
 from seamwise.cli import cli
+from seamwise.constants import VERSION
 from seamwise.engine import accept_plan, build_plan, compile_graph, map_recipe
 from seamwise.io import canonical_json, sha256_bytes, sha256_file
 from seamwise.workspace import init_workspace, status_result
@@ -44,7 +45,7 @@ def test_capabilities_are_machine_negotiable(tmp_path: Path) -> None:
     assert result.exit_code == 0
     envelope = json.loads(result.stdout)
     assert envelope["contract"] == "SeamwiseCLIResult/v1"
-    assert envelope["engine_version"] == "0.2.0"
+    assert envelope["engine_version"] == VERSION
     capability = envelope["data"]
     assert capability["contract"] == "SeamwiseCapabilities/v1"
     assert capability["contracts"]["task_plan"] == "TaskPlan/v1"
@@ -80,6 +81,12 @@ def test_lineage_binds_review_and_canonical_taskplan_digest(
     assert lineage["task_plan"]["digest"] == sha256_bytes(canonical_json(plan).encode("utf-8"))
     assert set(lineage["units"]) == {unit["id"] for unit in plan["units"]}
     assert all(entry["intent"] == lineage["intent"]["id"] for entry in lineage["units"].values())
+
+
+def test_runtime_version_matches_repository_version_file() -> None:
+    repository = Path(__file__).resolve().parents[1]
+    assert (repository / "VERSION").read_text(encoding="utf-8").strip() == VERSION
+    assert VERSION
 
 
 def test_seamwise_distribution_has_no_embedded_taskspec_engine() -> None:

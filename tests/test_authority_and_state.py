@@ -210,12 +210,29 @@ def test_plain_status_and_inspect_render_useful_data(
 ) -> None:
     compile_reviewed(tmp_path, recipe, fixture=True)
     runner = CliRunner()
-    status = runner.invoke(cli, ["--workspace", str(tmp_path), "status"])
+    status = runner.invoke(cli, ["--workspace", str(tmp_path), "--json", "status"])
     inspect = runner.invoke(
+        cli,
+        [
+            "--workspace",
+            str(tmp_path),
+            "--json",
+            "inspect",
+            "T-20260802-request-101",
+        ],
+    )
+    assert status.exit_code == 0
+    status_payload = json.loads(status.stdout)
+    assert status_payload["data"]["task_graph"] is True
+    assert inspect.exit_code == 0
+    inspect_payload = json.loads(inspect.stdout)
+    assert inspect_payload["data"]["seam"] == "SEAM-REQUEST-ENFORCEMENT"
+    plain_status = runner.invoke(cli, ["--workspace", str(tmp_path), "status"])
+    plain_inspect = runner.invoke(
         cli,
         ["--workspace", str(tmp_path), "inspect", "T-20260802-request-101"],
     )
-    assert status.exit_code == 0
-    assert '"task_graph": true' in status.stdout
-    assert inspect.exit_code == 0
-    assert '"seam": "SEAM-REQUEST-ENFORCEMENT"' in inspect.stdout
+    assert plain_status.exit_code == 0
+    assert "STATUS=READY" in plain_status.stdout
+    assert plain_inspect.exit_code == 0
+    assert "LINEAGE=READY" in plain_inspect.stdout

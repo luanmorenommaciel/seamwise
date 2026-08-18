@@ -2,7 +2,26 @@
 
 from __future__ import annotations
 
-VERSION = "0.2.0"
+from pathlib import Path
+
+
+def _load_version() -> str:
+    here = Path(__file__).resolve()
+    candidates = (
+        here.parents[2] / "VERSION",
+        here.parent / "assets" / "VERSION",
+    )
+    for path in candidates:
+        try:
+            text = path.read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+        if text:
+            return text
+    return ""
+
+
+VERSION = _load_version()
 ENVELOPE_VERSION = 1
 SEAM_MAP_VERSION = 1
 DELIVERY_PLAN_VERSION = 1
