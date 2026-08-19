@@ -1,0 +1,12 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#111720', 'primaryTextColor': '#F5F2EA', 'primaryBorderColor': '#2F6BFF', 'lineColor': '#29313A', 'secondaryColor': '#070A0F', 'tertiaryColor': '#29313A', 'background': '#070A0F', 'mainBkg': '#111720', 'nodeBorder': '#2F6BFF', 'clusterBkg': '#111720', 'titleColor': '#F5F2EA', 'edgeLabelBackground': '#111720'}}}%%
+flowchart LR
+    I["install skills"] --> S["start session"]
+    S --> P["propose map then plan"]
+    P --> R{"HUMAN REVIEW<br/>outside chat"}
+    R --> C["compile after receipt"]
+
+    style I fill:#111720,stroke:#29313A,color:#F5F2EA
+    style S fill:#111720,stroke:#29313A,color:#F5F2EA
+    style P fill:#2F6BFF,stroke:#F5F2EA,color:#F5F2EA
+    style R fill:#29313A,stroke:#2F6BFF,color:#F5F2EA
+    style C fill:#111720,stroke:#2F6BFF,color:#F5F2EA

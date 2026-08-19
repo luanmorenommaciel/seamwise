@@ -9,6 +9,9 @@ Datum Joint identity kit. Do not redraw wordmark.
 | `lockup-hero.png` | SEAMWISE lockup on Factory Black (#070A0F) — primary README hero |
 | `icon-hero.png` | Icon on Factory Black |
 | `architecture.png` | Authority boundary diagram |
+| `flow.png` / `flow.mmd` | First successful journey — init → map → plan → review → compile |
+| `chat.png` / `chat.mmd` | Chat interface — proposes only; cannot review or materialize |
+| `capabilities.png` / `capabilities.mmd` | SeamwiseCapabilities/v1 — owns decomposition, not tasks or dispatch |
 
 ## Lockups and icons
 
@@ -20,6 +23,11 @@ Datum Joint identity kit. Do not redraw wordmark.
 | `icon-color-light.png` / `seamwise-icon-light.png` / `.svg` | Icon for light backgrounds |
 | `lockup-color-dark.png` / `seamwise-lockup-dark.png` / `.svg` | Lockup for dark backgrounds |
 | `icon-color-dark.png` / `seamwise-icon-dark.png` / `.svg` | Icon for dark backgrounds |
+
+## Diagrams
+
+Phone-first PNG plates. Mermaid sources sit next to each PNG for the README `<details>` blocks.
+Do not redraw `architecture.png` as a journey or capabilities plate — that one is the cross-product authority boundary.
 
 ## Palette
 

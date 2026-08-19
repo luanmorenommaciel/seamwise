@@ -94,6 +94,30 @@ The returned `SeamwiseCapabilities/v1` advertises the engine version,
 commands. It also declares `materializes_tasks: false` and
 `dispatch_authority: false`.
 
+<p align="center">
+  <img src="assets/capabilities.png" alt="SEAMWISE capabilities — one initiative in, seams swimlanes capability legs and topology, human review, TaskPlan/v1 and lineage out. materializes_tasks false, dispatch_authority false" width="100%">
+</p>
+
+<details>
+<summary>View diagram source</summary>
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#111720', 'primaryTextColor': '#F5F2EA', 'primaryBorderColor': '#2F6BFF', 'lineColor': '#29313A', 'secondaryColor': '#070A0F', 'tertiaryColor': '#29313A', 'background': '#070A0F', 'mainBkg': '#111720', 'nodeBorder': '#2F6BFF', 'clusterBkg': '#111720', 'titleColor': '#F5F2EA', 'edgeLabelBackground': '#111720'}}}%%
+flowchart LR
+    I["One initiative"] --> S["SEAMWISE"]
+    S --> R{"review"}
+    R --> TP["TaskPlan/v1"]
+    R --> L["lineage/v1"]
+
+    style I fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style S fill:#2F6BFF,stroke:#F5F2EA,color:#F5F2EA
+    style R fill:#29313A,stroke:#2F6BFF,color:#F5F2EA
+    style TP fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style L fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+```
+
+</details>
+
 ## First successful journey
 
 Initialize a repository workspace and inspect the recipe schema:
@@ -119,6 +143,34 @@ seamwise --workspace "/path/to/project" status
 `plan` stops at `DELIVERY_PLAN=NEEDS_REVIEW`. `compile` refuses to cross that
 boundary without a current review receipt bound to the exact delivery-plan
 digest.
+
+<p align="center">
+  <img src="assets/flow.png" alt="First successful journey — init, map, plan stops at NEEDS_REVIEW, human review, compile refuses without receipt, TaskPlan/v1 and lineage/v1" width="100%">
+</p>
+
+<details>
+<summary>View diagram source</summary>
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#111720', 'primaryTextColor': '#F5F2EA', 'primaryBorderColor': '#2F6BFF', 'lineColor': '#29313A', 'secondaryColor': '#070A0F', 'tertiaryColor': '#29313A', 'background': '#070A0F', 'mainBkg': '#111720', 'nodeBorder': '#2F6BFF', 'clusterBkg': '#111720', 'titleColor': '#F5F2EA', 'edgeLabelBackground': '#111720'}}}%%
+flowchart LR
+    I["init"] --> M["map"]
+    M --> P["plan"]
+    P --> R{"HUMAN REVIEW"}
+    R --> C["compile"]
+    C --> TP["TaskPlan/v1"]
+    C --> L["lineage/v1"]
+
+    style I fill:#111720,stroke:#29313A,color:#F5F2EA
+    style M fill:#111720,stroke:#29313A,color:#F5F2EA
+    style P fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style R fill:#29313A,stroke:#2F6BFF,color:#F5F2EA
+    style C fill:#2F6BFF,stroke:#F5F2EA,color:#F5F2EA
+    style TP fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style L fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+```
+
+</details>
 
 Successful compilation writes exactly two boundary artifacts:
 
@@ -172,6 +224,30 @@ seamwise --workspace "/path/to/project" --json agent-context --host chat
 
 Chat output remains a proposal. It cannot review a plan, materialize a task,
 or create Task-Spec authority.
+
+<p align="center">
+  <img src="assets/chat.png" alt="Chat interface — install skills, start session, propose map then plan one pass at a time, human review outside chat, compile after receipt. Chat proposes only" width="100%">
+</p>
+
+<details>
+<summary>View diagram source</summary>
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#111720', 'primaryTextColor': '#F5F2EA', 'primaryBorderColor': '#2F6BFF', 'lineColor': '#29313A', 'secondaryColor': '#070A0F', 'tertiaryColor': '#29313A', 'background': '#070A0F', 'mainBkg': '#111720', 'nodeBorder': '#2F6BFF', 'clusterBkg': '#111720', 'titleColor': '#F5F2EA', 'edgeLabelBackground': '#111720'}}}%%
+flowchart LR
+    I["install skills"] --> S["start session"]
+    S --> P["propose map then plan"]
+    P --> R{"HUMAN REVIEW<br/>outside chat"}
+    R --> C["compile after receipt"]
+
+    style I fill:#111720,stroke:#29313A,color:#F5F2EA
+    style S fill:#111720,stroke:#29313A,color:#F5F2EA
+    style P fill:#2F6BFF,stroke:#F5F2EA,color:#F5F2EA
+    style R fill:#29313A,stroke:#2F6BFF,color:#F5F2EA
+    style C fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+```
+
+</details>
 
 ## CLI
 
