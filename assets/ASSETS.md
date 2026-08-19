@@ -2,17 +2,24 @@
 
 Datum Joint identity kit. Do not redraw wordmark.
 
-## Kit files
+## Hero (README)
 
 | File | Description |
 |------|-------------|
-| `lockup-hero.png` | SEAMWISE lockup on Factory Black (#070A0F) — primary hero |
-| `icon-hero.png` | Icon on Factory Black (#070A0F) |
-| `lockup-color-light.png` | SEAMWISE lockup for light backgrounds |
-| `icon-color-light.png` | Icon for light backgrounds |
-| `lockup-color-dark.png` | SEAMWISE lockup for dark backgrounds |
-| `icon-color-dark.png` | Icon for dark backgrounds |
+| `lockup-hero.png` | SEAMWISE lockup on Factory Black (#070A0F) — primary README hero |
+| `icon-hero.png` | Icon on Factory Black |
 | `architecture.png` | Authority boundary diagram |
+
+## Lockups and icons
+
+| File | Description |
+|------|-------------|
+| `seamwise-hero.png` / `.svg` | Same factory-black lockup, Task-Spec-style name |
+| `seamwise-icon.png` / `.svg` | Same factory-black icon |
+| `lockup-color-light.png` / `seamwise-lockup-light.png` / `.svg` | Lockup for light backgrounds |
+| `icon-color-light.png` / `seamwise-icon-light.png` / `.svg` | Icon for light backgrounds |
+| `lockup-color-dark.png` / `seamwise-lockup-dark.png` / `.svg` | Lockup for dark backgrounds |
+| `icon-color-dark.png` / `seamwise-icon-dark.png` / `.svg` | Icon for dark backgrounds |
 
 ## Palette
 
@@ -20,7 +27,7 @@ Datum Joint identity kit. Do not redraw wordmark.
 - **Carbon** #111720
 - **Graphite** #29313A
 - **Proof Ivory** #F5F2EA
-- **Register Blue** #2F6BFF (accent only)
+- **Register Blue** #2F6BFF (accent only — joint, not letters)
 
 ## Rules
 
