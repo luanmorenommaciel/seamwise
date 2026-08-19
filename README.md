@@ -1,20 +1,20 @@
-# Seamwise
+# SEAMWISE
 
 <p align="center">
-  <img src="assets/seamwise-hero.svg" alt="Seamwise lowers an approved initiative through evidence-backed seams, ownership, review, and TaskPlan projection." width="100%">
+  <img src="assets/lockup-hero.png" alt="SEAMWISE — architecture-aware decomposition compiler" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://github.com/luanmorenommaciel/seamwise/releases"><img src="https://img.shields.io/badge/release-0.2.0-171717" alt="Release 0.2.0"></a>
-  <img src="https://img.shields.io/badge/python-3.11%2B-3776AB" alt="Python 3.11+">
-  <img src="https://img.shields.io/badge/TaskPlan-v1-C18DFF" alt="TaskPlan v1">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2F855A" alt="MIT License"></a>
+  <a href="https://github.com/luanmorenommaciel/seamwise/releases"><img src="https://img.shields.io/badge/release-0.2.0-070A0F?labelColor=111720" alt="Release 0.2.0"></a>
+  <img src="https://img.shields.io/badge/python-3.11%2B-2F6BFF?labelColor=111720" alt="Python 3.11+">
+  <img src="https://img.shields.io/badge/TaskPlan-v1-29313A?labelColor=111720" alt="TaskPlan v1">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-29313A?labelColor=111720" alt="MIT License"></a>
 </p>
 
 > One approved initiative in. One reviewed `TaskPlan/v1` and digest-bound
 > lineage out. No task materialization and no dispatch authority.
 
-Seamwise answers one question:
+SEAMWISE answers one question:
 
 **How should this initiative be sliced along real system seams?**
 
@@ -23,14 +23,22 @@ per seam, lowers work into observable capability legs, proves dependency and
 contention ordering, stops for explicit human review, and projects the reviewed
 result into a portable TaskPlan.
 
-Seamwise does not import, vendor, invoke, or reimplement Task-Spec. It does not
+SEAMWISE does not import, vendor, invoke, or reimplement Task-Spec. It does not
 write Task-Spec Markdown, authorize dispatch, execute work, or accept delivery.
 
 ## Authority boundary
 
+<p align="center">
+  <img src="assets/architecture.png" alt="SEAMWISE authority boundary — from approved initiative through decomposition, review, TaskPlan projection, and external coordination" width="100%">
+</p>
+
+<details>
+<summary>View diagram source</summary>
+
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#111720', 'primaryTextColor': '#F5F2EA', 'primaryBorderColor': '#2F6BFF', 'lineColor': '#29313A', 'secondaryColor': '#070A0F', 'tertiaryColor': '#29313A', 'background': '#070A0F', 'mainBkg': '#111720', 'nodeBorder': '#2F6BFF', 'clusterBkg': '#111720', 'titleColor': '#F5F2EA', 'edgeLabelBackground': '#111720'}}}%%
 flowchart LR
-    I["Approved initiative"] --> S["Seamwise decomposition"]
+    I["Approved initiative"] --> S["SEAMWISE decomposition"]
     S --> R{"Explicit human review"}
     R --> TP["TaskPlan/v1"]
     R --> L["SeamwiseTaskPlanLineage/v1"]
@@ -39,17 +47,29 @@ flowchart LR
     C --> T["Task-Spec engine"]
     T --> M["Materialized tasks"]
     M --> A["Per-leaf authorization and acceptance"]
+
+    style I fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style S fill:#2F6BFF,stroke:#F5F2EA,color:#F5F2EA
+    style R fill:#29313A,stroke:#2F6BFF,color:#F5F2EA
+    style TP fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style L fill:#111720,stroke:#2F6BFF,color:#F5F2EA
+    style C fill:#29313A,stroke:#29313A,color:#F5F2EA
+    style T fill:#29313A,stroke:#29313A,color:#F5F2EA
+    style M fill:#29313A,stroke:#29313A,color:#F5F2EA
+    style A fill:#29313A,stroke:#29313A,color:#F5F2EA
 ```
+
+</details>
 
 | Product | Owns | Does not own |
 |---|---|---|
-| Seamwise | evidence-backed decomposition, seams, swimlanes, capability legs, topology, human plan review, TaskPlan projection | Task-Spec validation, materialization, dispatch, execution, acceptance |
+| SEAMWISE | evidence-backed decomposition, seams, swimlanes, capability legs, topology, human plan review, TaskPlan projection | Task-Spec validation, materialization, dispatch, execution, acceptance |
 | Task-Spec | TaskPlan validation, task materialization, per-leaf authorization, handoff, evaluation, acceptance | initiative discovery or decomposition |
 | Converge | engine negotiation, sequencing, runtime binding, settlement, composition receipts | either engine's internal authority |
 
 The invariant is:
 
-> **Seamwise decomposes. Task-Spec contracts. Converge coordinates.**
+> **SEAMWISE decomposes. Task-Spec contracts. Converge coordinates.**
 
 ## Install
 
@@ -59,8 +79,8 @@ seamwise --version
 seamwise --json doctor --host core
 ```
 
-Core Seamwise requires Python 3.11 or newer and Git. Task-Spec is deliberately
-not a Seamwise runtime dependency. A composed caller installs and negotiates
+Core SEAMWISE requires Python 3.11 or newer and Git. Task-Spec is deliberately
+not a SEAMWISE runtime dependency. A composed caller installs and negotiates
 the two engines independently.
 
 Inspect the exact machine boundary:
@@ -128,7 +148,7 @@ leaf passes `taskspec gate --stamp`.
 
 ## Chat interface
 
-Install the five focused Seamwise skills for Codex, Claude Code, or both:
+Install the five focused SEAMWISE skills for Codex, Claude Code, or both:
 
 ```bash
 seamwise install codex --scope project
@@ -141,7 +161,7 @@ Start a new host session after installation. A safe first prompt is:
 ```text
 Use $seamwise to decompose this approved initiative one confirmed pass at a
 time. Ask one concise unanswered question, show each proposed artifact, and
-wait for my confirmation before running the next Seamwise command.
+wait for my confirmation before running the next SEAMWISE command.
 ```
 
 Export a bounded, verified packet for a chat interface with:
@@ -226,7 +246,7 @@ Every command in JSON mode returns exactly one `SeamwiseCLIResult/v1` object:
 - Repository paths are canonical and checked against traversal, case, glob,
   collision, and symlink escape.
 - Reports and chat packets explain verified state but create no authority.
-- Seamwise never receives Task-Spec credentials or signing keys.
+- SEAMWISE never receives Task-Spec credentials or signing keys.
 
 ## Development and release proof
 
@@ -259,7 +279,7 @@ Version `0.2.0` removes the bundled Task Pack, the `task-spec` console
 script, `seamwise tasks ...`, direct Task-Spec skill installation, and
 Task-Spec materialization from `seamwise compile`.
 
-Install Task-Spec separately. Existing Seamwise plans can be reviewed and
+Install Task-Spec separately. Existing SEAMWISE plans can be reviewed and
 recompiled into the two new boundary artifacts. Let Converge or another caller
 invoke Task-Spec; do not copy the removed engine or restore local gate logic.
 
