@@ -39,6 +39,7 @@ from seamwise.io import (
     sha256_file,
     workspace_lock,
 )
+from seamwise.portability import use_utf8_streams
 from seamwise.reporting import agent_context as build_agent_context
 from seamwise.reporting import build_report
 from seamwise.result import Diagnostic, Result
@@ -652,6 +653,7 @@ def doctor_command(
 
 
 def main() -> None:
+    use_utf8_streams()
     cli(prog_name="seamwise")
 
 

@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from click.testing import CliRunner
-from conftest import git_init, write_recipe
+from conftest import git_init, make_link, write_recipe
 
 from seamwise.cli import cli
 from seamwise.engine import accept_plan, build_plan, compile_graph, map_recipe
@@ -43,7 +43,7 @@ def test_workspace_lock_rejects_symlinked_runtime_home(
     outside = tmp_path / "outside-lock-home"
     outside.mkdir()
     linked_home = tmp_path / "linked-lock-home"
-    linked_home.symlink_to(outside, target_is_directory=True)
+    make_link(linked_home, outside, directory=True)
     monkeypatch.setenv("SEAMWISE_LOCK_HOME", str(linked_home))
     with (
         pytest.raises(UnsafeWriteTargetError, match="Unsafe workspace lock directory"),
@@ -60,7 +60,7 @@ def test_workspace_lock_rejects_symlinked_lock_file(tmp_path: Path) -> None:
     lock.unlink()
     outside = tmp_path / "outside-lock-file"
     outside.write_text("untouched", encoding="utf-8")
-    lock.symlink_to(outside)
+    make_link(lock, outside)
     with (
         pytest.raises(UnsafeWriteTargetError, match="Unsafe workspace lock file"),
         workspace_lock(tmp_path),

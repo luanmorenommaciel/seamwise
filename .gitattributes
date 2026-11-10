@@ -1,2 +1,7 @@
+# Seamwise binds evidence by SHA-256, so every checkout must carry the same bytes.
+# Keep text files LF on Linux, macOS, and Windows regardless of core.autocrlf.
+* text=auto eol=lf
+*.png binary
+
 # uv.lock is generated. Keep it out of diffs and language statistics.
 uv.lock -diff linguist-generated=true

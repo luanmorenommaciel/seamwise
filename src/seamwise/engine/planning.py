@@ -146,7 +146,7 @@ def build_plan(root: Path, *, dry_run: bool = False) -> Result:
                     "id": lane["id"],
                     "seam_id": seam["id"],
                     "owner": lane["owner"],
-                    "path": str(lane_path.relative_to(root)),
+                    "path": lane_path.relative_to(root).as_posix(),
                     "sha256": sha256_bytes(lane_content.encode("utf-8")),
                 }
             )
@@ -160,7 +160,7 @@ def build_plan(root: Path, *, dry_run: bool = False) -> Result:
                         "id": leg["id"],
                         "seam_id": seam["id"],
                         "swimlane_id": lane["id"],
-                        "path": str(leg_path.relative_to(root)),
+                        "path": leg_path.relative_to(root).as_posix(),
                         "sha256": sha256_bytes(leg_content.encode("utf-8")),
                     }
                 )
@@ -176,7 +176,7 @@ def build_plan(root: Path, *, dry_run: bool = False) -> Result:
         }
         steel_thread_path = root / "seamwise" / "steel-thread.md"
         steel_thread_content = render_steel_thread(plan["steel_thread"], leg_index)
-        plan["steel_thread_path"] = str(steel_thread_path.relative_to(root))
+        plan["steel_thread_path"] = steel_thread_path.relative_to(root).as_posix()
         plan["steel_thread_sha256"] = sha256_bytes(steel_thread_content.encode("utf-8"))
         generated_files[steel_thread_path] = steel_thread_content
         existing_path = root / "seamwise" / "delivery-plan.yaml"

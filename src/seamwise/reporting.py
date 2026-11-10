@@ -263,7 +263,7 @@ def _snapshot(root: Path) -> dict[str, Any]:
         verified_text: dict[str, Any] = {}
         for path in verified_paths:
             entry, remaining = _bounded_text(path, remaining)
-            verified_text[str(path.relative_to(root))] = entry
+            verified_text[path.relative_to(root).as_posix()] = entry
         if verified_text:
             snapshot["verified_text_artifacts"] = verified_text
         return snapshot

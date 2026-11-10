@@ -19,11 +19,12 @@ from seamwise.constants import (
 )
 from seamwise.contracts import validate_contract
 from seamwise.installer import verify_installation
+from seamwise.portability import supported_platform
 from seamwise.result import Diagnostic, Result
 
 
 def _supported_platform() -> bool:
-    return sys.platform.startswith("linux") or sys.platform == "darwin"
+    return supported_platform()
 
 
 def _probe_version(executable: str) -> dict[str, Any]:

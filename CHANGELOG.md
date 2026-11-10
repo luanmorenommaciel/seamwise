@@ -6,6 +6,15 @@ All notable changes to Seamwise are documented here.
 
 ### Added
 
+- Run on Windows as well as Linux and macOS. `seamwise.portability` now holds
+  every operating-system difference: the workspace lock (`msvcrt` on Windows,
+  `fcntl` elsewhere), link detection, private-permission checks, per-user state
+  directories, and UTF-8 output streams.
+- Refuse Windows directory junctions wherever symlinks are refused. A junction
+  needs no privilege to create and `Path.is_symlink` does not see it.
+- Add the credential-free `portable` workflow, which runs lint, type check,
+  tests, and `doctor` on Linux, macOS, and Windows without any secret or
+  other repository.
 - Derive the package version from the `VERSION` file so a release edits that
   file, the changelog, and the host plugin manifests the gate already checks.
 - Include `Makefile`, `uv.lock`, and `assets/` in the source distribution so
@@ -19,6 +28,13 @@ All notable changes to Seamwise are documented here.
 
 ### Changed
 
+- Record relative paths with forward slashes on every platform, so a workspace
+  produced on Windows satisfies the same contracts as one produced elsewhere.
+- Emit UTF-8 on stdout and stderr regardless of the host locale, so a piped
+  `--json` envelope no longer fails on characters outside a legacy code page.
+- Pin text files to LF through `.gitattributes`. Evidence is bound by SHA-256,
+  and a CRLF checkout changed those bytes.
+- Treat a missing working directory as "not a Git worktree" on Windows too.
 - Split `seamwise.engine` into a package of focused stage modules. The public
   `seamwise.engine` import surface is unchanged.
 - The release workflow publishes any `v*` tag that matches `VERSION`, not only

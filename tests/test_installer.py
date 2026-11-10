@@ -5,11 +5,13 @@ import os
 from pathlib import Path
 
 import pytest
+from conftest import make_link
 
 import seamwise.installer as installer_module
 from seamwise.assets import SEAMWISE_SKILLS
 from seamwise.installer import install, uninstall
 from seamwise.io import private_state_path
+from seamwise.portability import is_link
 
 
 def receipt_path(target: Path, host: str) -> Path:
@@ -69,14 +71,14 @@ def test_unrelated_optional_task_spec_symlink_does_not_block_default_install(
     parent = target / ".agents/skills"
     parent.mkdir(parents=True)
     optional = parent / "task-spec"
-    optional.symlink_to(outside, target_is_directory=True)
+    make_link(optional, outside, directory=True)
 
     installed = install(tmp_path, host="codex", scope="project", target=target, dry_run=False)
     assert installed.ok
-    assert {item.name for item in parent.iterdir() if not item.is_symlink()} == set(SEAMWISE_SKILLS)
-    assert optional.is_symlink()
+    assert {item.name for item in parent.iterdir() if not is_link(item)} == set(SEAMWISE_SKILLS)
+    assert is_link(optional)
     assert uninstall(tmp_path, host="codex", scope="project", target=target, dry_run=False).ok
-    assert optional.is_symlink()
+    assert is_link(optional)
 
 
 def test_installer_rejects_tampered_receipt_target(tmp_path: Path) -> None:
@@ -155,7 +157,7 @@ def test_project_install_refuses_symlinked_host_ancestors(
     outside.mkdir()
     link = target / redirect
     link.parent.mkdir(parents=True, exist_ok=True)
-    link.symlink_to(outside, target_is_directory=True)
+    make_link(link, outside, directory=True)
 
     result = install(tmp_path, host=host, scope="project", target=target, dry_run=False)
     assert result.token == "INSTALL=BLOCKED"
@@ -203,7 +205,7 @@ def test_project_install_refuses_symlinked_private_state_ancestor(tmp_path: Path
     outside = tmp_path / "outside-state"
     state_home.mkdir(parents=True)
     outside.mkdir()
-    (state_home / "workspaces").symlink_to(outside, target_is_directory=True)
+    make_link((state_home / "workspaces"), outside, directory=True)
 
     result = install(tmp_path, host="codex", scope="project", target=target, dry_run=False)
     assert result.token == "INSTALL=BLOCKED"

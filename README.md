@@ -79,6 +79,21 @@ seamwise --version
 seamwise --json doctor --host core
 ```
 
+This fork also runs on Windows. Install it from the fork, with `uv` or with
+plain `pip` in a virtual environment (no administrator rights needed):
+
+```bash
+uv tool install "git+https://github.com/PedroZotelli/seamwiseLuan.git"
+# or
+python -m venv .venv
+.venv/Scripts/python -m pip install "git+https://github.com/PedroZotelli/seamwiseLuan.git"   # Windows
+.venv/bin/python -m pip install "git+https://github.com/PedroZotelli/seamwiseLuan.git"       # Linux, macOS
+```
+
+Supported platforms: Linux, macOS, and Windows. On Windows, lock and state
+directories live under `%LOCALAPPDATA%\seamwise`, and their privacy comes from
+the user profile's access-control list instead of POSIX permission bits.
+
 Core SEAMWISE requires Python 3.11 or newer and Git. Task-Spec is deliberately
 not a SEAMWISE runtime dependency. A composed caller installs and negotiates
 the two engines independently.

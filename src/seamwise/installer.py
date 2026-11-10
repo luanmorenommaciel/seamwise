@@ -23,6 +23,7 @@ from seamwise.constants import (
 )
 from seamwise.contracts import validate_contract
 from seamwise.io import Writer, load_json, private_state_path, sha256_object, workspace_lock
+from seamwise.portability import is_link
 from seamwise.result import Diagnostic, Result
 from seamwise.safety import path_boundary_diagnostics
 
@@ -68,7 +69,7 @@ def _install_boundary_diagnostics(
         if selected_skills is not None:
             targets.extend(parent / skill for skill in selected_skills)
     diagnostics = path_boundary_diagnostics(base, targets, code="unsafe_install_path")
-    if base.exists() and not base.is_dir() and not base.is_symlink():
+    if base.exists() and not base.is_dir() and not is_link(base):
         diagnostics.append(
             Diagnostic(
                 "unsafe_install_path",
@@ -78,7 +79,7 @@ def _install_boundary_diagnostics(
         )
     for current_host in _hosts(host):
         parent = _skill_parent(base, current_host)
-        if parent.exists() and not parent.is_dir() and not parent.is_symlink():
+        if parent.exists() and not parent.is_dir() and not is_link(parent):
             diagnostics.append(
                 Diagnostic(
                     "unsafe_install_path",
@@ -86,7 +87,7 @@ def _install_boundary_diagnostics(
                     str(parent),
                 )
             )
-    if base.is_symlink() or (base.exists() and not base.is_dir()):
+    if is_link(base) or (base.exists() and not base.is_dir()):
         return diagnostics
     for current_host in _hosts(host):
         receipt = _receipt_path(base, current_host, scope)
@@ -111,9 +112,9 @@ def _tree_inventory(root: Path) -> dict[str, dict[str, Any]]:
     for path in sorted(root.rglob("*")):
         if "__pycache__" in path.parts or path.suffix == ".pyc" or path.name == ".DS_Store":
             continue
-        relative = str(path.relative_to(root))
+        relative = path.relative_to(root).as_posix()
         mode = format(stat.S_IMODE(path.lstat().st_mode), "04o")
-        if path.is_symlink():
+        if is_link(path):
             inventory[relative] = {"type": "symlink", "mode": mode, "target": os.readlink(path)}
         elif path.is_dir():
             inventory[relative] = {"type": "directory", "mode": mode}

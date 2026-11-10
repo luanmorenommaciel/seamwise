@@ -8,7 +8,6 @@ import json
 import os
 import stat
 import subprocess
-import sys
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
@@ -17,6 +16,16 @@ from typing import Any
 import yaml
 from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
+
+from seamwise.portability import (
+    default_lock_home,
+    default_state_home,
+    group_or_other_can_access,
+    is_link,
+    lock_exclusive,
+    owned_by_another_user,
+    unlock,
+)
 
 
 class UnsafeWriteTargetError(OSError):
@@ -199,7 +208,7 @@ class TransactionWriter:
 
     def commit(self) -> None:
         for path in self._writes:
-            if path.is_symlink() or (path.exists() and not path.is_file()):
+            if is_link(path) or (path.exists() and not path.is_file()):
                 raise UnsafeWriteTargetError(
                     f"Refusing to replace non-regular managed file target: {path}"
                 )
@@ -227,7 +236,7 @@ class TransactionWriter:
                 staged[path] = temp_path
             for path, temp_path in staged.items():
                 backup: Path | None = None
-                if path.is_symlink() or (path.exists() and not path.is_file()):
+                if is_link(path) or (path.exists() and not path.is_file()):
                     raise UnsafeWriteTargetError(
                         f"Managed file target changed to a non-regular object: {path}"
                     )
@@ -273,17 +282,12 @@ def private_state_path(root: Path, *parts: str) -> Path:
             base = resolved_root / base
         digest = hashlib.sha256(str(resolved_root).encode("utf-8")).hexdigest()[:20]
         base = base.resolve() / "workspaces" / digest
-    except (FileNotFoundError, subprocess.CalledProcessError):
+    except (FileNotFoundError, NotADirectoryError, subprocess.CalledProcessError):
+        # Git is missing, the root is not a directory yet, or it is not a worktree.
+        # Windows reports a missing working directory as NotADirectoryError.
         digest = hashlib.sha256(str(resolved_root).encode("utf-8")).hexdigest()[:20]
         configured = os.environ.get("SEAMWISE_STATE_HOME")
-        if configured:
-            state_home = Path(configured).expanduser().resolve()
-        elif os.environ.get("XDG_STATE_HOME"):
-            state_home = Path(os.environ["XDG_STATE_HOME"]).expanduser().resolve() / "seamwise"
-        elif sys.platform == "darwin":
-            state_home = Path.home() / "Library" / "Application Support" / "seamwise"
-        else:
-            state_home = Path.home() / ".local" / "state" / "seamwise"
+        state_home = Path(configured).expanduser().resolve() if configured else default_state_home()
         base = state_home / "workspaces" / digest
     return base.joinpath(*parts)
 
@@ -297,40 +301,37 @@ def workspace_lock_path(root: Path) -> Path:
     if configured:
         lock_home = Path(os.path.abspath(os.path.expanduser(configured)))
     else:
-        user_id = str(os.getuid()) if hasattr(os, "getuid") else "user"
-        lock_home = Path(tempfile.gettempdir()).resolve() / f"seamwise-locks-{user_id}"
+        lock_home = default_lock_home()
     return lock_home / digest / "workspace.lock"
 
 
 def _ensure_private_lock_directory(path: Path) -> None:
-    """Create and verify a user-private directory without accepting a symlink leaf."""
+    """Create and verify a user-private directory without accepting a link leaf."""
 
-    if path.is_symlink() or (path.exists() and not path.is_dir()):
+    if is_link(path) or (path.exists() and not path.is_dir()):
         raise UnsafeWriteTargetError(f"Unsafe workspace lock directory: {path}")
     path.mkdir(parents=True, mode=0o700, exist_ok=True)
-    if path.is_symlink() or not path.is_dir():
+    if is_link(path) or not path.is_dir():
         raise UnsafeWriteTargetError(f"Unsafe workspace lock directory: {path}")
     metadata = path.stat()
-    if hasattr(os, "getuid") and metadata.st_uid != os.getuid():
+    if owned_by_another_user(metadata):
         raise UnsafeWriteTargetError(f"Workspace lock directory is not user-owned: {path}")
-    if stat.S_IMODE(metadata.st_mode) & 0o077:
+    if group_or_other_can_access(metadata):
         raise UnsafeWriteTargetError(f"Workspace lock directory is not private: {path}")
 
 
 @contextlib.contextmanager
 def workspace_lock(root: Path, *, dry_run: bool = False) -> Iterator[None]:
-    """Serialize mutations with an advisory lock on supported POSIX hosts."""
+    """Serialize mutations with an advisory lock on Linux, macOS, and Windows."""
 
     if dry_run:
         yield
         return
-    import fcntl
-
     lock_path = workspace_lock_path(root)
     lock_home = lock_path.parents[1]
     _ensure_private_lock_directory(lock_home)
     _ensure_private_lock_directory(lock_path.parent)
-    if lock_path.is_symlink() or (lock_path.exists() and not lock_path.is_file()):
+    if is_link(lock_path) or (lock_path.exists() and not lock_path.is_file()):
         raise UnsafeWriteTargetError(f"Unsafe workspace lock file: {lock_path}")
     flags = os.O_CREAT | os.O_RDWR | os.O_APPEND | getattr(os, "O_CLOEXEC", 0)
     flags |= getattr(os, "O_NOFOLLOW", 0)
@@ -343,14 +344,14 @@ def workspace_lock(root: Path, *, dry_run: bool = False) -> Iterator[None]:
     metadata = os.fstat(descriptor)
     if (
         not stat.S_ISREG(metadata.st_mode)
-        or (hasattr(os, "getuid") and metadata.st_uid != os.getuid())
-        or stat.S_IMODE(metadata.st_mode) & 0o077
+        or owned_by_another_user(metadata)
+        or group_or_other_can_access(metadata)
     ):
         os.close(descriptor)
         raise UnsafeWriteTargetError(f"Unsafe workspace lock file: {lock_path}")
     with os.fdopen(descriptor, "a+", encoding="utf-8") as handle:
-        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        lock_exclusive(handle)
         try:
             yield
         finally:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            unlock(handle)

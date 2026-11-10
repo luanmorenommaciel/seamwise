@@ -47,7 +47,7 @@ def resolve_workspace(explicit: Path | None = None) -> Path:
             capture_output=True,
             text=True,
         ).stdout.strip()
-    except (FileNotFoundError, subprocess.CalledProcessError):
+    except (FileNotFoundError, NotADirectoryError, subprocess.CalledProcessError):
         return current
     return Path(output).resolve()
 

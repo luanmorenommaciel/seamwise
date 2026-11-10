@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,27 @@ def write_recipe(root: Path, value: dict[str, Any]) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+def make_link(link: Path, target: Path, *, directory: bool = False) -> None:
+    """Create a redirecting filesystem link the way an attacker on this host could.
+
+    POSIX hosts and privileged Windows hosts get a symlink. An unprivileged
+    Windows host gets a directory junction, which needs no privilege; file
+    links have no unprivileged equivalent there, so those tests skip.
+    """
+
+    try:
+        link.symlink_to(target, target_is_directory=directory)
+        return
+    except OSError:
+        if sys.platform != "win32":
+            raise
+    if not directory:
+        pytest.skip("file symlinks need a privilege this Windows host does not grant")
+    import _winapi
+
+    _winapi.CreateJunction(str(target), str(link))
 
 
 def git_init(root: Path) -> None:

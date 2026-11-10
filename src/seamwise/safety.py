@@ -6,6 +6,7 @@ import os
 from collections.abc import Iterable
 from pathlib import Path
 
+from seamwise.portability import is_link
 from seamwise.result import Diagnostic
 
 MANAGED_WORKSPACE_DIRECTORIES = (
@@ -32,7 +33,7 @@ def path_boundary_diagnostics(
 
     base = Path(os.path.abspath(base))
     diagnostics: list[Diagnostic] = []
-    if base.is_symlink():
+    if is_link(base):
         diagnostics.append(
             Diagnostic(
                 code,
@@ -69,7 +70,7 @@ def path_boundary_diagnostics(
             if current in seen:
                 continue
             seen.add(current)
-            if current.is_symlink():
+            if is_link(current):
                 diagnostics.append(
                     Diagnostic(
                         code,
@@ -101,7 +102,7 @@ def workspace_boundary_diagnostics(
     managed_directories = [root / name for name in MANAGED_WORKSPACE_DIRECTORIES]
     diagnostics = path_boundary_diagnostics(root, [*managed_directories, *extra_paths])
     for directory in managed_directories:
-        if directory.exists() and not directory.is_dir() and not directory.is_symlink():
+        if directory.exists() and not directory.is_dir() and not is_link(directory):
             diagnostics.append(
                 Diagnostic(
                     "unsafe_managed_path",
@@ -111,13 +112,13 @@ def workspace_boundary_diagnostics(
                 )
             )
     for managed_root in (root / name for name in MANAGED_WORKSPACE_ROOTS):
-        if not managed_root.is_dir() or managed_root.is_symlink():
+        if not managed_root.is_dir() or is_link(managed_root):
             continue
         for current, directories, files in os.walk(managed_root, followlinks=False):
             current_path = Path(current)
             for name in [*directories, *files]:
                 candidate = current_path / name
-                if candidate.is_symlink():
+                if is_link(candidate):
                     diagnostics.append(
                         Diagnostic(
                             "unsafe_managed_path",
@@ -126,9 +127,7 @@ def workspace_boundary_diagnostics(
                             {"base": str(root)},
                         )
                     )
-            directories[:] = [
-                name for name in directories if not (current_path / name).is_symlink()
-            ]
+            directories[:] = [name for name in directories if not is_link(current_path / name)]
     unique: dict[tuple[str, str | None], Diagnostic] = {}
     for diagnostic in diagnostics:
         unique[(diagnostic.code, diagnostic.artifact)] = diagnostic

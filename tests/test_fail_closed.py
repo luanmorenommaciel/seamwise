@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 from click.testing import CliRunner
-from conftest import RECIPE, compile_fixture, write_recipe
+from conftest import RECIPE, compile_fixture, make_link, write_recipe
 
 from seamwise.cli import cli
 from seamwise.engine import (
@@ -314,7 +314,7 @@ def test_write_path_cannot_cross_project_symlink(tmp_path: Path, recipe: dict[st
     outside = tmp_path / "outside"
     outside.mkdir()
     (tmp_path / "src").mkdir()
-    (tmp_path / "src/link").symlink_to(outside, target_is_directory=True)
+    make_link((tmp_path / "src/link"), outside, directory=True)
     task = recipe["seams"][0]["swimlane"]["legs"][0]["tasks"][0]
     task["creates_paths"][0] = "src/link/escaped.json"
 
@@ -360,7 +360,7 @@ def test_init_refuses_symlinked_managed_root(tmp_path: Path) -> None:
     outside = tmp_path / "outside"
     root.mkdir()
     outside.mkdir()
-    (root / "seamwise").symlink_to(outside, target_is_directory=True)
+    make_link((root / "seamwise"), outside, directory=True)
 
     result = init_workspace(root)
     assert result.token == "WORKSPACE=BLOCKED"
@@ -415,7 +415,7 @@ def test_map_refuses_symlinked_managed_descendant(tmp_path: Path, recipe: dict[s
     assert init_workspace(root).ok
     seam_directory = root / "seamwise/seams"
     seam_directory.rmdir()
-    seam_directory.symlink_to(outside, target_is_directory=True)
+    make_link(seam_directory, outside, directory=True)
 
     result = map_recipe(root, write_recipe(root, recipe))
     assert result.exit_code == 4
@@ -451,7 +451,7 @@ def test_compile_refuses_symlinked_output_target(tmp_path: Path, recipe: dict[st
     assert map_recipe(root, source).ok
     assert build_plan(root).exit_code == 2
     assert accept_plan(root, reviewer="pytest", reason="boundary test", fixture=True).ok
-    (root / "seamwise/task-plan.json").symlink_to(outside_plan)
+    make_link((root / "seamwise/task-plan.json"), outside_plan)
     compile_result = compile_graph(root)
     assert compile_result.exit_code == 4
     assert outside_plan.read_text(encoding="utf-8") == "preserve"
@@ -464,7 +464,7 @@ def test_report_refuses_symlinked_output_root(tmp_path: Path, recipe: dict[str, 
     assert compile_fixture(root, recipe).ok
 
     (root / "reports").rmdir()
-    (root / "reports").symlink_to(outside_reports, target_is_directory=True)
+    make_link((root / "reports"), outside_reports, directory=True)
     report = build_report(root, output_format="json")
     assert report.exit_code == 4
     assert any(item.artifact == str(root / "reports") for item in report.diagnostics)

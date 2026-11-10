@@ -30,6 +30,7 @@ from seamwise.io import (
     sha256_file,
     strict_yaml_load,
 )
+from seamwise.portability import is_link
 from seamwise.result import Diagnostic
 
 
@@ -419,7 +420,7 @@ def _write_path_state_diagnostics(root: Path, recipe: dict[str, Any]) -> list[Di
         current = root
         for part in parts:
             current /= part
-            if current.is_symlink():
+            if is_link(current):
                 return current
             if not current.exists():
                 break

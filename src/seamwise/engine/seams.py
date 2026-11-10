@@ -137,7 +137,7 @@ def map_recipe(root: Path, source: Path, *, dry_run: bool = False) -> Result:
             decision_index.append(
                 {
                     "id": decision["id"],
-                    "path": str(decision_path.relative_to(root)),
+                    "path": decision_path.relative_to(root).as_posix(),
                     "status": decision["status"],
                     "sha256": sha256_bytes(decision_content.encode("utf-8")),
                 }
@@ -151,7 +151,7 @@ def map_recipe(root: Path, source: Path, *, dry_run: bool = False) -> Result:
             seam_index.append(
                 {
                     "id": seam["id"],
-                    "path": str(path.relative_to(root)),
+                    "path": path.relative_to(root).as_posix(),
                     "owner": seam["owner"],
                     "evidence": seam["evidence"],
                     "swimlane_id": seam["swimlane"]["id"],
